@@ -1,0 +1,69 @@
+name: briani
+services:
+  briani:
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 256
+    image: ${BRIANI_IMAGE:?set BRIANI_IMAGE to an audited digest after building}
+    user: "${BRIANI_UID:-1000}:${BRIANI_GID:-1000}"
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8088"
+      AllowedHosts: "${BRIANI_HOSTS:-localhost;127.0.0.1;briani}"
+    ports: ["${BRIANI_BIND:-127.0.0.1}:8088:8088"]
+    volumes:
+      - "${BRIANI_STATE:-./state}/briani:/config"
+      - "${BRIANI_DATA:-/srv/briani/data}:/data"
+      - "${BRIANI_STATE:-./state}/secrets:/run/briani-secrets:ro"
+    networks: [control, client-access]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    stop_grace_period: 60s
+  qbittorrent:
+    image: ${BRIANI_QBITTORRENT_IMAGE:-lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed}
+    environment:
+      PUID: "${BRIANI_UID:-1000}"
+      PGID: "${BRIANI_GID:-1000}"
+      WEBUI_PORT: "8080"
+      TORRENTING_PORT: "6881"
+    volumes:
+      - "${BRIANI_STATE:-./state}/qbittorrent:/config"
+      - "${BRIANI_DATA:-/srv/briani/data}:/data"
+    network_mode: service:torrent-egress-guard
+    depends_on:
+      torrent-egress-guard:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 60s
+  torrent-egress-guard:
+    image: ${BRIANI_EGRESS_IMAGE:?set BRIANI_EGRESS_IMAGE to the audited namespace firewall image}
+    networks:
+      control:
+        aliases: [qbittorrent]
+      torrent-egress: {}
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    mem_limit: 32m
+    cpus: 0.1
+    pids_limit: 16
+    restart: unless-stopped
+    stop_grace_period: 5s
+  prowlarr:
+    image: ${BRIANI_PROWLARR_IMAGE:-lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902}
+    environment:
+      PUID: "${BRIANI_UID:-1000}"
+      PGID: "${BRIANI_GID:-1000}"
+    volumes: ["${BRIANI_STATE:-./state}/prowlarr:/config"]
+    networks: [control, indexer-egress]
+    restart: unless-stopped
+    stop_grace_period: 60s
+networks:
+  control:
+    internal: true
+  client-access:
+  torrent-egress:
+  indexer-egress:

@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "nativeDotnetSdk": "10.0.112",
+  "containerDotnetSdk": "10.0.401",
+  "dotnetRuntime": "10.0.12",
+  "flutter": {
+    "version": "3.47.6",
+    "frameworkRevision": "5fc346839b5d0eef006ed8404392afb4dfae428d",
+    "engineRevision": "692136cb65",
+    "dart": "3.13.5"
+  },
+  "openapiGenerator": {
+    "version": "7.26.0",
+    "url": "https://repo.maven.apache.org/maven2/org/openapitools/openapi-generator-cli/7.26.0/openapi-generator-cli-7.26.0.jar",
+    "sha256": "1760050094997b9cc790cc1350be095f15da8c08a996b184d3eadc4ccda5e35e"
+  },
+  "buildx": {
+    "version": "0.38.0",
+    "sha256": "4fe4cc38adf48169132749b6ca22a990928db0118e3407584ee553723115d287"
+  },
+  "images": {
+    "sdk": {
+      "reference": "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317"
+    },
+    "runtime": {
+      "reference": "mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4"
+    },
+    "qBittorrent": {
+      "reference": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed"
+    },
+    "Prowlarr": {
+      "reference": "lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902",
+      "observedApplicationVersion": "2.6.5.5623",
+      "observedBranch": "master"
+    }
+  },
+  "engine": {
+    "applicationVersion": "v5.2.4",
+    "buildInfo": {
+      "bitness": 64,
+      "boost": "1.92.0",
+      "libtorrent": "2.0.15.0",
+      "openssl": "4.0.3",
+      "platform": "linux",
+      "qt": "6.12.0",
+      "zlib": "1.3.2"
+    },
+    "webApiVersion": "2.15.1"
+  },
+  "fixturePythonLibtorrent": "2.1.2.0",
+  "android": {
+    "gradle": "9.3.1",
+    "agp": "9.1.0",
+    "kotlin": "2.4.0",
+    "observedJdk": "OpenJDK27 2026-09-15 (actual Gradle debug builds passed)"
+  },
+  "dependencyLocks": [
+    "client/pubspec.lock",
+    "client/packages/briani_api/pubspec.lock",
+    "server/src/Briani.Api/packages.lock.json"
+  ],
+  "verification": {
+    "nativeAmd64ServerImage": "passed",
+    "nativeArm64Pi": "blocked_environment",
+    "WindowsMacOS": "blocked_environment",
+    "nativePlayerBinaryProvenance": "pending M10/M11"
+  },
+  "ciActions": {
+    "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
+    "actions/setup-dotnet": "26b0ec14cb23fa6904739307f278c14f94c95bf1",
+    "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+    "docker/setup-qemu-action": "c7c53464625b32c7a7e944ae62b3e17d2b600130",
+    "docker/setup-buildx-action": "8d2750c68a42422c14e847fe6c8ac0403b4cbd6f"
+  },
+  "serverMediaTools": {
+    "version": "9.0.2",
+    "sourceUrl": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+    "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+    "signingKeyFingerprint": "FCF986EA15E6E293A5644F10B4322F04D67658D8",
+    "licenseConfigure": "LGPL v2.1-or-later",
+    "configuration": "infra/media/ffmpeg.Dockerfile",
+    "runtimePath": "/opt/briani-media/bin",
+    "amd64Smoke": "passed",
+    "arm64Smoke": "not_run"
+  }
+}

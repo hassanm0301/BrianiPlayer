@@ -1,0 +1,226 @@
+{
+  "package": "Briani Player complete implementation plan",
+  "version": "1.0",
+  "date": "2026-10-12",
+  "applicationImplemented": false,
+  "contentFiles": 42,
+  "specifications": 14,
+  "implementationMilestones": 12,
+  "productRequirements": 26,
+  "acceptanceScenarios": 32,
+  "apiOperations": 72,
+  "apiSchemas": 67,
+  "markdownWords": 31715,
+  "files": [
+    {
+      "path": "00_START_HERE.md",
+      "bytes": 8032,
+      "sha256": "8729f601ca25d51fc4f2ac30209f5b4fa6ed01ed9a2725bf0523779b2bc6bfa9"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 3089,
+      "sha256": "a2318ea04d8a2a7be90348332d4e587a6f52182ae28a0e897a6c269899cafce6"
+    },
+    {
+      "path": "agents/CODEX_TEMPLATES.md",
+      "bytes": 1171,
+      "sha256": "b3b736f121dd73ec1d6cee506383e9e7e78c8bdc7676ff255dc5b1e07ecc30f5"
+    },
+    {
+      "path": "agents/EXECUTION_PROTOCOL.md",
+      "bytes": 7031,
+      "sha256": "07a53aebacc57b32f0a508483e578875dcdd39177927eccfdd8935f89ecc1289"
+    },
+    {
+      "path": "agents/HANDOFF_TEMPLATE.md",
+      "bytes": 844,
+      "sha256": "d5526da115bfd97c445f5e9ffe0555b65962fe76c49b2c7d9952f4fdbf7bf118"
+    },
+    {
+      "path": "agents/WORKER_PROMPT.md",
+      "bytes": 1452,
+      "sha256": "8ea39b7369f161cd116efa01e01a7d8e6547f97cc8c068a9ac7fa20d28c5e167"
+    },
+    {
+      "path": "agents/briani_protocol.toml.example",
+      "bytes": 589,
+      "sha256": "2478b84070be9b4630f785a7c35aeeb8702d58c6c56b84a64d0b8b6513516074"
+    },
+    {
+      "path": "agents/briani_reviewer.toml.example",
+      "bytes": 535,
+      "sha256": "53c72325b38bc6b9041981ab5a9dfd930042e9c7c17fe8aafc1bdc4418cd4133"
+    },
+    {
+      "path": "agents/briani_worker.toml.example",
+      "bytes": 545,
+      "sha256": "6698d713daf77d15f2e9e000f3984ece48cc79c9c828ef9038b997ebe6634830"
+    },
+    {
+      "path": "agents/config.toml.example",
+      "bytes": 228,
+      "sha256": "605240f65843c3c378fca0beb9269fcef318267b108b214611b257e50b635a39"
+    },
+    {
+      "path": "contracts/defaults.json",
+      "bytes": 3687,
+      "sha256": "e56c8390cb8c7ec3ebbd487871fa4e1f22000435bc702c0ebe5ca2924a218439"
+    },
+    {
+      "path": "contracts/openapi.yaml",
+      "bytes": 108301,
+      "sha256": "b4243d75020f49389d8bb0b41148308ebfe5a1a624686eb246d83810c327fb3b"
+    },
+    {
+      "path": "evidence/PACKAGE_VALIDATION.md",
+      "bytes": 1600,
+      "sha256": "a1252b543ba1767e82f1ec0e4f4616dd33c70df2fb787ef70cf59e8a72db3e56"
+    },
+    {
+      "path": "evidence/REPORT_TEMPLATE.md",
+      "bytes": 1763,
+      "sha256": "d100e0e190cad6d91d1c072e9c8f3b091bce61018c02d79a40b1cdb8724f0ba7"
+    },
+    {
+      "path": "evidence/status.json",
+      "bytes": 5981,
+      "sha256": "3c0489f0bd3d1cacaf696ca745d0def8d7cf2fcd8f27c239d57e1720011c1b8a"
+    },
+    {
+      "path": "milestones/M00_playback_proof.md",
+      "bytes": 7423,
+      "sha256": "11f963c78795409f71cdb44e85182d76dcd58adb4a924b543c4cbc796ddda405"
+    },
+    {
+      "path": "milestones/M01_foundation.md",
+      "bytes": 6897,
+      "sha256": "74d5fa85089cbfcf0a5f05d5ac61261944102d545cec43c457bcbdfff96f4df5"
+    },
+    {
+      "path": "milestones/M02_identity_and_permissions.md",
+      "bytes": 6089,
+      "sha256": "d9eb51951cdbcc2ab95f048417afaed432595eb37b8832f1e470bf7917ac52a6"
+    },
+    {
+      "path": "milestones/M03_libraries_and_media.md",
+      "bytes": 6069,
+      "sha256": "d21c7c989a697c2c21f78e739c6da40788460d69d749f029da853710d08009a8"
+    },
+    {
+      "path": "milestones/M04_torrent_discovery.md",
+      "bytes": 5998,
+      "sha256": "9156db77b8bb4c2d3c282a7c1652d8d77501674e065bdc807ba85cbbf29eed85"
+    },
+    {
+      "path": "milestones/M05_download_lifecycle.md",
+      "bytes": 6505,
+      "sha256": "4d4cc5cc714127eb8c83128d7bc927a3f98f065c911a0023f85e6c756e1ec4a8"
+    },
+    {
+      "path": "milestones/M06_progressive_gateway.md",
+      "bytes": 6581,
+      "sha256": "db0fe90a94db417783f47366d079aba7cf7345a2f3e6cff69675d1095e746870"
+    },
+    {
+      "path": "milestones/M07_desktop_client.md",
+      "bytes": 6430,
+      "sha256": "8431b802b5bed05de95242d8054186aa7db8883645936a004396a86a2dd4ea78"
+    },
+    {
+      "path": "milestones/M08_android_and_tv.md",
+      "bytes": 6432,
+      "sha256": "477b5b4d11c4492a244d4159a0d07b552dcf66fe61f043679d74c0a8e5db176c"
+    },
+    {
+      "path": "milestones/M09_customization_and_operations.md",
+      "bytes": 6599,
+      "sha256": "8afe530ad40c37135088aeb31a670f41c16d8ea7f3f7c2177deaff7c9646a5ad"
+    },
+    {
+      "path": "milestones/M10_hardening_and_performance.md",
+      "bytes": 6523,
+      "sha256": "8108ae7441680860d40c0c398ae272901709c7dc93e7143b91479c6c068cce99"
+    },
+    {
+      "path": "milestones/M11_release.md",
+      "bytes": 6670,
+      "sha256": "fd6724c9992495a96c88419c861776bbaecc3b66b089bd9b04afcfe034cbf9b1"
+    },
+    {
+      "path": "specs/01_PRODUCT.md",
+      "bytes": 9408,
+      "sha256": "6827f5e4b71795d249dd6fee9f8266e5d90f8d226c704d113884b28e31aa635b"
+    },
+    {
+      "path": "specs/02_ARCHITECTURE.md",
+      "bytes": 9488,
+      "sha256": "7dcad586d8bbfd764323b16f0206dca75b7eb75da090d00b0bfc22458b222cdf"
+    },
+    {
+      "path": "specs/03_DATA_MODEL.md",
+      "bytes": 13168,
+      "sha256": "eda47b0b2d4579e79214407fa0020638e13b0e5ebaf97536462f1f4939450461"
+    },
+    {
+      "path": "specs/04_DISCOVERY_AND_DOWNLOADS.md",
+      "bytes": 10623,
+      "sha256": "2020bb265a0b147aca095857a1f68f5a0f3ae3de54efce3dfcd262a61fb60087"
+    },
+    {
+      "path": "specs/05_PROGRESSIVE_PLAYBACK.md",
+      "bytes": 13997,
+      "sha256": "b25b1d9fa26cbb6f346ca84465e79537cbdce25cfb899a600f040f383a0178c8"
+    },
+    {
+      "path": "specs/06_CLIENT_AND_UX.md",
+      "bytes": 11936,
+      "sha256": "47097b2a9e6107e36dca3de15b206d84e863fb3fd83b814a96b2e2a52aee156d"
+    },
+    {
+      "path": "specs/07_SECURITY.md",
+      "bytes": 9904,
+      "sha256": "10d03cc75e66e2879fc4eb752abbed3ff90dcd9767725fbd24b30d2ed111be42"
+    },
+    {
+      "path": "specs/08_DOCKER_AND_PI.md",
+      "bytes": 10507,
+      "sha256": "f88c70e3b722f61d0d8a491849573aed81281f66831e4830b2650d42b576f2e9"
+    },
+    {
+      "path": "specs/09_TEST_AND_RELEASE.md",
+      "bytes": 9802,
+      "sha256": "34d3c60baf3c74023d35f492b47993da0474fc1ce44dfe07982cb3d14a3eac57"
+    },
+    {
+      "path": "specs/10_TOOLCHAIN.md",
+      "bytes": 6391,
+      "sha256": "6e23efee6a905a2f6ec72bae96eec702ef334b8000a07bcfa3ec3b66a0ffd572"
+    },
+    {
+      "path": "specs/11_DECISIONS_AND_RISKS.md",
+      "bytes": 8926,
+      "sha256": "7ca3b795d70f8cc065d30ec9c3f1b916100651f50e47696c954d16d453f120b9"
+    },
+    {
+      "path": "specs/12_API_CONTRACT.md",
+      "bytes": 6775,
+      "sha256": "7f4bfb262f0527b888f362c22b5f1277bd2ba7027a4b1d301c5fcc306ffdca7c"
+    },
+    {
+      "path": "specs/13_TRACEABILITY.md",
+      "bytes": 6242,
+      "sha256": "b867cdcdcf83f17fc995509035c7f0905f46c270215d31a561f8949d1e51989c"
+    },
+    {
+      "path": "specs/14_SOURCES_AND_LICENSING.md",
+      "bytes": 9531,
+      "sha256": "45a4e41d7d32d3cee7c28430a976413d154c3362e33cda1485021d3b1cd4cf06"
+    },
+    {
+      "path": "tools/validate_plan.py",
+      "bytes": 6912,
+      "sha256": "85bcd54dd4cbb1935b7614a1da3fb9f57f9e42511f03c54a2f1c0e43ad7e0592"
+    }
+  ]
+}

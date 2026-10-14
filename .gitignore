@@ -1,0 +1,16 @@
+.tools/
+**/bin/
+**/obj/
+**/__pycache__/
+.dart_tool/
+**/build/
+prototypes/playback/fixtures/generated/
+prototypes/playback/harness/state/
+prototypes/playback/artifacts/
+*.user
+.env
+artifacts/
+
+# Generated release packages and downloaded upstream source archives.
+/dist/
+/sources/

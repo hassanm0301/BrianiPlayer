@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "services": {
+    "briani": {
+      "reference": null,
+      "localTag": "briani-server:m10",
+      "localImageId": "sha256:1df27e12987bc5e3881d56e964d64a57de9837a13aef7eed8182921ba44f2ac8",
+      "observedArchitecture": "amd64",
+      "publicRelease": false,
+      "acceptedReferences": [],
+      "nativeArm64": {
+        "localTag": "briani-server:m10-arm64",
+        "localImageId": "sha256:9ea570f5eda301b2806dd8f41cecde55667626dd5d1b21243a134be8fccc050c",
+        "runtimeConfigDigest": "sha256:da78c5623715d988f36ff058fd6edb28bde59fbf638528f5a9174d0848437c24",
+        "verificationStatus": "portable_api_overlay_native_runtime_user_deferred",
+        "nativeBuildEvidence": "docs/evidence/M10/pi-native.md",
+        "observedArchitecture": "arm64",
+        "buildEvidence": "docs/evidence/M11/server-arm64-manager-overlay.log",
+        "buildMethod": "COPY-only portable .NET IL overlay over retained native ARM64 FFmpeg/runtime; no ARM64 execution"
+      },
+      "runtimeConfigDigest": "sha256:d07a1f7645d6127ded127c4ff7cdaf0be56c6c0395b1ea67a83cd92ff8492bd8"
+    },
+    "qbittorrent": {
+      "reference": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed"
+    },
+    "prowlarr": {
+      "reference": "lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902",
+      "observedApplicationVersion": "2.6.5.5623",
+      "observedBranch": "master"
+    },
+    "torrent-egress-guard": {
+      "reference": null,
+      "localTag": "briani-egress:m10",
+      "localImageId": "sha256:20427e8e73d5b71ca947eeef200563e206b0aff275fd7bd17413988644da4663",
+      "observedArchitecture": "amd64",
+      "publicRelease": false,
+      "runtimeConfigDigest": "sha256:3f8790a645e924fd948c26337b067e92234683510ec309d4d5d88a4b85182b8f",
+      "buildEvidence": "docs/evidence/M11/egress-build-final.log",
+      "nativeArm64": {
+        "localTag": "briani-egress:m10-arm64",
+        "localImageId": "sha256:9a2bd5113ddc771a56a0b845ffa4a088ada82bdd712aee59c700a6a40a3c0247",
+        "runtimeConfigDigest": "sha256:3a9a3ba8b1be0a51a1dfde7e35235eff8a501f45081f8e680708523f8ad56caf",
+        "observedArchitecture": "arm64",
+        "buildMethod": "signature-checked apk cross-root; scripts disabled; COPY-only ARM64 build",
+        "nativeRuntimeVerification": "user_deferred",
+        "evidence": "docs/evidence/M11/arm64-egress-assembly.json"
+      }
+    }
+  },
+  "baseImages": {
+    "sdk": {
+      "reference": "mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317"
+    },
+    "runtime": {
+      "reference": "mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4",
+      "observedArchitecture": "amd64",
+      "imageId": "sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4"
+    },
+    "egress": {
+      "reference": "alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6",
+      "nftablesVersion": "1.1.6-r1"
+    }
+  },
+  "notes": [
+    "Private locally built candidates; no publication. Final ARM64 API is portable .NET IL over retained native ARM64 base, with native runtime verification deferred to the user. OCI attestations are not byte-reproducible; runtime configuration digests are recorded separately."
+  ]
+}

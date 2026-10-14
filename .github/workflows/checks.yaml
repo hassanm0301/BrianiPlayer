@@ -1,0 +1,57 @@
+name: Briani checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  server:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1
+        with:
+          dotnet-version: '10.0.401'
+      - run: sudo apt-get update && sudo apt-get install -y python3-yaml python3-libtorrent ffmpeg mpv
+      - run: python tools/dev.py build
+      - run: python tools/dev.py test --suite unit
+      - run: docker buildx build --load -t briani-server:dev -f infra/images/server.Dockerfile .
+      - run: python tools/dev.py test --suite integration
+      - run: python tools/dev.py test --suite identity
+      - run: python tools/dev.py test --suite media
+      - run: python tools/dev.py test --suite discovery
+      - run: python tools/dev.py test --suite downloads
+      - run: python tools/dev.py test --suite streaming
+      - run: python tools/dev.py test --suite operations
+      - run: dotnet test server/tests/Briani.PreferencesTests/PreferencesTests.csproj --no-restore
+      - run: python -m unittest discover -s tests/release
+      - run: python -m unittest discover -s tests/benchmarks
+      - run: docker build -t briani-vlc-proof:dev -f prototypes/playback/production/vlc.Dockerfile prototypes/playback/production
+      - run: python prototypes/playback/production/run_api_playback.py
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - run: python tools/dev.py compose --task smoke
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: server-evidence
+          path: artifacts/dev
+  client:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: flutter/flutter
+          ref: 5fc346839b5d0eef006ed8404392afb4dfae428d
+          path: .tools/flutter
+      - run: echo "$GITHUB_WORKSPACE/.tools/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter --version
+      - run: flutter pub get --enforce-lockfile
+        working-directory: client
+      - run: python tools/contracts/bootstrap.py
+      - run: python tools/contracts/generate.py --check
+      - run: python tools/dev.py client --task analyze
+      - run: python tools/dev.py client --task test
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: client-evidence
+          path: artifacts/dev

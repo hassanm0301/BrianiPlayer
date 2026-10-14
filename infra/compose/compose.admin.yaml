@@ -1,0 +1,6 @@
+# Opt-in loopback upstream administration only; never binds these on the LAN.
+services:
+  torrent-egress-guard:
+    ports: ["127.0.0.1:18080:8080"]
+  prowlarr:
+    ports: ["127.0.0.1:19696:9696"]

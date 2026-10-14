@@ -1,0 +1,4530 @@
+openapi: 3.0.3
+info:
+  title: Briani Player API
+  version: 1.0.0-plan
+  description: Implementation contract, not a running service. See specifications
+    for authorization, piece-availability, lifecycle and resource limits. Owner-only
+    administration is enforced for all admin paths. Playback tickets are mandatory
+    capabilities even where normal bearer authentication is not used.
+servers:
+- url: /
+  description: Current Briani Server origin
+security:
+- AccessToken: []
+paths:
+  /api/v1/server:
+    get:
+      operationId: getServer
+      tags:
+      - Server
+      summary: Server capabilities and bootstrap state
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerInfo'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+  /api/v1/bootstrap:
+    post:
+      operationId: bootstrapAdmin
+      tags:
+      - Identity
+      summary: Claim one-time administrator bootstrap
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BootstrapRequest'
+  /api/v1/auth/login:
+    post:
+      operationId: login
+      tags:
+      - Identity
+      summary: Sign in
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+  /api/v1/auth/refresh:
+    post:
+      operationId: refresh
+      tags:
+      - Identity
+      summary: Rotate a refresh token
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+  /api/v1/auth/logout:
+    post:
+      operationId: logout
+      tags:
+      - Identity
+      summary: Revoke current session
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/auth/device-code:
+    post:
+      operationId: createDeviceCode
+      tags:
+      - Identity
+      summary: Create a bounded TV pairing attempt
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCode'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCodeRequest'
+  /api/v1/auth/device-code/token:
+    post:
+      operationId: exchangeDeviceCode
+      tags:
+      - Identity
+      summary: Poll/exchange the private pairing secret
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '202':
+          description: Approval pending; respect polling interval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePending'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCodePoll'
+  /api/v1/auth/device-code/approve:
+    post:
+      operationId: approveDeviceCode
+      tags:
+      - Identity
+      summary: Approve human code as current user
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCodeApprove'
+  /api/v1/me:
+    get:
+      operationId: getMe
+      tags:
+      - Identity
+      summary: Current identity
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/password:
+    post:
+      operationId: changePassword
+      tags:
+      - Identity
+      summary: Change password and revoke other sessions
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+  /api/v1/me/sessions:
+    get:
+      operationId: listOwnSessions
+      tags:
+      - Identity
+      summary: List own sessions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthSession'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/sessions/{id}:
+    delete:
+      operationId: revokeOwnSession
+      tags:
+      - Identity
+      summary: Revoke own device session
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/me/preferences:
+    get:
+      operationId: getPreferences
+      tags:
+      - Preferences
+      summary: Read effective personal preferences
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: updatePreferences
+      tags:
+      - Preferences
+      summary: Update typed personal preferences
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPreferences'
+  /api/v1/me/preferences/reset:
+    post:
+      operationId: resetPreferences
+      tags:
+      - Preferences
+      summary: Reset personal preferences; preserve device credentials
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionRequest'
+  /api/v1/me/continue-watching:
+    get:
+      operationId: listContinueWatching
+      tags:
+      - Media
+      summary: List permitted media with playback progress
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContinueWatchingPage'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 200
+          default: 50
+  /api/v1/admin/users:
+    get:
+      operationId: listUsers
+      tags:
+      - Administration
+      summary: List users as administrator
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: createUser
+      tags:
+      - Administration
+      summary: Create a user
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+  /api/v1/admin/users/{id}:
+    get:
+      operationId: getUser
+      tags:
+      - Administration
+      summary: Read user
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateUser
+      tags:
+      - Administration
+      summary: Update user without removing last administrator
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchUser'
+    delete:
+      operationId: deleteUser
+      tags:
+      - Administration
+      summary: Disable/delete according to retained ownership and audit policy
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/admin/users/{id}/reset-password:
+    post:
+      operationId: resetUserPassword
+      tags:
+      - Administration
+      summary: Reset password and revoke sessions
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+  /api/v1/libraries:
+    get:
+      operationId: listLibraries
+      tags:
+      - Libraries
+      summary: List only permitted libraries
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Library'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: createLibrary
+      tags:
+      - Libraries
+      summary: Create a library inside mounted storage; administrator only
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryCreate'
+  /api/v1/libraries/{id}:
+    get:
+      operationId: getLibrary
+      tags:
+      - Libraries
+      summary: Get permitted library
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateLibrary
+      tags:
+      - Libraries
+      summary: Update library settings; administrator only
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryPatch'
+    delete:
+      operationId: removeLibrary
+      tags:
+      - Libraries
+      summary: Remove library registration, never implicitly delete its files
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      description: Reject active downloads/readers unless separately cancelled. Payload
+        deletion is not part of this route.
+      parameters:
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/libraries/{id}/grants:
+    get:
+      operationId: getLibraryGrants
+      tags:
+      - Libraries
+      summary: Read grants; administrator only
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                  grants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LibraryGrant'
+                required:
+                - version
+                - grants
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      operationId: setLibraryGrants
+      tags:
+      - Libraries
+      summary: Set grants and revoke affected access
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                  grants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LibraryGrant'
+                required:
+                - version
+                - grants
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrantUpdate'
+  /api/v1/libraries/{id}/entries:
+    get:
+      operationId: listEntries
+      tags:
+      - Libraries
+      summary: Browse/search permitted entries
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryPage'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 200
+          default: 50
+      - name: folderId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+      - name: kind
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - all
+          - folder
+          - video
+          - photo
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - name
+          - date
+          - size
+      - name: order
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/libraries/{id}/scan:
+    post:
+      operationId: scanLibrary
+      tags:
+      - Libraries
+      summary: Enqueue library scan; administrator or manage grant
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+  /api/v1/media/{id}:
+    get:
+      operationId: getMedia
+      tags:
+      - Media
+      summary: Read authorized media metadata
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      operationId: deleteMedia
+      tags:
+      - Media
+      summary: Trash or explicitly remove authorized media
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      description: Protect active readers, seeding payload and shared requests. Permanent
+        removal requires explicit confirmed UI action; no cross-library side effects.
+      parameters:
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - name: mode
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - trash
+          - permanent
+          default: trash
+      - name: force
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/media/{id}/image:
+    get:
+      operationId: getImage
+      tags:
+      - Media
+      summary: Read a bounded authorized photo representation
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/media/{id}/thumbnail:
+    get:
+      operationId: getThumbnail
+      tags:
+      - Media
+      summary: Read authorized cached thumbnail
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/media/{id}/rename:
+    post:
+      operationId: renameMedia
+      tags:
+      - Media
+      summary: Rename a managed library entry safely
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenameRequest'
+  /api/v1/media/{id}/move:
+    post:
+      operationId: moveMedia
+      tags:
+      - Media
+      summary: Move to a folder in the same library
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveRequest'
+  /api/v1/media/{id}/progress:
+    get:
+      operationId: getPlaybackProgress
+      tags:
+      - Media
+      summary: Read current user progress
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybackProgress'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      operationId: setPlaybackProgress
+      tags:
+      - Media
+      summary: Save current user progress
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybackProgress'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressUpdate'
+  /api/v1/discovery/providers:
+    get:
+      operationId: listProviders
+      tags:
+      - Discovery
+      summary: Read permitted provider capabilities
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Provider'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/discovery/queries:
+    post:
+      operationId: createDiscoveryQuery
+      tags:
+      - Discovery
+      summary: Create/reuse bounded query snapshot
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoverySnapshot'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoveryQuery'
+  /api/v1/discovery/queries/{id}:
+    get:
+      operationId: getDiscoverySnapshot
+      tags:
+      - Discovery
+      summary: Read own query results with partial-failure warnings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoverySnapshot'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 200
+          default: 50
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/torrent-uploads:
+    post:
+      operationId: uploadTorrent
+      tags:
+      - Downloads
+      summary: Stage bounded user-owned torrent metainfo
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TorrentUpload'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+              - file
+              additionalProperties: false
+  /api/v1/downloads:
+    get:
+      operationId: listDownloads
+      tags:
+      - Downloads
+      summary: List visible download requests
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadPage'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 200
+          default: 50
+      - name: libraryId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+    post:
+      operationId: createDownload
+      tags:
+      - Downloads
+      summary: Resolve source and acquire metadata without selected payload
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Download'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadCreate'
+  /api/v1/downloads/{id}:
+    get:
+      operationId: getDownload
+      tags:
+      - Downloads
+      summary: Read authorized request
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Download'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/downloads/{id}/files:
+    get:
+      operationId: listDownloadFiles
+      tags:
+      - Downloads
+      summary: Read logical file metadata/selection
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DownloadFile'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/downloads/{id}/selection:
+    put:
+      operationId: selectDownloadFiles
+      tags:
+      - Downloads
+      summary: Commit file consent and reserve selected size
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Download'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadSelection'
+  /api/v1/downloads/{id}/settings:
+    get:
+      operationId: getDownloadSettings
+      tags:
+      - Downloads
+      summary: Read curated effective torrent settings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadSettings'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      operationId: updateDownloadSettings
+      tags:
+      - Downloads
+      summary: Change permitted curated settings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadSettings'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadSettings'
+  /api/v1/downloads/{id}/actions:
+    post:
+      operationId: actOnDownload
+      tags:
+      - Downloads
+      summary: Execute authorized lifecycle command
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadAction'
+  /api/v1/downloads/{id}/diagnostics:
+    get:
+      operationId: getDownloadDiagnostics
+      tags:
+      - Downloads
+      summary: Read redacted details for authorized download
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadDiagnostics'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/playback/sessions:
+    post:
+      operationId: createPlaybackSession
+      tags:
+      - Playback
+      summary: Authorize target and issue scoped playback capability
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybackSession'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaybackCreate'
+  /api/v1/playback/sessions/{id}:
+    get:
+      operationId: getPlaybackSession
+      tags:
+      - Playback
+      summary: Get own session readiness and availability
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybackSession'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      operationId: revokePlaybackSession
+      tags:
+      - Playback
+      summary: Revoke session and cancel readers
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /stream/{ticket}/{fileName}:
+    get:
+      operationId: readPlaybackBytes
+      tags:
+      - Playback
+      summary: Validate scoped ticket and serve verified media bytes
+      responses:
+        '200':
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+            Cache-Control:
+              schema:
+                type: string
+                example: private, no-store
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '206':
+          description: Valid single byte range
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+            Cache-Control:
+              schema:
+                type: string
+                example: private, no-store
+            Content-Range:
+              schema:
+                type: string
+        '416':
+          description: Unsatisfiable against logical final length
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+            Cache-Control:
+              schema:
+                type: string
+                example: private, no-store
+            Content-Range:
+              schema:
+                type: string
+        '503':
+          description: Required initial data did not arrive before header wait limit
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+      description: Normal bearer authentication is not used here, but a valid live
+        file-specific ticket is mandatory. Validate target suffix, grant and generation.
+        Never serve missing bytes, short successful bodies or static incomplete files.
+        HEAD never waits for payload. Only a range outside final logical length is
+        416; missing payload waits/timeouts according to specification 05.
+      parameters:
+      - name: Range
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: ticket
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 32
+          maxLength: 200
+      - name: fileName
+        in: path
+        required: true
+        schema:
+          type: string
+      x-authentication: mandatory-scoped-path-ticket
+    head:
+      operationId: headPlaybackBytes
+      tags:
+      - Playback
+      summary: Validate scoped ticket and describe final logical media length
+      responses:
+        '200':
+          description: Success
+          headers:
+            Accept-Ranges:
+              schema:
+                type: string
+                example: bytes
+            Content-Length:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+            Cache-Control:
+              schema:
+                type: string
+                example: private, no-store
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+      description: Normal bearer authentication is not used here, but a valid live
+        file-specific ticket is mandatory. Validate target suffix, grant and generation.
+        Never serve missing bytes, short successful bodies or static incomplete files.
+        HEAD never waits for payload. Only a range outside final logical length is
+        416; missing payload waits/timeouts according to specification 05. Range is
+        ignored on HEAD; return the final logical Content-Length without a body.
+      parameters:
+      - name: ticket
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 32
+          maxLength: 200
+      - name: fileName
+        in: path
+        required: true
+        schema:
+          type: string
+      x-authentication: mandatory-scoped-path-ticket
+  /api/v1/events:
+    get:
+      operationId: subscribeEvents
+      tags:
+      - Events
+      summary: Receive permission-filtered SSE hints
+      responses:
+        '200':
+          description: Server-sent events
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      description: Authenticated SSE; refresh/reconnect then fetch snapshots. Keepalive
+        every 15 seconds; no durable replay guarantee. Payloads follow Event schema
+        and specification 12.
+  /api/v1/admin/health:
+    get:
+      operationId: getAdminHealth
+      tags:
+      - Administration
+      summary: Read detailed dependency health
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceHealth'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/storage:
+    get:
+      operationId: listStorageRoots
+      tags:
+      - Administration
+      summary: Read mounted storage roots and reservations
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageRoot'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/storage/{id}/directories:
+    get:
+      operationId: listStorageDirectories
+      tags:
+      - Administration
+      summary: Browse contained directories for library setup
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageDirectory'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      description: Administrator only; ID refers to a configured mounted root. No
+        arbitrary host paths or symlink traversal.
+      parameters:
+      - name: relativePath
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 4096
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/admin/settings:
+    get:
+      operationId: getAdminSettings
+      tags:
+      - Administration
+      summary: Read curated server settings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSettings'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: setAdminSettings
+      tags:
+      - Administration
+      summary: Update curated server settings
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSettings'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSettings'
+  /api/v1/admin/integrations:
+    get:
+      operationId: listIntegrations
+      tags:
+      - Administration
+      summary: Read private integrations without secrets
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Integration'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/integrations/{kind}:
+    put:
+      operationId: setIntegration
+      tags:
+      - Administration
+      summary: Configure protected service connection
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Integration'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: kind
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - prowlarr
+          - qbittorrent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationUpdate'
+  /api/v1/admin/integrations/{kind}/test:
+    post:
+      operationId: testIntegration
+      tags:
+      - Administration
+      summary: Test configured connection without exposing credentials
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceHealth'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: kind
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - prowlarr
+          - qbittorrent
+  /api/v1/admin/maintenance:
+    post:
+      operationId: runMaintenance
+      tags:
+      - Administration
+      summary: Queue bounded application maintenance
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          maxLength: 200
+        description: Use a unique key for retriable mutations; reused key with different
+          body is rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceRequest'
+  /api/v1/admin/audit:
+    get:
+      operationId: listAudit
+      tags:
+      - Administration
+      summary: Read redacted administrator audit
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditPage'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 200
+          default: 50
+  /api/v1/operations/{id}:
+    get:
+      operationId: getOperation
+      tags:
+      - Operations
+      summary: Read authorized command status
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /api/v1/jobs/{id}:
+    get:
+      operationId: getJob
+      tags:
+      - Operations
+      summary: Read authorized background job status
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+  /healthz:
+    get:
+      operationId: liveness
+      tags:
+      - Server
+      summary: Minimal process health without secrets
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - ok
+                    - unavailable
+                required:
+                - status
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+  /readyz:
+    get:
+      operationId: readiness
+      tags:
+      - Server
+      summary: Minimal process health without secrets
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - ok
+                    - unavailable
+                required:
+                - status
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      security: []
+  /api/v1/auth/device-code/inspect:
+    post:
+      operationId: inspectDeviceCode
+      tags:
+      - Identity
+      summary: Inspect pending device name and expiry before approval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCodeApprove'
+      responses:
+        '200':
+          description: Pending device; no approval or secret is returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCodePreview'
+        default:
+          description: Request rejected
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    AccessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Short-lived opaque access token; not JWT and not a playback URL
+        token.
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int64
+          minimum: 100
+          maximum: 599
+        code:
+          type: string
+        detail:
+          type: string
+        traceId:
+          type: string
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        retryAfterSeconds:
+          type: integer
+          format: int64
+          minimum: 0
+      required:
+      - title
+      - status
+      - code
+    VersionRequest:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - version
+      additionalProperties: false
+    ServerInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        apiMajor:
+          type: integer
+          format: int64
+        bootstrapRequired:
+          type: boolean
+        capabilities:
+          type: array
+          items:
+            type: string
+        minimumClientVersion:
+          type: string
+          nullable: true
+        publicBaseUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Administrator-configured public playback origin. API credentials
+            remain scoped to the selected server address.
+      required:
+      - name
+      - version
+      - apiMajor
+      - bootstrapRequired
+      - capabilities
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: string
+          enum:
+          - administrator
+          - member
+        enabled:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        mustChangePassword:
+          type: boolean
+          description: When true, complete the account password-change flow before
+            other actions.
+      required:
+      - id
+      - username
+      - displayName
+      - role
+      - enabled
+      - version
+    CreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+          pattern: ^[A-Za-z0-9._-]+$
+        displayName:
+          type: string
+          maxLength: 200
+        password:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+        role:
+          type: string
+          enum:
+          - administrator
+          - member
+      required:
+      - username
+      - displayName
+      - password
+      - role
+      additionalProperties: false
+    PatchUser:
+      type: object
+      properties:
+        displayName:
+          type: string
+          maxLength: 200
+        role:
+          type: string
+          enum:
+          - administrator
+          - member
+        enabled:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - version
+      additionalProperties: false
+    BootstrapRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          writeOnly: true
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+          pattern: ^[A-Za-z0-9._-]+$
+        displayName:
+          type: string
+          maxLength: 200
+        password:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+      required:
+      - code
+      - username
+      - displayName
+      - password
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        deviceName:
+          type: string
+          maxLength: 200
+      required:
+      - username
+      - password
+      - deviceName
+      additionalProperties: false
+    AuthTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        accessExpiresAt:
+          type: string
+          format: date-time
+        refreshToken:
+          type: string
+        refreshExpiresAt:
+          type: string
+          format: date-time
+        sessionId:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - accessToken
+      - accessExpiresAt
+      - refreshToken
+      - refreshExpiresAt
+      - sessionId
+      - user
+    RefreshRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          writeOnly: true
+      required:
+      - refreshToken
+      additionalProperties: false
+    PasswordChange:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          writeOnly: true
+        newPassword:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+      required:
+      - currentPassword
+      - newPassword
+      additionalProperties: false
+    PasswordReset:
+      type: object
+      properties:
+        newPassword:
+          type: string
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - newPassword
+      - version
+      additionalProperties: false
+    AuthSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        deviceName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastSeenAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        current:
+          type: boolean
+      required:
+      - id
+      - deviceName
+      - createdAt
+      - lastSeenAt
+      - expiresAt
+      - current
+    DeviceCodeRequest:
+      type: object
+      properties:
+        deviceName:
+          type: string
+          maxLength: 200
+      required:
+      - deviceName
+      additionalProperties: false
+    DeviceCode:
+      type: object
+      properties:
+        deviceSecret:
+          type: string
+        userCode:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        pollIntervalSeconds:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - deviceSecret
+      - userCode
+      - expiresAt
+      - pollIntervalSeconds
+    DeviceCodePoll:
+      type: object
+      properties:
+        deviceSecret:
+          type: string
+          writeOnly: true
+      required:
+      - deviceSecret
+      additionalProperties: false
+    DeviceCodeApprove:
+      type: object
+      properties:
+        userCode:
+          type: string
+          writeOnly: true
+      required:
+      - userCode
+      additionalProperties: false
+    DevicePending:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - pending
+          - expired
+          - denied
+        retryAfterSeconds:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - state
+    UserPreferences:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        theme:
+          type: string
+          enum:
+          - system
+          - light
+          - dark
+        density:
+          type: string
+          enum:
+          - comfortable
+          - compact
+        libraryLayout:
+          type: string
+          enum:
+          - grid
+          - list
+        showFilenameExtensions:
+          type: boolean
+        showContinueWatching:
+          type: boolean
+        rememberFolderSort:
+          type: boolean
+        torrentColumns:
+          type: array
+          items:
+            type: string
+            enum:
+            - title
+            - size
+            - seeders
+            - leechers
+            - peers
+            - provider
+            - publishedAt
+        defaultSort:
+          type: string
+          enum:
+          - name
+          - date
+          - size
+        defaultSortOrder:
+          type: string
+          enum:
+          - asc
+          - desc
+        resumePolicy:
+          type: string
+          enum:
+          - ask
+          - always
+          - never
+        defaultPlaybackSpeed:
+          type: number
+          format: double
+          minimum: 0.25
+          maximum: 4
+        subtitleScale:
+          type: number
+          format: double
+          minimum: 0.5
+          maximum: 3
+        preferredAudioLanguage:
+          type: string
+          maxLength: 50
+          nullable: true
+          pattern: ^[a-zA-Z0-9_-]{1,50}$
+        preferredSubtitleLanguage:
+          type: string
+          maxLength: 50
+          nullable: true
+          pattern: ^[a-zA-Z0-9_-]{1,50}$
+        slideshowSeconds:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 3600
+        locale:
+          type: string
+          maxLength: 30
+        accentPreset:
+          type: string
+          enum:
+          - blue
+          - teal
+          - green
+          - purple
+          - orange
+          - red
+        playbackMode:
+          type: string
+          enum:
+          - internal
+          - ask
+          - external
+        pinnedLibraryIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 200
+        keyboardShortcutPreset:
+          type: string
+          enum:
+          - standard
+          - minimal
+        folderPreferences:
+          type: array
+          items:
+            type: object
+            properties:
+              libraryId:
+                type: string
+                format: uuid
+              folderId:
+                type: string
+                format: uuid
+                nullable: true
+              layout:
+                type: string
+                enum:
+                - grid
+                - list
+              sort:
+                type: string
+                enum:
+                - name
+                - date
+                - size
+              order:
+                type: string
+                enum:
+                - asc
+                - desc
+            required:
+            - libraryId
+            - folderId
+            - layout
+            - sort
+            - order
+            additionalProperties: false
+          maxItems: 1000
+        discoveryViews:
+          type: array
+          maxItems: 3
+          items:
+            type: object
+            properties:
+              mode:
+                type: string
+                enum:
+                - latest
+                - mostSeeded
+                - search
+              sort:
+                type: string
+                enum:
+                - publishedAt
+                - seeders
+                - leechers
+                - peers
+                - sizeBytes
+                - title
+              order:
+                type: string
+                enum:
+                - asc
+                - desc
+              providerIds:
+                type: array
+                items:
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                maxItems: 100
+              categories:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                maxItems: 100
+              minSizeBytes:
+                type: integer
+                format: int64
+                minimum: 0
+                nullable: true
+              maxSizeBytes:
+                type: integer
+                format: int64
+                minimum: 0
+                nullable: true
+              minSeeders:
+                type: integer
+                format: int64
+                minimum: 0
+                nullable: true
+            required:
+            - mode
+            - sort
+            - order
+            - providerIds
+            - categories
+            additionalProperties: false
+          description: User-synced per-mode discovery filters and sort; search text
+            is not retained.
+      required:
+      - version
+      additionalProperties: false
+    LibraryGrant:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        read:
+          type: boolean
+        download:
+          type: boolean
+        manage:
+          type: boolean
+        quotaBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+      required:
+      - userId
+      - read
+      - download
+      - manage
+      additionalProperties: false
+    Library:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        readOnly:
+          type: boolean
+        enabled:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        capabilities:
+          type: object
+          properties:
+            read:
+              type: boolean
+            download:
+              type: boolean
+            manage:
+              type: boolean
+          required:
+          - read
+          - download
+          - manage
+        rootPath:
+          type: string
+          description: Administrator-only; omitted for members.
+        scanIntervalSeconds:
+          type: integer
+          format: int64
+          minimum: 60
+          nullable: true
+      required:
+      - id
+      - name
+      - description
+      - readOnly
+      - enabled
+      - version
+      - capabilities
+    LibraryCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+        storageRootId:
+          type: string
+          format: uuid
+        relativePath:
+          type: string
+          maxLength: 4096
+        readOnly:
+          type: boolean
+      required:
+      - name
+      - storageRootId
+      - relativePath
+      - readOnly
+      additionalProperties: false
+    LibraryPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+        enabled:
+          type: boolean
+        readOnly:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        scanIntervalSeconds:
+          type: integer
+          format: int64
+          minimum: 60
+          nullable: true
+      required:
+      - version
+      additionalProperties: false
+    GrantUpdate:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/LibraryGrant'
+          maxItems: 1000
+      required:
+      - version
+      - grants
+      additionalProperties: false
+    Entry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        libraryId:
+          type: string
+          format: uuid
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - folder
+          - video
+          - photo
+          - subtitle
+        name:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        modifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        mediaId:
+          type: string
+          format: uuid
+          nullable: true
+        thumbnailAvailable:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - id
+      - libraryId
+      - parentId
+      - kind
+      - name
+      - sizeBytes
+      - modifiedAt
+      - thumbnailAvailable
+      - version
+    MediaTrack:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - video
+          - audio
+          - subtitle
+        codec:
+          type: string
+          nullable: true
+        language:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        default:
+          type: boolean
+      required:
+      - id
+      - kind
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        libraryId:
+          type: string
+          format: uuid
+        entryId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - video
+          - photo
+        mimeType:
+          type: string
+          maxLength: 200
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        durationMs:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        width:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        height:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaTrack'
+        complete:
+          type: boolean
+        probeState:
+          type: string
+          enum:
+          - pending
+          - ready
+          - unsupported
+          - failed
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - id
+      - libraryId
+      - entryId
+      - name
+      - kind
+      - mimeType
+      - sizeBytes
+      - complete
+      - probeState
+      - version
+    RenameRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - name
+      - version
+      additionalProperties: false
+    MoveRequest:
+      type: object
+      properties:
+        targetFolderId:
+          type: string
+          format: uuid
+          nullable: true
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - targetFolderId
+      - version
+      additionalProperties: false
+    PlaybackProgress:
+      type: object
+      properties:
+        positionMs:
+          type: integer
+          format: int64
+          minimum: 0
+        durationMs:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        watched:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - positionMs
+      - durationMs
+      - watched
+      - updatedAt
+      - version
+    ProgressUpdate:
+      type: object
+      properties:
+        positionMs:
+          type: integer
+          format: int64
+          minimum: 0
+        durationMs:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        watched:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - positionMs
+      - durationMs
+      - version
+      additionalProperties: false
+    ContinueWatching:
+      type: object
+      properties:
+        media:
+          $ref: '#/components/schemas/Media'
+        progress:
+          $ref: '#/components/schemas/PlaybackProgress'
+      required:
+      - media
+      - progress
+    Provider:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        enabled:
+          type: boolean
+        supportsSearch:
+          type: boolean
+        supportsRecent:
+          type: boolean
+        categories:
+          type: array
+          items:
+            type: integer
+            format: int64
+        state:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - unavailable
+          - unknown
+        warning:
+          type: string
+          nullable: true
+      required:
+      - id
+      - name
+      - enabled
+      - supportsSearch
+      - supportsRecent
+      - categories
+      - state
+    DiscoveryQuery:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - latest
+          - mostSeeded
+          - search
+        query:
+          type: string
+          maxLength: 200
+        providerIds:
+          type: array
+          items:
+            type: string
+          maxItems: 100
+        categories:
+          type: array
+          items:
+            type: integer
+            format: int64
+          maxItems: 100
+        sort:
+          type: string
+          enum:
+          - publishedAt
+          - seeders
+          - leechers
+          - peers
+          - sizeBytes
+          - title
+        order:
+          type: string
+          enum:
+          - asc
+          - desc
+        minSizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        maxSizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        minSeeders:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+      required:
+      - mode
+      additionalProperties: false
+      description: Size/seeder filters apply to the bounded fetched result snapshot;
+        unknown counts do not satisfy a numeric minimum. Validate min <= max. No exhaustive
+        indexer pagination is promised.
+    DiscoveryResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        seeders:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        leechers:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        peers:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        providerId:
+          type: string
+        providerName:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        fetchedAt:
+          type: string
+          format: date-time
+        stale:
+          type: boolean
+        downloadable:
+          type: boolean
+        categories:
+          type: array
+          items:
+            type: integer
+            format: int64
+      required:
+      - id
+      - title
+      - sizeBytes
+      - seeders
+      - leechers
+      - peers
+      - providerId
+      - providerName
+      - publishedAt
+      - fetchedAt
+      - stale
+      - downloadable
+    DiscoverySnapshot:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - queued
+          - running
+          - complete
+          - partial
+          - failed
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryResult'
+        nextCursor:
+          type: string
+          nullable: true
+        totalKnown:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        truncated:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - state
+      - createdAt
+      - expiresAt
+      - items
+      - nextCursor
+      - totalKnown
+      - truncated
+      - warnings
+    TorrentUpload:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        expiresAt:
+          type: string
+          format: date-time
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+      required:
+      - id
+      - expiresAt
+      - sizeBytes
+    DownloadSource:
+      oneOf:
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - discoveryResult
+          value:
+            type: string
+            format: uuid
+        required:
+        - kind
+        - value
+        additionalProperties: false
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - magnet
+          value:
+            type: string
+            maxLength: 65536
+        required:
+        - kind
+        - value
+        additionalProperties: false
+      - type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - torrentUpload
+          value:
+            type: string
+            format: uuid
+        required:
+        - kind
+        - value
+        additionalProperties: false
+      description: Exactly one tagged source. A value is not an arbitrary fetch URL.
+    DownloadCreate:
+      type: object
+      properties:
+        libraryId:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/DownloadSource'
+      required:
+      - libraryId
+      - source
+      additionalProperties: false
+    Download:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        libraryId:
+          type: string
+          format: uuid
+        ownerId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        state:
+          type: string
+          enum:
+          - resolving
+          - metadataPending
+          - awaitingSelection
+          - queued
+          - downloading
+          - paused
+          - stalled
+          - completeSelected
+          - importing
+          - seeding
+          - completed
+          - removing
+          - removed
+          - failed
+        selectedBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        downloadedSelectedBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        torrentBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        downloadBps:
+          type: integer
+          format: int64
+          minimum: 0
+        uploadBps:
+          type: integer
+          format: int64
+          minimum: 0
+        seedersConnected:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        peersConnected:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        etaSeconds:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        sequential:
+          type: boolean
+        firstLastMetadataAssist:
+          type: boolean
+        generation:
+          type: string
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        errorCode:
+          type: string
+          nullable: true
+        errorDetail:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        sourceState:
+          type: string
+          enum:
+          - resolving
+          - metadataPending
+          - ready
+          - failed
+        transferState:
+          type: string
+          enum:
+          - metadata
+          - queued
+          - downloading
+          - paused
+          - stalled
+          - checking
+          - seeding
+          - complete
+          - stopped
+          - failed
+        importState:
+          type: string
+          enum:
+          - notReady
+          - pending
+          - running
+          - complete
+          - failed
+      required:
+      - id
+      - libraryId
+      - ownerId
+      - name
+      - state
+      - selectedBytes
+      - downloadedSelectedBytes
+      - torrentBytes
+      - downloadBps
+      - uploadBps
+      - sequential
+      - firstLastMetadataAssist
+      - generation
+      - version
+      - createdAt
+      - updatedAt
+      - tags
+      - sourceState
+      - transferState
+      - importState
+    DownloadFile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        downloadId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        relativePath:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        downloadedBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        contiguousBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        kind:
+          type: string
+          enum:
+          - video
+          - photo
+          - subtitle
+          - other
+        selected:
+          type: boolean
+        priority:
+          type: string
+          enum:
+          - normal
+          - high
+          - maximum
+        playbackState:
+          type: string
+          enum:
+          - notSelected
+          - metadataPending
+          - waitingForData
+          - eligible
+          - complete
+          - unsupported
+          - unavailable
+        importedMediaId:
+          type: string
+          format: uuid
+          nullable: true
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - id
+      - downloadId
+      - name
+      - relativePath
+      - sizeBytes
+      - downloadedBytes
+      - contiguousBytes
+      - kind
+      - selected
+      - priority
+      - playbackState
+      - importedMediaId
+      - version
+    FileChoice:
+      type: object
+      properties:
+        fileId:
+          type: string
+          format: uuid
+        selected:
+          type: boolean
+        priority:
+          type: string
+          enum:
+          - normal
+          - high
+          - maximum
+      required:
+      - fileId
+      - selected
+      - priority
+      additionalProperties: false
+    DownloadSelection:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileChoice'
+          maxItems: 10000
+        autoStart:
+          type: boolean
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - files
+      - autoStart
+      - version
+      additionalProperties: false
+    DownloadSettings:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        downloadLimitBytesPerSecond:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        uploadLimitBytesPerSecond:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        ratioLimit:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+        seedTimeMinutes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        queuePosition:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 50
+      required:
+      - version
+      additionalProperties: false
+    DownloadAction:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - pause
+          - resume
+          - retry
+          - remove
+          - reannounce
+          - recheck
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        deleteData:
+          type: boolean
+          default: false
+        force:
+          type: boolean
+          default: false
+        confirmation:
+          type: string
+          maxLength: 200
+          nullable: true
+      required:
+      - action
+      - version
+      additionalProperties: false
+    TrackerSummary:
+      type: object
+      properties:
+        host:
+          type: string
+        state:
+          type: string
+        peers:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        message:
+          type: string
+          nullable: true
+      required:
+      - host
+      - state
+      description: No passkeys, full credential-bearing URLs or user secrets.
+    DownloadDiagnostics:
+      type: object
+      properties:
+        downloadId:
+          type: string
+          format: uuid
+        engineState:
+          type: string
+        generation:
+          type: string
+        trackers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackerSummary'
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - downloadId
+      - engineState
+      - generation
+      - trackers
+      - warnings
+    Operation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - pending
+          - running
+          - completed
+          - failed
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+        resourceType:
+          type: string
+          nullable: true
+        error:
+          $ref: '#/components/schemas/Problem'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - state
+      - resourceId
+      - resourceType
+      - createdAt
+      - updatedAt
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        state:
+          type: string
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+        progress:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          nullable: true
+        error:
+          $ref: '#/components/schemas/Problem'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - kind
+      - state
+      - progress
+      - createdAt
+      - updatedAt
+    PlaybackTarget:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - media
+          - downloadFile
+        id:
+          type: string
+          format: uuid
+      required:
+      - kind
+      - id
+      additionalProperties: false
+    PlaybackCreate:
+      type: object
+      properties:
+        target:
+          $ref: '#/components/schemas/PlaybackTarget'
+        mode:
+          type: string
+          enum:
+          - internal
+          - external
+        initialPositionMs:
+          type: integer
+          format: int64
+          minimum: 0
+      required:
+      - target
+      - mode
+      additionalProperties: false
+    PlaybackSidecar:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        language:
+          type: string
+          nullable: true
+        mimeType:
+          type: string
+          maxLength: 200
+        url:
+          type: string
+          format: uri
+      required:
+      - id
+      - name
+      - language
+      - mimeType
+      - url
+      description: Each URL is separately scoped to this authorized subtitle file.
+    PlaybackSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - metadataPending
+          - waitingForData
+          - ready
+          - buffering
+          - complete
+          - expired
+          - revoked
+          - unavailable
+        streamUrl:
+          type: string
+          format: uri
+          nullable: true
+        activationExpiresAt:
+          type: string
+          format: date-time
+        idleExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        absoluteExpiresAt:
+          type: string
+          format: date-time
+        generation:
+          type: string
+        contiguousBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        totalBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        mimeType:
+          type: string
+          maxLength: 200
+          nullable: true
+        fileName:
+          type: string
+          nullable: true
+        sidecars:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaybackSidecar'
+        retryAfterSeconds:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+        importedMediaId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Authorized media identity when a download file has been imported;
+            supports saving current playback progress.
+      required:
+      - id
+      - state
+      - streamUrl
+      - activationExpiresAt
+      - idleExpiresAt
+      - absoluteExpiresAt
+      - generation
+      - contiguousBytes
+      - totalBytes
+      - sidecars
+    ServiceHealth:
+      type: object
+      properties:
+        service:
+          type: string
+        state:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - unavailable
+          - unknown
+        detail:
+          type: string
+          nullable: true
+        checkedAt:
+          type: string
+          format: date-time
+      required:
+      - service
+      - state
+      - checkedAt
+    StorageRoot:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        path:
+          type: string
+        writable:
+          type: boolean
+        freeBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        totalBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        reservedBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        available:
+          type: boolean
+        supportsHardLinks:
+          type: boolean
+          nullable: true
+      required:
+      - id
+      - label
+      - path
+      - writable
+      - freeBytes
+      - totalBytes
+      - reservedBytes
+      - available
+    StorageDirectory:
+      type: object
+      properties:
+        relativePath:
+          type: string
+        name:
+          type: string
+        writable:
+          type: boolean
+        alreadyAssigned:
+          type: boolean
+      required:
+      - relativePath
+      - name
+      - writable
+      - alreadyAssigned
+    AdminSettings:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+        serverName:
+          type: string
+          maxLength: 200
+        publicBaseUrl:
+          type: string
+          format: uri
+          nullable: true
+        activeDownloads:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 20
+        activeDownloadsPerUser:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 20
+        activeSeeds:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 50
+        globalConnections:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 5000
+        connectionsPerTorrent:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 1000
+        downloadLimitBytesPerSecond:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          maximum: 1073741824
+        uploadLimitBytesPerSecond:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          maximum: 1073741824
+        defaultRatioLimit:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+          maximum: 10000
+        defaultSeedTimeMinutes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          maximum: 525600
+        defaultUserQuotaBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        lowDiskFloorBytes:
+          type: integer
+          format: int64
+          minimum: 0
+        lowDiskFloorFraction:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 0.5
+        thumbnailCacheMaxBytes:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 8589934592
+        auditRetentionDays:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 3650
+        enabledProviderIds:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 128
+          maxItems: 100
+          nullable: true
+        enabledCategoryIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+            minimum: 0
+          maxItems: 100
+          nullable: true
+        libraryScanIntervalSeconds:
+          type: integer
+          format: int64
+          minimum: 60
+          maximum: 31536000
+        discoveryCacheSeconds:
+          type: integer
+          format: int64
+          minimum: 30
+          maximum: 86400
+        discoveryRecentRefreshSeconds:
+          type: integer
+          format: int64
+          minimum: 60
+          maximum: 86400
+      required:
+      - version
+      additionalProperties: false
+      description: Curated administrator settings, not an arbitrary qBittorrent/Prowlarr
+        configuration proxy. Validate deployment-origin policy before accepting publicBaseUrl.
+    Integration:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - prowlarr
+          - qbittorrent
+        baseUrl:
+          type: string
+        credentialConfigured:
+          type: boolean
+        health:
+          $ref: '#/components/schemas/ServiceHealth'
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - kind
+      - baseUrl
+      - credentialConfigured
+      - health
+      - version
+    IntegrationUpdate:
+      type: object
+      properties:
+        baseUrl:
+          type: string
+          format: uri
+        username:
+          type: string
+          maxLength: 200
+          nullable: true
+        secret:
+          type: string
+          writeOnly: true
+          maxLength: 10000
+          nullable: true
+        version:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - baseUrl
+      - version
+      additionalProperties: false
+      description: Missing/null secret preserves existing credential. Store through
+        protected server secret facilities; do not echo it. URL is validated against
+        administrator deployment policy.
+    MaintenanceRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - rescanLibraries
+          - pruneThumbnailCache
+          - databaseSnapshot
+        libraryId:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - action
+      additionalProperties: false
+      description: Database snapshot is not a full-stack backup and this endpoint
+        never controls Docker.
+    AuditEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        actorId:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          type: string
+        resourceType:
+          type: string
+          nullable: true
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+        outcome:
+          type: string
+        detail:
+          type: string
+          nullable: true
+      required:
+      - id
+      - occurredAt
+      - actorId
+      - action
+      - outcome
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+          - download.updated
+          - media.changed
+          - playback.state
+          - job.updated
+          - service.health
+          - permissions.changed
+          - snapshot.required
+        occurredAt:
+          type: string
+          format: date-time
+        payload:
+          type: object
+          additionalProperties: true
+      required:
+      - id
+      - type
+      - occurredAt
+      - payload
+    EntryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entry'
+        nextCursor:
+          type: string
+          nullable: true
+        totalKnown:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        truncated:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - items
+      - nextCursor
+      - totalKnown
+      - truncated
+      - warnings
+    MediaPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        nextCursor:
+          type: string
+          nullable: true
+        totalKnown:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        truncated:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - items
+      - nextCursor
+      - totalKnown
+      - truncated
+      - warnings
+    DownloadPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Download'
+        nextCursor:
+          type: string
+          nullable: true
+        totalKnown:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        truncated:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - items
+      - nextCursor
+      - totalKnown
+      - truncated
+      - warnings
+    AuditPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEntry'
+        nextCursor:
+          type: string
+          nullable: true
+        totalKnown:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        truncated:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - items
+      - nextCursor
+      - totalKnown
+      - truncated
+      - warnings
+    ContinueWatchingPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContinueWatching'
+        nextCursor:
+          type: string
+          nullable: true
+        totalKnown:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+        truncated:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+      required:
+      - items
+      - nextCursor
+      - totalKnown
+      - truncated
+      - warnings
+    DeviceCodePreview:
+      type: object
+      additionalProperties: false
+      required:
+      - deviceName
+      - expiresAt
+      properties:
+        deviceName:
+          type: string
+          maxLength: 128
+        expiresAt:
+          type: string
+          format: date-time

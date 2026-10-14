@@ -1,0 +1,24 @@
+name: briani-foundation-test
+services:
+  briani:
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 256
+    image: briani-server:dev
+    build:
+      context: ../..
+      dockerfile: infra/images/server.Dockerfile
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8088"
+      AllowedHosts: "localhost;127.0.0.1;briani"
+    ports: ["127.0.0.1:18089:8088"]
+    volumes: ["test-config:/config", "test-data:/data"]
+    restart: "no"
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    stop_grace_period: 60s
+volumes:
+  test-config:
+  test-data:

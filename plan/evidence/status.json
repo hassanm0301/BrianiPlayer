@@ -1,0 +1,453 @@
+{
+  "planVersion": "1.0",
+  "generatedOn": "2026-10-13",
+  "applicationImplemented": true,
+  "milestones": [
+    {
+      "id": "M00",
+      "file": "milestones/M00_playback_proof.md",
+      "state": "blocked_verification",
+      "codeStatus": "complete",
+      "verificationStatus": "blocked_verification",
+      "commit": null,
+      "report": "docs/evidence/M00/report.md",
+      "blockers": [
+        "Windows/macOS native build runners unavailable",
+        "Physical Android verification explicitly reserved to the user",
+        "Pi runtime/benchmark explicitly reserved to the user; no further access"
+      ]
+    },
+    {
+      "id": "M01",
+      "file": "milestones/M01_foundation.md",
+      "state": "blocked_verification",
+      "codeStatus": "complete",
+      "verificationStatus": "blocked_verification",
+      "commit": null,
+      "report": "docs/evidence/M01/report.md",
+      "blockers": [
+        "Windows/macOS native build runners unavailable",
+        "Physical Android verification explicitly reserved to the user",
+        "Pi runtime/benchmark explicitly reserved to the user; no further access"
+      ]
+    },
+    {
+      "id": "M02",
+      "file": "milestones/M02_identity_and_permissions.md",
+      "state": "complete",
+      "codeStatus": "complete",
+      "verificationStatus": "passed",
+      "commit": null,
+      "report": "docs/evidence/M02/report.md",
+      "blockers": []
+    },
+    {
+      "id": "M03",
+      "file": "milestones/M03_libraries_and_media.md",
+      "state": "complete",
+      "codeStatus": "complete",
+      "verificationStatus": "passed",
+      "commit": null,
+      "report": "docs/evidence/M03/report.md",
+      "blockers": []
+    },
+    {
+      "id": "M04",
+      "file": "milestones/M04_torrent_discovery.md",
+      "state": "complete",
+      "codeStatus": "complete",
+      "verificationStatus": "passed",
+      "commit": null,
+      "report": "docs/evidence/M04/report.md",
+      "blockers": []
+    },
+    {
+      "id": "M05",
+      "file": "milestones/M05_download_lifecycle.md",
+      "state": "complete",
+      "codeStatus": "complete",
+      "verificationStatus": "passed",
+      "commit": null,
+      "report": "docs/evidence/M05/report.md",
+      "blockers": []
+    },
+    {
+      "id": "M06",
+      "file": "milestones/M06_progressive_gateway.md",
+      "state": "complete",
+      "codeStatus": "complete",
+      "verificationStatus": "passed",
+      "commit": null,
+      "report": "docs/evidence/M06/report.md",
+      "blockers": []
+    },
+    {
+      "id": "M07",
+      "file": "milestones/M07_desktop_client.md",
+      "state": "blocked_verification",
+      "codeStatus": "complete",
+      "verificationStatus": "blocked_verification",
+      "commit": null,
+      "report": "docs/evidence/M07/report.md",
+      "blockers": [
+        "Windows/macOS native build runners unavailable",
+        "Physical Android verification explicitly reserved to the user",
+        "Pi runtime/benchmark explicitly reserved to the user; no further access"
+      ]
+    },
+    {
+      "id": "M08",
+      "file": "milestones/M08_android_and_tv.md",
+      "state": "blocked_verification",
+      "codeStatus": "complete",
+      "verificationStatus": "blocked_verification",
+      "commit": null,
+      "report": "docs/evidence/M08/report.md",
+      "blockers": [
+        "Windows/macOS native build runners unavailable",
+        "Physical Android verification explicitly reserved to the user",
+        "Pi runtime/benchmark explicitly reserved to the user; no further access"
+      ]
+    },
+    {
+      "id": "M09",
+      "file": "milestones/M09_customization_and_operations.md",
+      "state": "complete",
+      "codeStatus": "complete",
+      "verificationStatus": "passed",
+      "commit": null,
+      "report": "docs/evidence/M09/report.md",
+      "blockers": []
+    },
+    {
+      "id": "M10",
+      "file": "milestones/M10_hardening_and_performance.md",
+      "state": "blocked_verification",
+      "codeStatus": "complete",
+      "verificationStatus": "blocked_verification",
+      "commit": null,
+      "report": "docs/evidence/M10/report.md",
+      "blockers": [
+        "Windows/macOS native build runners unavailable",
+        "Physical Android verification explicitly reserved to the user",
+        "Pi runtime/benchmark explicitly reserved to the user; no further access",
+        "Unassisted qBittorrent reconnect reliability unresolved; controlled restart recovery passed",
+        "Branch coverage target not attained in all critical source handlers; exact collector measurements retained"
+      ]
+    },
+    {
+      "id": "M11",
+      "file": "milestones/M11_release.md",
+      "state": "blocked_verification",
+      "codeStatus": "complete",
+      "verificationStatus": "blocked_verification",
+      "commit": null,
+      "report": "docs/evidence/M11/report.md",
+      "blockers": [
+        "Windows/macOS native build runners unavailable",
+        "Physical Android verification explicitly reserved to the user",
+        "Pi runtime/benchmark explicitly reserved to the user; no further access",
+        "Release signing/public license grant unavailable",
+        "24 package SPDX expressions and five NuGet immutable source pins unresolved",
+        "Native binary-to-source correspondence and comprehensive native/OS distribution SBOM incomplete",
+        "Optimized client playback not certified; packaged startup and connected test variants passed"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "T01",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T02",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T03",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T04",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T05",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T06",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T07",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T08",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T09",
+      "state": "passed",
+      "evidence": "docs/evidence/M06/report.md"
+    },
+    {
+      "id": "T10",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/final-acceptance-tests.md"
+    },
+    {
+      "id": "T11",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T12",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T13",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/final-acceptance-tests.md"
+    },
+    {
+      "id": "T14",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T15",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/final-acceptance-tests.md"
+    },
+    {
+      "id": "T16",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/final-acceptance-tests.md"
+    },
+    {
+      "id": "T17",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T18",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/final-acceptance-tests.md"
+    },
+    {
+      "id": "T19",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T20",
+      "state": "passed_partial",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T21",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T22",
+      "state": "passed_emulator_physical_user_deferred",
+      "evidence": "docs/evidence/M08/report.md"
+    },
+    {
+      "id": "T23",
+      "state": "passed_partial",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T24",
+      "state": "passed_partial",
+      "evidence": "docs/evidence/M10/final-acceptance-tests.md"
+    },
+    {
+      "id": "T25",
+      "state": "passed_retained_media",
+      "evidence": "docs/evidence/M10/download-restore-manager-final-pass.json"
+    },
+    {
+      "id": "T26",
+      "state": "blocked_verification",
+      "evidence": "docs/evidence/M10/pi-native.md"
+    },
+    {
+      "id": "T27",
+      "state": "passed_partial",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T28",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/contracts-final.log"
+    },
+    {
+      "id": "T29",
+      "state": "passed_partial",
+      "evidence": "docs/evidence/M10/traceability.md"
+    },
+    {
+      "id": "T30",
+      "state": "blocked_verification",
+      "evidence": "docs/evidence/M11/report.md"
+    },
+    {
+      "id": "T31",
+      "state": "passed_emulator_physical_user_deferred",
+      "evidence": "docs/evidence/M08/report.md"
+    },
+    {
+      "id": "T32",
+      "state": "passed",
+      "evidence": "docs/evidence/M10/crash-matrix.json"
+    }
+  ],
+  "releaseStatus": "blocked_verification",
+  "notes": [
+    "All M00-M11 application implementation paths are present; this ledger distinguishes code completeness from release certification.",
+    "Local final-image desktop and Android TV workflows passed; packaged four-service install/backup/restore/rollback passed with exact cleanup.",
+    "Final regression counts and commands are in docs/evidence/M11/report.md; no physical-platform, reproducibility or signing passes are invented.",
+    "Pi and physical Android testing are reserved to the user. No further access is authorized.",
+    "Only private local artifacts are produced. No tag/image/app was published and no owner public-license grant was assigned."
+  ],
+  "localVerification": {
+    "serverTestsPassed": 412,
+    "pythonTestsPassed": 134,
+    "pythonSubtestsPassed": 21,
+    "flutterTestsPassed": 86,
+    "flutterAnalysis": "passed",
+    "finalImageDesktop": "passed",
+    "finalImageAndroidTvEmulator": "passed",
+    "packagedOperations": "passed_final_staged_package",
+    "nativeHardware": "user_deferred_or_unavailable",
+    "releaseCertification": "blocked_verification",
+    "retainedMediaDownloadRestore": "passed_final_image",
+    "resourceHarnessTestsPassed": 4,
+    "downloadRestoreHarnessTestsPassed": 6,
+    "ownedTestResourcesCleanup": "verified",
+    "artifactChecksums": {
+      "state": "passed",
+      "files": 843,
+      "exitCode": 0
+    },
+    "artifactAudit": {
+      "state": "blocked_verification",
+      "exitCode": 3,
+      "artifactCount": 7,
+      "componentCount": 247,
+      "qualificationCount": 474
+    },
+    "releaseVerify": {
+      "state": "blocked_verification",
+      "exitCode": 3
+    },
+    "independentFinalReview": "no_artifact_mismatch_or_open_changed_boundary_P1_P2"
+  },
+  "documentationUpdates": [
+    {
+      "date": "2026-10-14",
+      "scope": "End-user self-hosting, client installation and use",
+      "state": "complete",
+      "report": "docs/evidence/M11/self-hosting-docs.md",
+      "files": [
+        "README.md",
+        "docs/operations/README.md",
+        "docs/client-installation.md",
+        "docs/user-guide.md",
+        "client/README.md"
+      ],
+      "checks": {
+        "documentationValidation": {
+          "exitCode": 0,
+          "documents": 5,
+          "localLinksAndAnchors": 24,
+          "shellBlocks": 24,
+          "operationsParserExamples": 15,
+          "composeIdentityCases": 4
+        },
+        "operationsToolTests": {
+          "exitCode": 0,
+          "passed": 26
+        },
+        "releaseToolTests": {
+          "exitCode": 0,
+          "passed": 57
+        },
+        "packagedChecksums": {
+          "exitCode": 0,
+          "files": 843
+        },
+        "independentReview": "no_priority_findings",
+        "releaseVerify": {
+          "exitCode": 2,
+          "state": "snapshot_mismatch",
+          "reason": "Updated source documentation differs from the original dist sourceTreeSha256; packaged archives were not regenerated."
+        }
+      },
+      "limitations": [
+        "Documentation-only change; no deployment or clean-install/hardware tests rerun.",
+        "Existing milestone and release certification blockers remain unchanged.",
+        "dist archives and their embedded documentation remain the original candidate snapshot."
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "scope": "Simplify self-hosting documentation",
+      "state": "complete",
+      "report": "docs/evidence/M11/simplified-docs.md",
+      "files": [
+        "README.md",
+        "docs/operations/README.md",
+        "docs/operations/advanced.md",
+        "docs/user-guide.md",
+        "docs/evidence/M11/self-hosting-docs/validate_docs.py"
+      ],
+      "checks": {
+        "documentationValidation": {
+          "exitCode": 0,
+          "documents": 6,
+          "localLinksAndAnchors": 34,
+          "shellBlocks": 31,
+          "operationsParserExamples": 21,
+          "composeIdentityCases": 4
+        },
+        "operationsToolTests": {
+          "exitCode": 0,
+          "passed": 26
+        },
+        "releaseToolTests": {
+          "exitCode": 0,
+          "passed": 57
+        },
+        "packagedChecksums": {
+          "exitCode": 0,
+          "files": 843
+        },
+        "independentReview": "two_clarifications_fixed_no_remaining_priority_findings",
+        "releaseVerify": {
+          "exitCode": 2,
+          "state": "snapshot_mismatch",
+          "reason": "Source docs differ from the original packaged snapshot; dist artifacts were not rebuilt."
+        }
+      },
+      "limitations": [
+        "Documentation-only change; no deployment, hardware or clean-install checks rerun.",
+        "Existing milestone/release gates unchanged; packaged archives retain original documentation."
+      ]
+    }
+  ]
+}
