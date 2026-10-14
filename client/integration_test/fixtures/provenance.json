@@ -1,0 +1,13 @@
+{
+  "generator": "local ffmpeg testsrc2 + sine; 160x90 24fps 8sec H264/AAC",
+  "fixtures": {
+    "mp4": {
+      "sha256": "7a61e3388b84a0c194e8a50876a6f0eb27c111db85a61c696a0b3ebc7a358927",
+      "bytes": 345804
+    },
+    "mkv": {
+      "sha256": "42ce11feb5696e869f609f6b1da81fe2dbc3fd74fbd1b24a739c56f2d20fe422",
+      "bytes": 343981
+    }
+  }
+}

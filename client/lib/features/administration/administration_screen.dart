@@ -1,0 +1,1603 @@
+import 'dart:async';
+
+import 'package:briani_api/briani_api.dart';
+import 'package:briani_api/briani_api.dart' as api_models;
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/session/client_session.dart';
+import '../../core/preferences/preferences_providers.dart';
+import '../../core/formatting/locale_formatters.dart';
+
+final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
+  final session = ref.watch(clientSessionProvider);
+  if (session == null || !session.administrator) {
+    throw StateError('Administrator access is required.');
+  }
+  final api = session.api;
+  final admin = api.getAdministrationApi();
+  final libraries = api.getLibrariesApi();
+  final results = await Future.wait([
+    admin.getAdminSettings(),
+    admin.listUsers(),
+    admin.getAdminHealth(),
+    admin.listStorageRoots(),
+    admin.listIntegrations(),
+    admin.listAudit(limit: 30),
+    libraries.listLibraries(),
+    api.getDiscoveryApi().listProviders(),
+  ]);
+  return _AdminSnapshot(
+    settings: (results[0] as Response<AdminSettings>).data!,
+    users: (results[1] as Response<dynamic>).data!.toList().cast<User>(),
+    health: (results[2] as Response<dynamic>).data!
+        .toList()
+        .cast<ServiceHealth>(),
+    roots: (results[3] as Response<dynamic>).data!.toList().cast<StorageRoot>(),
+    integrations: (results[4] as Response<dynamic>).data!
+        .toList()
+        .cast<Integration>(),
+    audit: (results[5] as Response<AuditPage>).data!,
+    libraries: (results[6] as Response<dynamic>).data!
+        .toList()
+        .cast<ModelLibrary>(),
+    providers: (results[7] as Response<dynamic>).data!
+        .toList()
+        .cast<api_models.Provider>(),
+  );
+});
+
+class _AdminSnapshot {
+  const _AdminSnapshot({
+    required this.settings,
+    required this.users,
+    required this.health,
+    required this.roots,
+    required this.integrations,
+    required this.audit,
+    required this.libraries,
+    required this.providers,
+  });
+  final AdminSettings settings;
+  final List<User> users;
+  final List<ServiceHealth> health;
+  final List<StorageRoot> roots;
+  final List<Integration> integrations;
+  final AuditPage audit;
+  final List<ModelLibrary> libraries;
+  final List<api_models.Provider> providers;
+}
+
+class AdministrationScreen extends ConsumerWidget {
+  const AdministrationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(clientSessionProvider);
+    if (session?.administrator != true) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Administration')),
+        body: const Center(child: Text('Administrator access is required.')),
+      );
+    }
+    final data = ref.watch(_adminSnapshotProvider);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Administration')),
+      body: data.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Administration data is unavailable.'),
+              const SizedBox(height: 8),
+              FilledButton(
+                onPressed: () => ref.invalidate(_adminSnapshotProvider),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        data: (snapshot) => _AdminContent(snapshot: snapshot),
+      ),
+    );
+  }
+}
+
+class _AdminContent extends ConsumerWidget {
+  const _AdminContent({required this.snapshot});
+  final _AdminSnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(userPreferencesProvider).asData?.value.locale;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _ServerSettings(snapshot.settings),
+        _DiscoveryScope(snapshot.settings, snapshot.providers),
+        _UserManagement(snapshot.users),
+        _LibraryManagement(snapshot, locale: locale),
+        _HealthAndIntegrations(snapshot),
+        _Operations(snapshot, locale: locale),
+      ],
+    );
+  }
+}
+
+class _ServerSettings extends StatelessWidget {
+  const _ServerSettings(this.settings);
+  final AdminSettings settings;
+
+  @override
+  Widget build(BuildContext context) => _AdminSection(
+    title: 'Server and transfer settings',
+    children: [
+      _saveText(
+        context,
+        'Server name',
+        settings.serverName ?? '',
+        (value) => _putSettings(
+          context,
+          settings.rebuild((b) => b.serverName = value.trim()),
+        ),
+      ),
+      _saveText(
+        context,
+        'Public base URL (optional)',
+        settings.publicBaseUrl ?? '',
+        (value) {
+          final text = value.trim();
+          final uri = text.isEmpty ? null : Uri.tryParse(text);
+          if (text.isNotEmpty &&
+              (uri == null || !uri.hasScheme || uri.host.isEmpty)) {
+            _toast(context, 'Enter a valid absolute URL.');
+            return;
+          }
+          _putSettings(
+            context,
+            settings.rebuild(
+              (b) => b.publicBaseUrl = text.isEmpty ? null : text,
+            ),
+          );
+        },
+      ),
+      _saveInt(
+        context,
+        'Concurrent downloads',
+        settings.activeDownloads ?? 2,
+        1,
+        20,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.activeDownloads = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Downloads per user',
+        settings.activeDownloadsPerUser ?? 1,
+        1,
+        20,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.activeDownloadsPerUser = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Active seed jobs',
+        settings.activeSeeds ?? 2,
+        0,
+        50,
+        (v) =>
+            _putSettings(context, settings.rebuild((b) => b.activeSeeds = v)),
+      ),
+      _saveInt(
+        context,
+        'Global connections',
+        settings.globalConnections ?? 100,
+        1,
+        5000,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.globalConnections = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Connections per torrent',
+        settings.connectionsPerTorrent ?? 40,
+        1,
+        1000,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.connectionsPerTorrent = v),
+        ),
+      ),
+      _saveNullableIntBounded(
+        context,
+        'Download limit (bytes/second; rounded down to KiB/s; blank = unlimited)',
+        settings.downloadLimitBytesPerSecond,
+        1073741824,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.downloadLimitBytesPerSecond = v),
+        ),
+      ),
+      _saveNullableIntBounded(
+        context,
+        'Upload limit (bytes/second; rounded down to KiB/s; blank = unlimited)',
+        settings.uploadLimitBytesPerSecond,
+        1073741824,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.uploadLimitBytesPerSecond = v),
+        ),
+      ),
+      _saveNullableDouble(
+        context,
+        'Default seed ratio (blank = unlimited)',
+        settings.defaultRatioLimit,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.defaultRatioLimit = v),
+        ),
+      ),
+      _saveNullableInt(
+        context,
+        'Default seed minutes (blank = unlimited)',
+        settings.defaultSeedTimeMinutes,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.defaultSeedTimeMinutes = v),
+        ),
+      ),
+      _saveNullableInt(
+        context,
+        'Default user quota (bytes; blank = unlimited)',
+        settings.defaultUserQuotaBytes,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.defaultUserQuotaBytes = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Low disk floor (bytes)',
+        settings.lowDiskFloorBytes ?? 5368709120,
+        0,
+        9007199254740991,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.lowDiskFloorBytes = v),
+        ),
+      ),
+      _saveDouble(
+        context,
+        'Low disk floor fraction',
+        settings.lowDiskFloorFraction ?? .05,
+        0,
+        .5,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.lowDiskFloorFraction = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Thumbnail cache limit (bytes)',
+        settings.thumbnailCacheMaxBytes ?? 536870912,
+        0,
+        8589934592,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.thumbnailCacheMaxBytes = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Audit retention (days)',
+        settings.auditRetentionDays ?? 30,
+        1,
+        3650,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.auditRetentionDays = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Library scan interval (seconds)',
+        settings.libraryScanIntervalSeconds ?? 3600,
+        60,
+        31536000,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.libraryScanIntervalSeconds = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Discovery cache (seconds)',
+        settings.discoveryCacheSeconds ?? 300,
+        30,
+        86400,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.discoveryCacheSeconds = v),
+        ),
+      ),
+      _saveInt(
+        context,
+        'Recent refresh (seconds)',
+        settings.discoveryRecentRefreshSeconds ?? 900,
+        60,
+        86400,
+        (v) => _putSettings(
+          context,
+          settings.rebuild((b) => b.discoveryRecentRefreshSeconds = v),
+        ),
+      ),
+    ],
+  );
+}
+
+class _DiscoveryScope extends ConsumerStatefulWidget {
+  const _DiscoveryScope(this.settings, this.providers);
+  final AdminSettings settings;
+  final List<api_models.Provider> providers;
+
+  @override
+  ConsumerState<_DiscoveryScope> createState() => _DiscoveryScopeState();
+}
+
+class _DiscoveryScopeState extends ConsumerState<_DiscoveryScope> {
+  late final TextEditingController _providers;
+  late final TextEditingController _categories;
+  late String _providerMode;
+  late String _categoryMode;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _providers = TextEditingController(
+      text: widget.settings.enabledProviderIds?.join('\n') ?? '',
+    );
+    _categories = TextEditingController(
+      text: widget.settings.enabledCategoryIds?.join('\n') ?? '',
+    );
+    _providerMode = widget.settings.enabledProviderIds == null
+        ? 'all'
+        : 'selected';
+    _categoryMode = widget.settings.enabledCategoryIds == null
+        ? 'all'
+        : 'selected';
+  }
+
+  @override
+  void dispose() {
+    _providers.dispose();
+    _categories.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => _AdminSection(
+    title: 'Discovery scope',
+    children: [
+      const Text(
+        'Choose which configured providers and category IDs can appear in discovery. The server enforces this scope for every user.',
+      ),
+      const SizedBox(height: 8),
+      _scopeMode(
+        'Providers',
+        _providerMode,
+        (value) => setState(() => _providerMode = value),
+      ),
+      if (_providerMode == 'selected')
+        TextField(
+          controller: _providers,
+          minLines: 1,
+          maxLines: 4,
+          decoration: InputDecoration(
+            labelText: 'Provider IDs',
+            helperText: 'One ID per line. Maximum 100 IDs; each ID is at most 128 characters.',
+            border: const OutlineInputBorder(),
+            suffixIcon: PopupMenuButton<String>(
+              tooltip: 'Choose configured provider IDs',
+              icon: const Icon(Icons.list_alt),
+              itemBuilder: (_) => widget.providers
+                  .map(
+                    (provider) => PopupMenuItem(
+                      value: provider.id,
+                      child: Text('${provider.name} · ${provider.id}'),
+                    ),
+                  )
+                  .toList(),
+              onSelected: (id) {
+                final ids = _parseTokens(_providers.text);
+                if (!ids.contains(id)) ids.add(id);
+                _providers.text = ids.join('\n');
+              },
+            ),
+          ),
+        ),
+      const SizedBox(height: 8),
+      _scopeMode(
+        'Categories',
+        _categoryMode,
+        (value) => setState(() => _categoryMode = value),
+      ),
+      if (_categoryMode == 'selected')
+        TextField(
+          controller: _categories,
+          minLines: 1,
+          maxLines: 4,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: 'Category IDs',
+            helperText: 'Enter non-negative numeric IDs separated by commas or lines. Maximum 100 IDs.',
+            border: const OutlineInputBorder(),
+            suffixIcon: PopupMenuButton<int>(
+              tooltip: 'Choose configured category IDs',
+              icon: const Icon(Icons.list_alt),
+              itemBuilder: (_) {
+                final ids =
+                    widget.providers
+                        .expand((provider) => provider.categories)
+                        .toSet()
+                        .toList()
+                      ..sort();
+                return ids
+                    .map((id) => PopupMenuItem(value: id, child: Text('$id')))
+                    .toList();
+              },
+              onSelected: (id) {
+                final ids = _parseTokens(_categories.text);
+                if (!ids.contains('$id')) ids.add('$id');
+                _categories.text = ids.join('\n');
+              },
+            ),
+          ),
+        ),
+      Align(
+        alignment: Alignment.centerRight,
+        child: FilledButton(
+          onPressed: _saving ? null : _save,
+          child: Text(_saving ? 'Saving…' : 'Save discovery scope'),
+        ),
+      ),
+    ],
+  );
+
+  Widget _scopeMode(
+    String label,
+    String value,
+    ValueChanged<String> onChanged,
+  ) => DropdownButtonFormField<String>(
+    initialValue: value,
+    decoration: InputDecoration(labelText: '$label scope'),
+    items: const [
+      DropdownMenuItem(value: 'all', child: Text('All (no restriction)')),
+      DropdownMenuItem(value: 'selected', child: Text('Selected IDs')),
+    ],
+    onChanged: (next) {
+      if (next != null) onChanged(next);
+    },
+  );
+
+  Future<void> _save() async {
+    final providerIds = _providerMode == 'all'
+        ? null
+        : _parseTokens(_providers.text);
+    final categoryStrings = _categoryMode == 'all'
+        ? null
+        : _parseTokens(_categories.text);
+    if (providerIds != null &&
+        (providerIds.length > 100 ||
+            providerIds.any((id) => id.length > 128))) {
+      _toast(
+        context,
+        'Use at most 100 provider IDs, each no longer than 128 characters.',
+      );
+      return;
+    }
+    final categoryIds = <int>[];
+    if (categoryStrings != null) {
+      if (categoryStrings.length > 100) {
+        _toast(context, 'Use at most 100 category IDs.');
+        return;
+      }
+      for (final token in categoryStrings) {
+        final id = int.tryParse(token);
+        if (id == null || id < 0) {
+          _toast(context, 'Category IDs must be non-negative whole numbers.');
+          return;
+        }
+        categoryIds.add(id);
+      }
+    }
+    final updated = widget.settings.rebuild((b) {
+      if (providerIds == null) {
+        b.enabledProviderIds = null;
+      } else {
+        b.enabledProviderIds.replace(providerIds);
+      }
+      if (categoryStrings == null) {
+        b.enabledCategoryIds = null;
+      } else {
+        b.enabledCategoryIds.replace(categoryIds);
+      }
+    });
+    setState(() => _saving = true);
+    await _putSettings(context, updated);
+    if (mounted) setState(() => _saving = false);
+  }
+
+  List<String> _parseTokens(String text) => text
+      .split(RegExp(r'[,\n]'))
+      .map((value) => value.trim())
+      .where((value) => value.isNotEmpty)
+      .toSet()
+      .toList();
+}
+
+class _UserManagement extends ConsumerWidget {
+  const _UserManagement(this.users);
+  final List<User> users;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
+    title: 'Users and access',
+    trailing: FilledButton.icon(
+      onPressed: () => _createUser(context, ref),
+      icon: const Icon(Icons.person_add_alt_1),
+      label: const Text('Create user'),
+    ),
+    children: [
+      for (final user in users)
+        ListTile(
+          title: Text(user.displayName),
+          subtitle: Text('${user.username} · ${user.role.name}'),
+          leading: Icon(
+            user.role == UserRoleEnum.administrator
+                ? Icons.admin_panel_settings
+                : Icons.person_outline,
+          ),
+          trailing: Wrap(
+            spacing: 4,
+            children: [
+              Semantics(
+                label: 'Enable ${user.displayName}',
+                child: Switch(
+                  value: user.enabled,
+                  onChanged: (enabled) =>
+                      _editUser(context, ref, user, enabled: enabled),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Reset ${user.displayName} password',
+                icon: const Icon(Icons.password),
+                onPressed: () => _resetPassword(context, ref, user),
+              ),
+            ],
+          ),
+        ),
+      if (users.isEmpty) const ListTile(title: Text('No users returned.')),
+    ],
+  );
+}
+
+class _LibraryManagement extends ConsumerStatefulWidget {
+  const _LibraryManagement(this.snapshot, {this.locale});
+  final _AdminSnapshot snapshot;
+  final String? locale;
+  @override
+  ConsumerState<_LibraryManagement> createState() => _LibraryManagementState();
+}
+
+class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
+  String? _selectedLibrary;
+  GetLibraryGrants200Response? _grants;
+  bool _loadingGrants = false;
+
+  Future<void> _loadGrants(String id) async {
+    setState(() {
+      _selectedLibrary = id;
+      _loadingGrants = true;
+    });
+    final session = _captureAdminSession(ref);
+    if (session == null) {
+      setState(() {
+        _grants = null;
+        _loadingGrants = false;
+      });
+      return;
+    }
+    try {
+      final grants = (await session.api.getLibrariesApi().getLibraryGrants(
+        id: id,
+      )).data!;
+      if (mounted &&
+          _selectedLibrary == id &&
+          _sameAdminSession(ref, session)) {
+        setState(() {
+          _grants = grants;
+          _loadingGrants = false;
+        });
+      }
+    } catch (_) {
+      if (mounted && _sameAdminSession(ref, session)) {
+        setState(() {
+          _grants = null;
+          _loadingGrants = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final snapshot = widget.snapshot;
+    final selected = snapshot.libraries
+        .where((l) => l.id == _selectedLibrary)
+        .firstOrNull;
+    return _AdminSection(
+      title: 'Libraries, grants and storage',
+      trailing: FilledButton.icon(
+        onPressed: snapshot.roots.isEmpty
+            ? null
+            : () => _createLibrary(context, ref, snapshot.roots),
+        icon: const Icon(Icons.create_new_folder_outlined),
+        label: const Text('Add library'),
+      ),
+      children: [
+        for (final root in snapshot.roots)
+          ListTile(
+            leading: Icon(
+              root.available && root.writable
+                  ? Icons.storage
+                  : Icons.storage_outlined,
+            ),
+            title: Text(root.label),
+            subtitle: Text(
+              '${root.available ? 'Available' : 'Unavailable'} · ${root.writable ? 'Writable' : 'Read-only'}'
+              '${root.freeBytes == null ? '' : ' · ${_bytes(root.freeBytes!, locale: widget.locale)} free'}',
+            ),
+          ),
+        for (final library in snapshot.libraries)
+          ListTile(
+            title: Text(library.name),
+            subtitle: Text(
+              '${library.enabled ? 'Enabled' : 'Disabled'} · ${library.readOnly ? 'Read-only' : 'Writable'}',
+            ),
+            trailing: Wrap(
+              children: [
+                IconButton(
+                  tooltip: 'Manage ${library.name} access',
+                  icon: const Icon(Icons.group_outlined),
+                  onPressed: () => _loadGrants(library.id),
+                ),
+                IconButton(
+                  tooltip: 'Scan ${library.name}',
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => _scanLibrary(context, ref, library),
+                ),
+              ],
+            ),
+          ),
+        if (snapshot.libraries.isEmpty)
+          const ListTile(title: Text('No libraries are configured.')),
+        if (_selectedLibrary != null) ...[
+          const Divider(),
+          Text(
+            'Access for ${selected?.name ?? 'library'}',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          if (_loadingGrants) const LinearProgressIndicator(),
+          if (_grants != null)
+            for (final user in snapshot.users.where(
+              (u) => u.role != UserRoleEnum.administrator,
+            ))
+              _grantRow(context, ref, user, _grants!),
+          if (_grants != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton(
+                onPressed: () =>
+                    _saveGrants(context, ref, _selectedLibrary!, _grants!),
+                child: const Text('Save access'),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+
+  Widget _grantRow(
+    BuildContext context,
+    WidgetRef ref,
+    User user,
+    GetLibraryGrants200Response response,
+  ) {
+    final grant = response.grants.where((g) => g.userId == user.id).firstOrNull;
+    return StatefulBuilder(
+      builder: (context, setLocal) {
+        var read = grant?.read ?? false;
+        var download = grant?.download ?? false;
+        var manage = grant?.manage ?? false;
+        final quota = grant?.quotaBytes;
+        void store() {
+          final grants = response.grants
+              .where((g) => g.userId != user.id)
+              .toList();
+          if (read || download || manage) {
+            grants.add(
+              LibraryGrant(
+                (b) => b
+                  ..userId = user.id
+                  ..read = read
+                  ..download = download
+                  ..manage = manage
+                  ..quotaBytes = quota,
+              ),
+            );
+          }
+          setState(
+            () => _grants = response.rebuild((b) => b.grants.replace(grants)),
+          );
+        }
+
+        return Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SizedBox(width: 140, child: Text(user.displayName)),
+            SizedBox(
+              width: 150,
+              child: CheckboxListTile(
+                dense: true,
+                title: const Text('Read'),
+                value: read,
+                onChanged: (v) => setLocal(() {
+                  read = v == true;
+                  store();
+                }),
+              ),
+            ),
+            SizedBox(
+              width: 170,
+              child: CheckboxListTile(
+                dense: true,
+                title: const Text('Download'),
+                value: download,
+                onChanged: (v) => setLocal(() {
+                  download = v == true;
+                  store();
+                }),
+              ),
+            ),
+            SizedBox(
+              width: 150,
+              child: CheckboxListTile(
+                dense: true,
+                title: const Text('Manage'),
+                value: manage,
+                onChanged: (v) => setLocal(() {
+                  manage = v == true;
+                  store();
+                }),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _HealthAndIntegrations extends ConsumerWidget {
+  const _HealthAndIntegrations(this.snapshot);
+  final _AdminSnapshot snapshot;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
+    title: 'Service health and integrations',
+    children: [
+      for (final health in snapshot.health)
+        ListTile(
+          leading: Icon(
+            health.state == ServiceHealthStateEnum.healthy
+                ? Icons.check_circle_outline
+                : Icons.warning_amber,
+          ),
+          title: Text(health.service),
+          subtitle: Text(
+            '${health.state.name}${health.detail == null ? '' : ' · ${health.detail}'}',
+          ),
+        ),
+      for (final item in snapshot.integrations)
+        ListTile(
+          title: Text(item.kind.name),
+          subtitle: Text(
+            '${item.health.state.name} · ${item.credentialConfigured ? 'Credential configured' : 'No credential configured'}',
+          ),
+          trailing: Wrap(
+            children: [
+              IconButton(
+                tooltip: 'Test ${item.kind.name}',
+                icon: const Icon(Icons.health_and_safety_outlined),
+                onPressed: () => _testIntegration(context, ref, item.kind.name),
+              ),
+              IconButton(
+                tooltip: 'Configure ${item.kind.name}',
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () => _editIntegration(context, ref, item),
+              ),
+            ],
+          ),
+        ),
+      if (snapshot.integrations.isEmpty)
+        const ListTile(title: Text('No integration status is available.')),
+    ],
+  );
+}
+
+class _Operations extends ConsumerWidget {
+  const _Operations(this.snapshot, {this.locale});
+  final _AdminSnapshot snapshot;
+  final String? locale;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
+    title: 'Maintenance and audit',
+    children: [
+      Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          OutlinedButton.icon(
+            icon: const Icon(Icons.document_scanner_outlined),
+            label: const Text('Rescan libraries'),
+            onPressed: () => _maintenance(
+              context,
+              ref,
+              MaintenanceRequestActionEnum.rescanLibraries,
+            ),
+          ),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.cleaning_services_outlined),
+            label: const Text('Clean thumbnail cache'),
+            onPressed: () => _maintenance(
+              context,
+              ref,
+              MaintenanceRequestActionEnum.pruneThumbnailCache,
+            ),
+          ),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Database snapshot'),
+            onPressed: () => _maintenance(
+              context,
+              ref,
+              MaintenanceRequestActionEnum.databaseSnapshot,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      const Text('Recent audit activity (server-redacted)'),
+      for (final item in snapshot.audit.items)
+        ListTile(
+          dense: true,
+          title: Text(item.action),
+          subtitle: Text(
+            '${formatDateTime(item.occurredAt, locale: locale)} · ${item.actorId ?? 'System'}',
+          ),
+        ),
+      if (snapshot.audit.truncated)
+        const Text('More audit records are available.'),
+    ],
+  );
+}
+
+class _AdminSection extends StatelessWidget {
+  const _AdminSection({
+    required this.title,
+    required this.children,
+    this.trailing,
+  });
+  final String title;
+  final List<Widget> children;
+  final Widget? trailing;
+  @override
+  Widget build(BuildContext context) => Card(
+    margin: const EdgeInsets.only(bottom: 16),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              ?trailing,
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...children,
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _saveText(
+  BuildContext context,
+  String label,
+  String value,
+  ValueChanged<String> save,
+) => Padding(
+  padding: const EdgeInsets.symmetric(vertical: 4),
+  child: TextFormField(
+    key: ValueKey('$label:$value'),
+    initialValue: value,
+    maxLength: 200,
+    decoration: InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(),
+    ),
+    onFieldSubmitted: save,
+  ),
+);
+
+Widget _saveInt(
+  BuildContext context,
+  String label,
+  int value,
+  int min,
+  int max,
+  ValueChanged<int> save,
+) => _saveText(context, label, '$value', (raw) {
+  final parsed = int.tryParse(raw.trim());
+  if (parsed == null || parsed < min || parsed > max) {
+    _toast(context, '$label must be between $min and $max.');
+    return;
+  }
+  save(parsed);
+});
+
+Widget _saveDouble(
+  BuildContext context,
+  String label,
+  double value,
+  double min,
+  double max,
+  ValueChanged<double> save,
+) => _saveText(context, label, '$value', (raw) {
+  final parsed = double.tryParse(raw.trim());
+  if (parsed == null || !parsed.isFinite || parsed < min || parsed > max) {
+    _toast(context, '$label is outside its allowed range.');
+    return;
+  }
+  save(parsed);
+});
+
+Widget _saveNullableInt(
+  BuildContext context,
+  String label,
+  int? value,
+  ValueChanged<int?> save,
+) => _saveText(context, label, value?.toString() ?? '', (raw) {
+  final text = raw.trim();
+  final parsed = text.isEmpty ? null : int.tryParse(text);
+  if (text.isNotEmpty && (parsed == null || parsed < 0)) {
+    _toast(context, '$label must be zero or greater.');
+    return;
+  }
+  save(parsed);
+});
+
+Widget _saveNullableIntBounded(
+  BuildContext context,
+  String label,
+  int? value,
+  int max,
+  ValueChanged<int?> save,
+) => _saveText(context, label, value?.toString() ?? '', (raw) {
+  final text = raw.trim();
+  final parsed = text.isEmpty ? null : int.tryParse(text);
+  if (text.isNotEmpty && (parsed == null || parsed < 0 || parsed > max)) {
+    _toast(
+      context,
+      '$label must be between 0 and $max, or blank for unlimited.',
+    );
+    return;
+  }
+  save(parsed);
+});
+
+Widget _saveNullableDouble(
+  BuildContext context,
+  String label,
+  double? value,
+  ValueChanged<double?> save,
+) => _saveText(context, label, value?.toString() ?? '', (raw) {
+  final text = raw.trim();
+  final parsed = text.isEmpty ? null : double.tryParse(text);
+  if (text.isNotEmpty && (parsed == null || !parsed.isFinite || parsed < 0)) {
+    _toast(context, '$label must be zero or greater.');
+    return;
+  }
+  save(parsed);
+});
+
+Future<void> _putSettings(BuildContext context, AdminSettings settings) async {
+  final container = ProviderScope.containerOf(context, listen: false);
+  final session = container.read(clientSessionProvider);
+  if (session == null || !session.administrator) {
+    if (context.mounted) _toast(context, 'Administrator access is required.');
+    return;
+  }
+  try {
+    await session.api.getAdministrationApi().setAdminSettings(
+      adminSettings: settings,
+    );
+    if (context.mounted &&
+        identical(container.read(clientSessionProvider), session)) {
+      container.invalidate(_adminSnapshotProvider);
+    }
+  } catch (_) {
+    if (context.mounted &&
+        identical(container.read(clientSessionProvider), session)) {
+      _toast(context, 'The server rejected this setting. Refresh and retry.');
+    }
+  }
+}
+
+Future<void> _createUser(BuildContext context, WidgetRef ref) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  var username = '';
+  var name = '';
+  var password = '';
+  final value = await showDialog<(String, String, String)>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Create member account'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            decoration: const InputDecoration(labelText: 'Username'),
+            onChanged: (v) => username = v,
+          ),
+          TextFormField(
+            decoration: const InputDecoration(labelText: 'Display name'),
+            onChanged: (v) => name = v,
+          ),
+          TextFormField(
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Initial password'),
+            onChanged: (v) => password = v,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, (username, name, password)),
+          child: const Text('Create'),
+        ),
+      ],
+    ),
+  );
+  if (!context.mounted) return;
+  if (!_sameAdminSession(ref, session)) return;
+  if (value == null) return;
+  if (value.$1.trim().isEmpty ||
+      value.$2.trim().isEmpty ||
+      value.$3.length < 12 ||
+      value.$3.length > 128) {
+    _toast(
+      context,
+      'Enter a username, display name, and password of 12–128 characters.',
+    );
+    return;
+  }
+  try {
+    await session.api.getAdministrationApi().createUser(
+      createUser: CreateUser(
+        (b) => b
+          ..username = value.$1.trim()
+          ..displayName = value.$2.trim()
+          ..password = value.$3
+          ..role = CreateUserRoleEnum.member,
+      ),
+      idempotencyKey: 'create-user-${DateTime.now().microsecondsSinceEpoch}',
+    );
+    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'The account could not be created.');
+    }
+  }
+}
+
+Future<void> _editUser(
+  BuildContext context,
+  WidgetRef ref,
+  User user, {
+  required bool enabled,
+}) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  try {
+    await session.api.getAdministrationApi().updateUser(
+      id: user.id,
+      patchUser: PatchUser(
+        (b) => b
+          ..enabled = enabled
+          ..version = user.version,
+      ),
+    );
+    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'The account could not be updated.');
+    }
+  }
+}
+
+Future<void> _resetPassword(
+  BuildContext context,
+  WidgetRef ref,
+  User user,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  var password = '';
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Reset ${user.displayName} password?'),
+      content: TextFormField(
+        obscureText: true,
+        decoration: const InputDecoration(labelText: 'New password'),
+        onChanged: (v) => password = v,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Reset and revoke sessions'),
+        ),
+      ],
+    ),
+  );
+  if (!context.mounted) return;
+  if (!_sameAdminSession(ref, session)) return;
+  if (confirmed != true) return;
+  if (password.length < 12 || password.length > 128) {
+    _toast(context, 'Password must be 12–128 characters.');
+    return;
+  }
+  try {
+    await session.api.getAdministrationApi().resetUserPassword(
+      id: user.id,
+      passwordReset: PasswordReset(
+        (b) => b
+          ..newPassword = password
+          ..version = user.version,
+      ),
+    );
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(
+        context,
+        'Password changed; the user’s other sessions were revoked.',
+      );
+    }
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'The password could not be reset.');
+    }
+  }
+}
+
+Future<void> _createLibrary(
+  BuildContext context,
+  WidgetRef ref,
+  List<StorageRoot> roots,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  final availableRoots = roots.where((r) => r.available && r.writable).toList();
+  if (availableRoots.isEmpty) {
+    _toast(context, 'No writable mounted storage roots are available.');
+    return;
+  }
+  final api = session.api.getAdministrationApi();
+  final directories = <String, List<StorageDirectory>>{};
+  try {
+    final responses = await Future.wait(
+      availableRoots.map((root) => api.listStorageDirectories(id: root.id)),
+    );
+    for (var i = 0; i < availableRoots.length; i++) {
+      directories[availableRoots[i].id] = responses[i].data!.toList();
+    }
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Could not browse this mounted storage root.');
+    }
+    return;
+  }
+  if (!context.mounted || !_sameAdminSession(ref, session)) return;
+  final rootsWithDirs = availableRoots
+      .where((r) => directories[r.id]!.isNotEmpty)
+      .toList();
+  if (rootsWithDirs.isEmpty) {
+    _toast(
+      context,
+      'No eligible directories are available under mounted storage.',
+    );
+    return;
+  }
+  var name = '';
+  var description = '';
+  var selectedRoot = rootsWithDirs.first;
+  var relative = directories[selectedRoot.id]!.first.relativePath;
+  var readOnly = false;
+  final result = await showDialog<(String, String, String, String, bool)>(
+    context: context,
+    builder: (context) => StatefulBuilder(
+      builder: (context, setDialog) => AlertDialog(
+        title: const Text('Add library'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: selectedRoot.id,
+              decoration: const InputDecoration(labelText: 'Mounted storage'),
+              items: [
+                for (final root in rootsWithDirs)
+                  DropdownMenuItem(value: root.id, child: Text(root.label)),
+              ],
+              onChanged: (id) {
+                if (id != null) {
+                  setDialog(() {
+                    selectedRoot = rootsWithDirs.firstWhere(
+                      (root) => root.id == id,
+                    );
+                    relative = directories[id]!.first.relativePath;
+                  });
+                }
+              },
+            ),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Library name'),
+              onChanged: (v) => name = v,
+            ),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Description'),
+              onChanged: (v) => description = v,
+            ),
+            DropdownButtonFormField<String>(
+              key: ValueKey('${selectedRoot.id}:$relative'),
+              initialValue: relative,
+              decoration: const InputDecoration(labelText: 'Directory'),
+              items: [
+                for (final d in directories[selectedRoot.id]!)
+                  DropdownMenuItem(value: d.relativePath, child: Text(d.name)),
+              ],
+              onChanged: (v) {
+                if (v != null) setDialog(() => relative = v);
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Read-only library'),
+              value: readOnly,
+              onChanged: (v) => setDialog(() => readOnly = v),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, (
+              name,
+              description,
+              selectedRoot.id,
+              relative,
+              readOnly,
+            )),
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (!context.mounted) return;
+  if (!_sameAdminSession(ref, session)) return;
+  if (result == null) return;
+  if (result.$1.trim().isEmpty) {
+    _toast(context, 'Enter a library name.');
+    return;
+  }
+  try {
+    await session.api.getLibrariesApi().createLibrary(
+      libraryCreate: LibraryCreate(
+        (b) => b
+          ..name = result.$1.trim()
+          ..description = result.$2.trim()
+          ..storageRootId = result.$3
+          ..relativePath = result.$4
+          ..readOnly = result.$5,
+      ),
+      idempotencyKey: 'create-library-${DateTime.now().microsecondsSinceEpoch}',
+    );
+    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'The library could not be added.');
+    }
+  }
+}
+
+Future<void> _scanLibrary(
+  BuildContext context,
+  WidgetRef ref,
+  ModelLibrary library,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  final approved = await _confirm(
+    context,
+    'Scan ${library.name}?',
+    'The server will scan its registered directory for library changes.',
+  );
+  if (!approved || !context.mounted) return;
+  if (!_sameAdminSession(ref, session)) return;
+  try {
+    await session.api.getLibrariesApi().scanLibrary(
+      id: library.id,
+      idempotencyKey:
+          'scan-${library.id}-${DateTime.now().microsecondsSinceEpoch}',
+    );
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Library scan queued.');
+    }
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Could not queue the library scan.');
+    }
+  }
+}
+
+Future<void> _saveGrants(
+  BuildContext context,
+  WidgetRef ref,
+  String id,
+  GetLibraryGrants200Response grants,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  try {
+    await session.api.getLibrariesApi().setLibraryGrants(
+      id: id,
+      grantUpdate: GrantUpdate(
+        (b) => b
+          ..version = grants.version
+          ..grants.replace(grants.grants),
+      ),
+    );
+    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Library access saved.');
+    }
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(
+        context,
+        'Access changed elsewhere or could not be saved. Reload and retry.',
+      );
+    }
+  }
+}
+
+Future<void> _testIntegration(
+  BuildContext context,
+  WidgetRef ref,
+  String kind,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  try {
+    final response = await session.api.getAdministrationApi().testIntegration(
+      kind: kind,
+    );
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(
+        context,
+        '${response.data!.service}: ${response.data!.state.name}',
+      );
+    }
+    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(
+        context,
+        'Integration test failed. Check service health and configuration.',
+      );
+    }
+  }
+}
+
+Future<void> _editIntegration(
+  BuildContext context,
+  WidgetRef ref,
+  Integration integration,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  var baseUrl = integration.baseUrl;
+  var username = '';
+  var secret = '';
+  final result = await showDialog<(String, String, String)>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Configure ${integration.kind.name}'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            initialValue: baseUrl,
+            decoration: const InputDecoration(labelText: 'Service URL'),
+            onChanged: (v) => baseUrl = v,
+          ),
+          TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Username (if required)',
+            ),
+            onChanged: (v) => username = v,
+          ),
+          TextFormField(
+            obscureText: true,
+            decoration: InputDecoration(
+              labelText: 'New secret',
+              helperText: integration.credentialConfigured
+                  ? 'Leave blank to keep the saved credential.'
+                  : 'Secret is stored only by the server.',
+            ),
+            onChanged: (v) => secret = v,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, (baseUrl, username, secret)),
+          child: const Text('Save'),
+        ),
+      ],
+    ),
+  );
+  if (!context.mounted) return;
+  if (!_sameAdminSession(ref, session)) return;
+  if (result == null) return;
+  final uri = Uri.tryParse(result.$1.trim());
+  if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+    _toast(context, 'Enter an absolute service URL.');
+    return;
+  }
+  try {
+    await session.api.getAdministrationApi().setIntegration(
+      kind: integration.kind.name,
+      integrationUpdate: IntegrationUpdate(
+        (b) => b
+          ..baseUrl = result.$1.trim()
+          ..username = result.$2.trim().isEmpty ? null : result.$2.trim()
+          ..secret = result.$3.isEmpty ? null : result.$3
+          ..version = integration.version,
+      ),
+    );
+    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Integration settings saved.');
+    }
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Could not save integration settings.');
+    }
+  }
+}
+
+Future<void> _maintenance(
+  BuildContext context,
+  WidgetRef ref,
+  MaintenanceRequestActionEnum action,
+) async {
+  final session = _captureAdminSession(ref);
+  if (session == null) return;
+  final label = switch (action) {
+    MaintenanceRequestActionEnum.rescanLibraries => 'Rescan libraries',
+    MaintenanceRequestActionEnum.pruneThumbnailCache => 'Clean thumbnail cache',
+    MaintenanceRequestActionEnum.databaseSnapshot => 'Create database snapshot',
+    _ => 'Run maintenance job',
+  };
+  final detail = action == MaintenanceRequestActionEnum.databaseSnapshot
+      ? 'This creates an application database snapshot only. It is not a full-stack backup of Docker services or media files.'
+      : 'This queues a bounded maintenance job on the server.';
+  if (!await _confirm(context, '$label?', detail) || !context.mounted) return;
+  if (!_sameAdminSession(ref, session)) return;
+  try {
+    final job = (await session.api.getAdministrationApi().runMaintenance(
+      maintenanceRequest: MaintenanceRequest((b) => b..action = action),
+      idempotencyKey:
+          'maintenance-${action.name}-${DateTime.now().microsecondsSinceEpoch}',
+    )).data!;
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, '${job.kind}: ${job.state.name}');
+    }
+  } catch (_) {
+    if (context.mounted && _sameAdminSession(ref, session)) {
+      _toast(context, 'Maintenance job could not be started.');
+    }
+  }
+}
+
+Future<bool> _confirm(
+  BuildContext context,
+  String title,
+  String detail,
+) async =>
+    await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(detail),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    ) ==
+    true;
+
+ClientSession? _captureAdminSession(WidgetRef ref) {
+  final session = ref.read(clientSessionProvider);
+  return session?.administrator == true ? session : null;
+}
+
+bool _sameAdminSession(WidgetRef ref, ClientSession session) =>
+    session.administrator &&
+    identical(ref.read(clientSessionProvider), session);
+
+void _toast(BuildContext context, String message) =>
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+
+String _bytes(int value, {String? locale}) =>
+    formatBytes(value, locale: locale);

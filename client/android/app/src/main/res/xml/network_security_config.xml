@@ -1,0 +1,6 @@
+<network-security-config>
+    <!-- Dart validates explicit trusted-LAN opt-in before credentials are used. -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors><certificates src="system" /></trust-anchors>
+    </base-config>
+</network-security-config>
