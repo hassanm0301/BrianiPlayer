@@ -1,0 +1,14 @@
+Running owned egress case: tracker
+tracker: passed
+Running owned egress case: webseed
+webseed: passed
+Running owned egress case: explicitPeer
+explicitPeer: passed
+Running owned egress case: trackerRedirect
+trackerRedirect: passed
+Running owned egress case: webseedRedirect
+webseedRedirect: passed
+Running owned egress case: trackerDnsRebind
+trackerDnsRebind: passed
+Running owned egress case: webseedDnsRebind
+webseedDnsRebind: passed

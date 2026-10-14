@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "runId": "dfe5552380d54e6e8000f314e1ada4cb",
+  "network": "briani-m05-api-dfe5552380d5",
+  "fixtureRoot": "/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generated",
+  "containerImageId": "sha256:841a812384c909cf64da00fe62a28de9557dd76bae448c49188895a121e725e1",
+  "apiRestarts": 5,
+  "exactBoundaryCrashes": [
+    {
+      "boundary": "download:after_add",
+      "signal": "SIGKILL",
+      "exitCode": 137,
+      "markerProcessId": 1
+    },
+    {
+      "boundary": "import:link_applied",
+      "signal": "SIGKILL",
+      "exitCode": 137,
+      "markerProcessId": 1
+    },
+    {
+      "boundary": "download:engine_removed",
+      "signal": "SIGKILL",
+      "exitCode": 137,
+      "markerProcessId": 1
+    }
+  ],
+  "retainedAfterRemoval": true,
+  "requestId": "7bc131be-1760-4629-a0ab-54ca02ae9c38",
+  "selectionOperationId": "92e8642d-ebc7-473a-897a-b0292cd20695",
+  "torrentHash": "97a1e0c3904c385fbe04510880e8aea2e98e8215",
+  "fixture": "prototypes/playback/fixtures/generated/torrents/Faststart caf\u00e9 [test]-v1.torrent",
+  "trackerlessTorrentSha256": "4798da4fecdf56affc1fb10a07df2a99c596234ee2b2553c31fc8bc081207bb4",
+  "fixtureSha256": "40f1485f12f0d7da01e433ac15d21ec84bd66911c62f1e8648fad6a960578907",
+  "sizeBytes": 15787543,
+  "selectedFileId": "48f87599-b0b3-41ed-b3fd-22ff8905473a",
+  "selectedComplete": "complete",
+  "thumbnailBytes": 13604,
+  "thumbnailMimeType": "image/jpeg",
+  "hardLinkSameDeviceInode": true,
+  "visibleSha256Matches": true,
+  "engineState": "stalledUP",
+  "seedStillRegistered": true,
+  "qBittorrentVersion": "v5.2.4",
+  "externalTrackerOrPeer": false,
+  "networkPublishedPorts": {
+    "8088/tcp": null
+  },
+  "durableRemoval": {
+    "operation": "completed",
+    "requestState": "removed",
+    "removedAtPersisted": true
+  }
+}

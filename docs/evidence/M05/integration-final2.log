@@ -1,0 +1,29 @@
+[0] /usr/bin/dotnet test /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/IntegrationTests.csproj --nologo
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  IntegrationTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 1 s - IntegrationTests.dll (net10.0)
+[0] /usr/bin/dotnet build server/tests/Briani.DownloadTests/DownloadTests.csproj --nologo
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  DownloadTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.65
+[0] /usr/bin/python3 prototypes/downloads/engine/run_pinned_engine.py --fixture-root /home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generated --log /home/hassan/projects/BrianiPlayer/artifacts/dev/20261012T143323.751260Z/pinned-engine.json
+{"result": "passed", "exitCode": 0, "log": "/home/hassan/projects/BrianiPlayer/artifacts/dev/20261012T143323.751260Z/pinned-engine.json", "network": "briani-m05-6e6688425ddb"}
+[0] /usr/bin/python3 prototypes/downloads/engine/run_local_peer_transfer.py --fixture-root /home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generated --log /home/hassan/projects/BrianiPlayer/artifacts/dev/20261012T143323.751260Z/metadata-layout.json
+{"result": "passed", "exitCode": 0, "log": "/home/hassan/projects/BrianiPlayer/artifacts/dev/20261012T143323.751260Z/metadata-layout.json"}
+[0] /usr/bin/python3 prototypes/downloads/lifecycle/run_api_restart.py --fixture-root /home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generated --log /home/hassan/projects/BrianiPlayer/artifacts/dev/20261012T143323.751260Z/api-restart-import.json
+PASS production API admission/selection restart recovery, selected bytes, hard-link identity, and retained isolated seed
+Evidence: artifacts/download-lifecycle/9d59b7a3dd6e42e196ff4d7768865fc6
+Evidence: artifacts/dev/20261012T143323.751260Z
+Task exit status: 0

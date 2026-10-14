@@ -1,0 +1,88 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +1: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +2: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +3: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +4: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +5: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +6: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +7: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:00 +8: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:00 +9: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: saved download settings survive dialog exit and preserve values
+00:02 +10: /home/hassan/projects/BrianiPlayer/client/test/platform_service_test.dart: external handler and launch forward only scoped media URI and MIME
+00:02 +11: /home/hassan/projects/BrianiPlayer/client/test/platform_service_test.dart: external launch omits package when user has not selected one
+00:02 +12: /home/hassan/projects/BrianiPlayer/client/test/platform_service_test.dart: native audio focus events are forwarded and desktop focus is available
+00:02 +13: /home/hassan/projects/BrianiPlayer/client/test/platform_service_test.dart: invalid unscoped URL is rejected before native channel invocation
+00:03 +14: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +15: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +16: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +17: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +18: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +19: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +20: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +21: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: playing overlay hides after inactivity without disposing controls
+00:03 +22: /home/hassan/projects/BrianiPlayer/client/test/playback_relay_test.dart: relay preserves exact ranges, HEAD and never forwards ordinary credentials
+00:03 +23: /home/hassan/projects/BrianiPlayer/client/test/playback_relay_test.dart: relay preserves exact ranges, HEAD and never forwards ordinary credentials
+00:03 +24: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden directional key wakes and traverses immediately
+00:03 +25: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden directional key wakes and traverses immediately
+00:03 +26: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden directional key wakes and traverses immediately
+00:03 +27: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden directional key wakes and traverses immediately
+00:03 +28: /home/hassan/projects/BrianiPlayer/client/test/playback_relay_test.dart: individual cancelled ranges release slots during body gap
+00:03 +29: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden Select wakes and activates focused control
+00:03 +30: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden Select wakes and activates focused control
+00:03 +31: /home/hassan/projects/BrianiPlayer/client/test/tv_overlay_test.dart: first hidden Select wakes and activates focused control
+00:03 +32: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:03 +33: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:03 +34: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:03 +35: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:03 +36: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:03 +37: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:04 +38: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:04 +39: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:04 +40: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:04 +41: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: provider lookup failure is visible while query results still load
+00:04 +42: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: device pairing session early polls are suppressed and HTTP 202 is never parsed as tokens
+00:04 +43: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +44: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +45: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +46: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +47: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +48: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +49: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +50: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +51: /home/hassan/projects/BrianiPlayer/client/test/client_session_test.dart: simultaneous unauthorized calls share rotating refresh and retry once
+00:04 +52: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +53: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +54: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +55: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +56: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +57: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +58: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +59: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +60: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +61: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +62: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: TV displays only human code and never persists private secret
+00:04 +63: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:04 +64: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:04 +65: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:04 +66: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:04 +67: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:04 +68: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:04 +69: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:04 +70: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:04 +71: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:04 +72: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:04 +73: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:05 +74: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:05 +75: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:05 +76: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +77: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +78: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +79: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +80: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +81: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +82: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +83: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:05 +84: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: photo viewer reports an unavailable authorized image and offers retry
+00:05 +85: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: Flutter decodes the generated EXIF-oriented JPEG upright
+00:05 +86: All tests passed!

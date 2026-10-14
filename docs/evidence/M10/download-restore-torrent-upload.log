@@ -1,0 +1,55 @@
+preflight Docker=29.9.0 linux image=briani-server:m10 exact-id ports=free projects=unique
+cli init: exit 0 (expected 0)
+cli doctor-source: exit 0 (expected 0)
+cli qbit-bootstrap: exit 0 (expected 0)
+cli up-source: exit 0 (expected 0)
+api healthz: HTTP 200
+ready Briani source health: observed
+api claim bootstrap: HTTP 201
+bootstrap token claimed over HTTP; token and generated account password withheld
+api create drill member: HTTP 201
+api list storage roots: HTTP 200
+api create drill library: HTTP 201
+api grant drill library: HTTP 200
+ready Prowlarr private config: observed
+cli capture-prowlarr-key: exit 0 (expected 0)
+private upstream config inspection: Prowlarr ApiKey matches mounted key=True; qBittorrent config present=True; WebUI auth fields present=True
+Prowlarr API readiness: authenticated system/status returned version
+loopback Prowlarr API key verified; no indexers are configured
+ready recreated qBittorrent authenticated readiness: observed
+api read mounted integration fallback: HTTP 200
+integration GET confirms read-only mounted credentials configured; no API save has occurred
+api test prowlarr mounted credential: HTTP 200
+api test qbittorrent mounted credential: HTTP 200
+api persist encrypted prowlarr integration: HTTP 200
+api persist encrypted qbittorrent integration: HTTP 200
+api read admin settings: HTTP 200
+api persist qBittorrent desired settings: HTTP 200
+ready durable qBittorrent configuration job: observed
+qBittorrent worker preferences and transfer limits match persisted admin settings
+api read default user preferences: HTTP 200
+api read discovery providers: HTTP 200
+api save user discovery preferences: HTTP 200
+api source member login: HTTP 200
+cli backup: exit 0 (expected 0)
+cleanup stop source before restore: stopped 4 exact project-owned container(s)
+cli restore: exit 0 (expected 0)
+cli doctor-restore: exit 0 (expected 0)
+cli up-restore: exit 0 (expected 0)
+Prowlarr API readiness: authenticated system/status returned version
+api healthz: HTTP 200
+ready restore readiness: observed
+api restore admin login: HTTP 200
+api restore member login: HTTP 200
+api restore users: HTTP 200
+api restore library grant: HTTP 200
+api restore member library access: HTTP 200
+api restore member admin denial: HTTP 403
+api restore encrypted integrations: HTTP 200
+api restore integration prowlarr: HTTP 200
+api restore integration qbittorrent: HTTP 200
+ready recreated qBittorrent authenticated readiness: observed
+api restore admin settings: HTTP 200
+api restore preferences persisted: HTTP 200
+ready restored qBittorrent preferences: observed
+cleanup drill-owned state/data/backup/project files: removed

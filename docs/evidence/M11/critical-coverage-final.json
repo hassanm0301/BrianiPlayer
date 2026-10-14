@@ -1,0 +1,931 @@
+{
+  "collector": "Microsoft Code Coverage; actual source and generated async predicates retained",
+  "artifact": "artifacts/coverage-quota-final/0c89f599-aacf-4196-8932-1d5c3267662c/hassan_archlinux_2026-10-13.15_50_48.cobertura.xml",
+  "serverTestsPassed": 412,
+  "measurements": [
+    {
+      "class": "Briani.Api.Modules.Playback.PlaybackTarget",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.PlaybackCreate",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 10,
+      "totalBranches": 12,
+      "branchRate": 0.8333333333333334
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 18,
+      "totalBranches": 26,
+      "branchRate": 0.6923076923076923
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ByteRange",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/RangeSpec.cs",
+      "coveredBranches": 26,
+      "totalBranches": 26,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.RangeException",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/RangeSpec.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 10,
+      "totalBranches": 10,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Media.MediaAccess",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Media/MediaAccess.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAccess",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAccess.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommand",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 51,
+      "totalBranches": 86,
+      "branchRate": 0.5930232558139535
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadLayout",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadLayout.cs",
+      "coveredBranches": 27,
+      "totalBranches": 28,
+      "branchRate": 0.9642857142857143
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 34,
+      "totalBranches": 86,
+      "branchRate": 0.3953488372093023
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.DiscoveryAccess",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/DiscoveryAccess.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.BNode",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 1,
+      "totalBranches": 2,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.BencodeReader",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 42,
+      "totalBranches": 42,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.MetainfoFile",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.MetainfoDescriptor",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.Metainfo",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 144,
+      "totalBranches": 150,
+      "branchRate": 0.96
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.ApiException",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.IdentityInput",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.Credentials",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.WriteGate",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.Actor",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.Capabilities",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.Audit",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.SecretStore",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/SecretStore.cs",
+      "coveredBranches": 3,
+      "totalBranches": 4,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<>c__DisplayClass18_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<>c__DisplayClass19_0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<ActorAsync>d__17",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<CreateAsync>d__12",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 18,
+      "totalBranches": 20,
+      "branchRate": 0.9
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<RevokeAsync>d__15",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<StatusAsync>d__14",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 3,
+      "totalBranches": 4,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<StreamAsync>d__18",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 39,
+      "totalBranches": 48,
+      "branchRate": 0.8125
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<ViewAsync>d__13",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<WatchAsync>d__20",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 22,
+      "totalBranches": 22,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.Target",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<>c__DisplayClass31_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<CreateAsync>d__25",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 38,
+      "totalBranches": 40,
+      "branchRate": 0.95
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<RequireAsync>d__20",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 28,
+      "totalBranches": 28,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<SessionActorAsync>d__27",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<StatusAsync>d__26",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 14,
+      "totalBranches": 18,
+      "branchRate": 0.7777777777777778
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<StreamAsync>d__28",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 2,
+      "totalBranches": 4,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<StreamCoreAsync>d__29",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 38,
+      "totalBranches": 50,
+      "branchRate": 0.76
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<UrlAsync>d__24",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<ViewAsync>d__23",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<WatchAsync>d__31",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 28,
+      "totalBranches": 28,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.Candidate",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<>c__DisplayClass19_0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 1,
+      "totalBranches": 2,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<>c__DisplayClass20_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<>c__DisplayClass21_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<>c__DisplayClass22_0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<>c__DisplayClass22_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<DescribeAsync>d__20",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<ResolveAsync>d__19",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 39,
+      "totalBranches": 50,
+      "branchRate": 0.78
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<StreamAsync>d__21",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 23,
+      "totalBranches": 26,
+      "branchRate": 0.8846153846153846
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<WatchAsync>d__22",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 8,
+      "branchRate": 0.0
+    },
+    {
+      "class": "Briani.Api.Modules.Media.MediaAccess.<RequireAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Media/MediaAccess.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAccess.<RequestActorAsync>d__6",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAccess.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAccess.<RequireAsync>d__3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAccess.cs",
+      "coveredBranches": 5,
+      "totalBranches": 6,
+      "branchRate": 0.8333333333333334
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAccess.<RequireCommandAsync>d__5",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAccess.cs",
+      "coveredBranches": 12,
+      "totalBranches": 12,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAccess.<RequireControlAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAccess.cs",
+      "coveredBranches": 3,
+      "totalBranches": 4,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 10,
+      "branchRate": 0.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c__DisplayClass19_2",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 4,
+      "totalBranches": 4,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c__DisplayClass20_0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 2,
+      "totalBranches": 4,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<CompatibleSelectionAsync>d__20",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 8,
+      "totalBranches": 10,
+      "branchRate": 0.8
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<CreateAsync>d__15",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 58,
+      "totalBranches": 88,
+      "branchRate": 0.6590909090909091
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<FenceAsync>d__23",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 6,
+      "totalBranches": 8,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<RequireOperationCapacityAsync>d__17",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<SubmitAsync>d__19",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 131,
+      "totalBranches": 158,
+      "branchRate": 0.8291139240506329
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadLayout.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadLayout.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 3,
+      "totalBranches": 6,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass33_0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 4,
+      "totalBranches": 8,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass39_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass39_2",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass43_0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 1,
+      "totalBranches": 2,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass43_1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 4,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass43_2",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass43_3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass43_4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 1,
+      "totalBranches": 2,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass48_3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 4,
+      "totalBranches": 4,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass48_4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 4,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass48_5",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass48_6",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass48_7",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 5,
+      "totalBranches": 6,
+      "branchRate": 0.8333333333333334
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass48_8",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<AddOrRecoverAsync>d__34",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 15,
+      "totalBranches": 34,
+      "branchRate": 0.4411764705882353
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<ApplySelectionAsync>d__39",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 29,
+      "totalBranches": 38,
+      "branchRate": 0.7631578947368421
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<CaptureDeletionIdentitiesAsync>d__46",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 10,
+      "totalBranches": 14,
+      "branchRate": 0.7142857142857143
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<ClearAvailabilityAsync>d__42",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<ClearAvailabilityInGateAsync>d__52",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<CommandLoopAsync>d__24",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<ExecuteAsync>d__23",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<FetchMetadataAsync>d__36",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 14,
+      "totalBranches": 16,
+      "branchRate": 0.875
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<FetchMetadataCoreAsync>d__37",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 25,
+      "totalBranches": 34,
+      "branchRate": 0.7352941176470589
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<FindCandidatesAsync>d__33",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<InitializeStageAsync>d__28",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 18,
+      "totalBranches": 24,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<LiveSelectionsAuthorizedAsync>d__49",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 6,
+      "totalBranches": 8,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<PollCoreAsync>d__48",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 128,
+      "totalBranches": 200,
+      "branchRate": 0.64
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<PollLoopAsync>d__25",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<PollOnceAsync>d__47",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<PruneRetiredCachesAsync>d__45",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<RemoveAsync>d__43",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 71,
+      "totalBranches": 104,
+      "branchRate": 0.6826923076923077
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<RequireNoReadersAsync>d__41",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 1,
+      "totalBranches": 2,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<RequireOwnedAsync>d__32",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 6,
+      "totalBranches": 10,
+      "branchRate": 0.6
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<RequireReservationsAsync>d__50",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 6,
+      "totalBranches": 10,
+      "branchRate": 0.6
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<RunCoreAsync>d__27",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 56,
+      "totalBranches": 92,
+      "branchRate": 0.6086956521739131
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<RunOnceAsync>d__26",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<StopSettledAsync>d__38",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 4,
+      "totalBranches": 8,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<scopesAdmission>d__40",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.DiscoveryAccess.<RequireAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/DiscoveryAccess.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.Metainfo.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.WriteGate.Lease",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.WriteGate.<EnterAsync>d__1",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<CanDiscoverAsync>d__7",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<CapabilitiesAsync>d__5",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 24,
+      "totalBranches": 24,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<IsAccessValidAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<IsSessionValidAsync>d__3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<RequireDownloadControlAsync>d__8",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 10,
+      "totalBranches": 10,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<RequireLibraryAsync>d__6",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<>c.<<Map>b__11_0>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<>c.<<Map>b__11_1>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<>c.<<Map>b__11_2>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<>c.<<Map>b__11_3>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c.<<Map>b__25_0>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c.<<Map>b__25_1>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c.<<Map>b__25_2>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c.<<Map>b__25_3>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 20,
+      "totalBranches": 26,
+      "branchRate": 0.7692307692307693
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<>c.<<Map>b__25_4>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 0,
+      "totalBranches": 14,
+      "branchRate": 0.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadWorker.<>c__DisplayClass27_3.<<RunCoreAsync>g__Reauthorize|5>d",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadWorker.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    }
+  ]
+}

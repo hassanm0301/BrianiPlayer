@@ -1,0 +1,17 @@
+..warning
+.unavailable executable: missing
+.......
+----------------------------------------------------------------------
+Ran 10 tests in 0.002s
+
+OK
+[3] /usr/bin/python /tmp/tmp0biqpw8j/tools/release/package_audit.py verify --root /tmp/tmp0biqpw8j --manifest dist/manifest.json
+blocked native provenance
+[3] release artifact evidence remains blocked
+[2] integration suite has no test project; status=not_run
+[7] tool with space sub --flag a b
+done
+[127] does-not-exist
+[0] ok
+Evidence: /tmp/tmpchx9b0kj
+Task exit status: 0

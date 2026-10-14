@@ -1,0 +1,102 @@
+{
+  "result": {
+    "version": "2.6.5.5623",
+    "branch": "master",
+    "fixtureProtocol": "torrent",
+    "supportsSearch": true,
+    "supportsRss": true,
+    "capabilityFields": [
+      "bookSearchParams",
+      "categories",
+      "limitsDefault",
+      "limitsMax",
+      "movieSearchParams",
+      "musicSearchParams",
+      "searchParams",
+      "supportsRawSearch",
+      "tvSearchParams"
+    ],
+    "recentCount": 1,
+    "searchCount": 1,
+    "resultFields": [
+      "age",
+      "ageHours",
+      "ageMinutes",
+      "categories",
+      "downloadUrl",
+      "fileName",
+      "files",
+      "grabs",
+      "guid",
+      "imdbId",
+      "indexer",
+      "indexerFlags",
+      "indexerId",
+      "infoHash",
+      "leechers",
+      "protocol",
+      "publishDate",
+      "seeders",
+      "size",
+      "sortTitle",
+      "title",
+      "tmdbId",
+      "tvMazeId",
+      "tvdbId"
+    ],
+    "recentFields": [
+      "age",
+      "ageHours",
+      "ageMinutes",
+      "categories",
+      "downloadUrl",
+      "fileName",
+      "files",
+      "grabs",
+      "guid",
+      "imdbId",
+      "indexer",
+      "indexerFlags",
+      "indexerId",
+      "infoHash",
+      "leechers",
+      "protocol",
+      "publishDate",
+      "seeders",
+      "size",
+      "sortTitle",
+      "title",
+      "tmdbId",
+      "tvMazeId",
+      "tvdbId"
+    ],
+    "fixtureFailureSearchHttpStatus": 200,
+    "fixtureFailureResultCount": 0,
+    "indexerStatusFields": [
+      "disabledTill",
+      "indexerId",
+      "initialFailure",
+      "mostRecentFailure"
+    ],
+    "indexerStatusSample": [
+      {
+        "indexerId": 1,
+        "disabledTill": "2026-10-12T11:49:56Z",
+        "mostRecentFailureType": "str",
+        "initialFailureType": "str",
+        "mostRecentFailurePresent": true,
+        "initialFailurePresent": true
+      }
+    ],
+    "lockedImage": "lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902",
+    "compatibilityCommands": [
+      "docker network create --internal --label com.briani.m04.prowlarr-compat=<run-id>",
+      "python3 prototypes/discovery/fixture_indexer.py (bound to the dedicated bridge gateway)",
+      "docker run --pull=never --network <dedicated-internal-network> --volume <throwaway-config>:/config <locked-image>"
+    ],
+    "fixtureBind": "172.21.0.1:41221",
+    "failureDetailsRedacted": true
+  },
+  "error": null,
+  "resourcesRemoved": true
+}

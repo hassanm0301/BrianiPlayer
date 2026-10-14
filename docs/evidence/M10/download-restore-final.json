@@ -1,0 +1,59 @@
+{
+  "runId": "e4033a2aabda4b49",
+  "result": "review_cancelled_before_fixture",
+  "startedUtc": "2026-10-13T10:40:48Z",
+  "cleanupVerification": {
+    "composeProjectResourceIdsBeforeCleanup": {
+      "briani-source-project-db6f5e4b6f": {
+        "container": [
+          "4f85e348f1a5",
+          "e7b2e3e48e0f",
+          "7e342f86b7f8",
+          "caf4144ceefa",
+          "14eda1b43443"
+        ],
+        "network": [
+          "04e7497a3aff",
+          "e16fc512cb7a",
+          "171ec3a63585",
+          "67703c716955"
+        ],
+        "volume": []
+      },
+      "briani-restore-project-11361e8e0c": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-5e61e373bc": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "composeProjectsChecked": {
+      "briani-source-project-db6f5e4b6f": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-restore-project-11361e8e0c": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-5e61e373bc": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "fixtureContainerIdsRemoved": [],
+    "fixtureNetworkIdRemoved": "",
+    "scratchRootRemoved": "/tmp/briani-m10-download-restore-e4033a2aabda4b49",
+    "verified": true
+  },
+  "finishedUtc": "2026-10-13T10:42:01Z",
+  "error": "A parent source review found a seed permission call typo and a startup credential tuple-unpacking issue before the harness reached the fixture. The run was interrupted during CLI source bootstrap; no fixture network or seeder was created.",
+  "cleanupStatus": "passed: cleanup verification recorded all exact Compose project resources before cleanup, found no resources afterward, and confirmed the unique scratch root was removed. This is cleanup evidence only, not a T25 scenario pass."
+}

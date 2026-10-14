@@ -1,0 +1,5 @@
+preflight Docker=29.9.0 linux image=briani-server:m10 exact-id ports=free projects=unique
+cli init: exit 0 (expected 0)
+cli doctor-source: exit 0 (expected 0)
+cli qbit-bootstrap: exit 0 (expected 0)
+cleanup drill-owned state/data/backup/project files: removed

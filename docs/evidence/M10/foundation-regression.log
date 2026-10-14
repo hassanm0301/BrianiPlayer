@@ -1,0 +1,12 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  IntegrationTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 1 s - IntegrationTests.dll (net10.0)
+
+Attachments:
+  /home/hassan/projects/BrianiPlayer/artifacts/coverage-final/327ec075-1980-46c1-9990-873515a8da62/hassan_archlinux_2026-10-13.12_00_20.cobertura.xml

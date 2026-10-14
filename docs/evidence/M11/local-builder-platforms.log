@@ -1,0 +1,40 @@
+Name:          default
+Driver:        docker
+Last Activity: 2026-10-13 09:10:44 +0000 UTC
+
+Nodes:
+Name:             default
+Endpoint:         default
+Status:           running
+BuildKit version: v0.0.0+unknown
+Platforms:        linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/amd64/v4
+Labels:
+ org.mobyproject.buildkit.worker.containerd.namespace: moby
+ org.mobyproject.buildkit.worker.containerd.uuid:      1da474a6-760f-4a04-b1a6-15662809aba7
+ org.mobyproject.buildkit.worker.executor:             containerd
+ org.mobyproject.buildkit.worker.hostname:             archlinux
+ org.mobyproject.buildkit.worker.moby.host-gateway-ip: 172.17.0.1
+ org.mobyproject.buildkit.worker.network:              host
+ org.mobyproject.buildkit.worker.selinux.enabled:      false
+ org.mobyproject.buildkit.worker.snapshotter:          overlayfs
+GC Policy rule#0:
+ All:            false
+ Filters:        type==source.local type==exec.cachemount type==source.git.checkout
+ Keep Duration:  48h0m0s
+ Max Used Space: 23.55GiB
+GC Policy rule#1:
+ All:            false
+ Keep Duration:  1440h0m0s
+ Reserved Space: 170.4GiB
+ Max Used Space: 1.331TiB
+ Min Free Space: 340.9GiB
+GC Policy rule#2:
+ All:            false
+ Reserved Space: 170.4GiB
+ Max Used Space: 1.331TiB
+ Min Free Space: 340.9GiB
+GC Policy rule#3:
+ All:            true
+ Reserved Space: 170.4GiB
+ Max Used Space: 1.331TiB
+ Min Free Space: 340.9GiB

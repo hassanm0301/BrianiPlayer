@@ -1,0 +1,209 @@
+{
+  "collector": "Microsoft Code Coverage; async source predicates retained",
+  "artifact": "artifacts/coverage-complete-local/6b4d4368-13fc-476a-b4b9-f720f786efd7/hassan_archlinux_2026-10-13.13_40_04.cobertura.xml",
+  "measurements": [
+    {
+      "class": "Briani.Api.Modules.Playback.ByteRange",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/RangeSpec.cs",
+      "coveredBranches": 26,
+      "totalBranches": 26,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadLayout",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadLayout.cs",
+      "coveredBranches": 27,
+      "totalBranches": 28,
+      "branchRate": 0.9642857142857143
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.BencodeReader",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 42,
+      "totalBranches": 42,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.MetainfoFile",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.MetainfoDescriptor",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.Metainfo",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 144,
+      "totalBranches": 150,
+      "branchRate": 0.96
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.SecretStore",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/SecretStore.cs",
+      "coveredBranches": 3,
+      "totalBranches": 4,
+      "branchRate": 0.75
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<CreateAsync>d__12",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 18,
+      "totalBranches": 20,
+      "branchRate": 0.9
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.CompletedPlayback.<WatchAsync>d__20",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/CompletedPlayback.cs",
+      "coveredBranches": 22,
+      "totalBranches": 22,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.PlaybackAdmission.<RequireAsync>d__0",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/PlaybackAdmission.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<CreateAsync>d__25",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 38,
+      "totalBranches": 40,
+      "branchRate": 0.95
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<RequireAsync>d__20",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 28,
+      "totalBranches": 28,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.ProgressivePlayback.<WatchAsync>d__31",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/ProgressivePlayback.cs",
+      "coveredBranches": 28,
+      "totalBranches": 28,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Playback.SubtitleDelivery.<WatchAsync>d__22",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Playback/SubtitleDelivery.cs",
+      "coveredBranches": 0,
+      "totalBranches": 8,
+      "branchRate": 0.0
+    },
+    {
+      "class": "Briani.Api.Modules.Media.MediaAccess.<RequireAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Media/MediaAccess.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Media.MediaEndpoints.<WatchAsync>d__3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Media/MediaEndpoints.cs",
+      "coveredBranches": 1,
+      "totalBranches": 2,
+      "branchRate": 0.5
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAccess.<RequireAsync>d__3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAccess.cs",
+      "coveredBranches": 5,
+      "totalBranches": 6,
+      "branchRate": 0.8333333333333334
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadAdmission.<RequireAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadAdmission.cs",
+      "coveredBranches": 32,
+      "totalBranches": 44,
+      "branchRate": 0.7272727272727273
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadCommands.<CreateAsync>d__15",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadCommands.cs",
+      "coveredBranches": 47,
+      "totalBranches": 74,
+      "branchRate": 0.6351351351351351
+    },
+    {
+      "class": "Briani.Api.Modules.Downloads.DownloadLayout.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Downloads/DownloadLayout.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.DiscoveryAccess.<RequireAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/DiscoveryAccess.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Modules.Discovery.Sources.Metainfo.<>c",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Modules/Discovery/Sources/Metainfo.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<CanDiscoverAsync>d__7",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<CapabilitiesAsync>d__5",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 16,
+      "totalBranches": 16,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<IsAccessValidAsync>d__4",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 2,
+      "totalBranches": 2,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<IsSessionValidAsync>d__3",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<RequireDownloadControlAsync>d__8",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 10,
+      "totalBranches": 10,
+      "branchRate": 1.0
+    },
+    {
+      "class": "Briani.Api.Infrastructure.Security.PermissionService.<RequireLibraryAsync>d__6",
+      "filename": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Infrastructure/Security/Policy.cs",
+      "coveredBranches": 0,
+      "totalBranches": 0,
+      "branchRate": 1.0
+    }
+  ]
+}

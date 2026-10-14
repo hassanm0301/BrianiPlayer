@@ -1,0 +1,14 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  UnitTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll
+  ContractTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll
+  IntegrationTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll
+  IdentityTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll
+  DiscoveryTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll
+  MediaTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll
+  DownloadTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.77

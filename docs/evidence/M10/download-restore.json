@@ -1,0 +1,9 @@
+{
+  "runId": "9241485cb505414c",
+  "result": "failed_before_fixture",
+  "startedUtc": "2026-10-13T10:32:10Z",
+  "finishedUtc": "2026-10-13T10:34:53Z",
+  "error": "JSONDecodeError: Docker network ls -q returns newline-separated IDs; parser expected a single JSON value. The process was interrupted during automatic cleanup after detecting the error.",
+  "cleanupVerification": "Initial filters were incorrect and did not prove cleanup. A later exact docker inspect found three extant containers in Compose project briani-source-project-3573b4658d, all with working_dir and env_file under /tmp/briani-m10-download-restore-9241485cb505414c/source-project and bind mounts beneath that run root; qBittorrent had exited, while Prowlarr and the API remained running. The owner marker had already been removed. Parent is performing verified exact-ID cleanup; no cleanup pass is claimed here.",
+  "cleanupStatus": "failed/incomplete: exact source project resources were left running by interrupting the cleanup path. Do not treat cleanup as successful; parent is verifying and removing the exact remaining containers/networks before any new run."
+}

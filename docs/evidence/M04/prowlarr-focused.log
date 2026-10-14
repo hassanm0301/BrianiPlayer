@@ -1,0 +1,9 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  DiscoveryTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 25 ms - DiscoveryTests.dll (net10.0)

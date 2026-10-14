@@ -1,0 +1,6 @@
+{
+  "status": "invalid",
+  "error": "artifact[0] platform verification: evidence SHA-256 mismatch",
+  "exitCode": 2,
+  "context": "Parent ran audit while the final operations verification log was still being written; regenerate evidence hashes after completion."
+}

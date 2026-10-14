@@ -1,0 +1,50 @@
+{
+  "containerRestart": {
+    "engineRestarted": true,
+    "missingPieceBeforeRestart": 0,
+    "problemCode": "unavailable",
+    "waiterStatus": 503
+  },
+  "engine": "v5.2.4",
+  "fileSelectionChange": {
+    "failClosed": true,
+    "problemCode": "unavailable",
+    "reportedPriority": 0,
+    "responseStatus": 503
+  },
+  "preallocation": {
+    "allocatedBytes": 15790080,
+    "logicalBytes": 15787543,
+    "missingPiece": 0,
+    "missingRangeNoResponse": true,
+    "progress": 0
+  },
+  "preallocationPreferenceRestored": true,
+  "preheaderFence": {
+    "activeReaderReleased": true,
+    "fenceStatus": 200,
+    "invalidatedGeneration": 2,
+    "problemCode": "unavailable",
+    "waiterStatus": 503
+  },
+  "recheck": {
+    "failClosed": true,
+    "missingPieceBeforeRequest": 0,
+    "requested": true,
+    "responseStatus": 503
+  },
+  "recheckFence": {
+    "activeReaderReleased": true,
+    "fenceStatus": 200,
+    "invalidatedGeneration": 2,
+    "problemCode": "unavailable",
+    "waiterStatus": 503
+  },
+  "selectionFence": {
+    "activeReaderReleased": true,
+    "fenceStatus": 200,
+    "invalidatedGeneration": 2,
+    "problemCode": "unavailable",
+    "waiterStatus": 503
+  }
+}

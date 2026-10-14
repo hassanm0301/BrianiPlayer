@@ -1,0 +1,69 @@
+# M10 independent critical-boundary source audit
+
+2026-10-13. Read-only review of current playback/ticket/availability/range/descriptor paths, durable download commands/import/removal/admission, discovery source/daemon egress, client native relay/configuration and M09 preference scopes. Read M10, security/test specifications and relevant Pi/traceability sections; inspected prior M05/M06/M09 review evidence. Only this report was edited. No test, Docker, remote Pi, Android build/device or production-data action was executed. Paths and lines describe the source at this checkpoint.
+
+## Findings requiring owner reproduction/fix
+
+**R1 — P1: daemon egress isolation remains missing (T17, existing release blocker).** `infra/compose/compose.yaml:34,50` attaches qBittorrent to an unrestricted torrent-egress bridge. `SourceValidation.cs:46–48` validates application-time tracker DNS, then an unchanged tracker hostname reaches the engine; `QBitTorrentClient.cs:165–199` configures resource/administration options, not destination isolation. README points to a documented firewall policy, but no executable rules/checker or prohibited-destination fixture proof was found. Reproduction: isolated controlled tracker hostname returns a permitted address to application DNS, then a prohibited owned destination to daemon DNS; require a captured blocked connection test, including redirects/peers and IPv4/IPv6. Current source cannot guarantee this denial. No captured exploit is claimed. Ship an explicit daemon/host destination policy and fail closed or record the gate blocked until actually applied/tested; the bridge and application HTTP policy cannot substitute.
+
+**R2 — P2: cancelling one native range does not cancel its upstream wait (T04).** `client/lib/core/playback/playback_relay.dart:74,88–98` awaits headers/body chunks without observing downstream disconnect while idle. `_active` releases only when forwarding exits. Reproduction: keep the relay alive; issue four permitted ranges whose upstream withholds headers or sends one chunk then gaps; close their downstream sockets, then issue a new valid range. Existing source retains upstream waits/slots up to the 65/125-second deadline and returns 429 to the new request. Existing `client/test/playback_relay_test.dart:69–98` covers relay-wide close, not cancelling one seek range. Add both per-request cancellation schedules with a raw owned upstream socket; ensure abort and slot release within two seconds while the relay remains usable. Source schedule; not executed by reviewer.
+
+**R3 — P2: active-per-user admission is not reserved before upstream start (T14).** `DownloadAdmission.cs:54–57` counts DB jobs in downloading/stalled state. `DownloadWorker.cs:178–179` releases WriteGate before StartAsync and saves downloading state later; `DownloadWorker.cs:295` independently admits/starts a queued job without persisting an active reservation first. Reproduction: two selected jobs for the same user on distinct job-lock stripes, per-user cap one/global cap two; hold poll-loop StartAsync(A), then run command-loop resume/select(B). Both can see zero active DB jobs and start. qBittorrent's global queue cannot enforce Briani's per-user cap. Reserve an admission slot under the shared gate before I/O, reconcile uncertain start outcomes, and test the two-loop schedule. Source schedule; not executed by reviewer.
+
+**R4 — P2: an older add-path configuration apply can overwrite a completed newer settings apply (T29).** `ApplicationOperations.cs:191–204` now fences its own successful configuration work against a changed setting version. However `DownloadWorker.cs:117` separately calls ConfigureManagedAsync; `QBitTorrentClient.cs:165–199` reads a settings snapshot without whole-apply serialization/version reconciliation. Reproduction: hold that add-path call after reading V1, save V2 and complete its admin configure job, then release V1 to post/verify its own older settings. V2's job has finished and no corrective job remains. Put every apply entry point behind one ordered, version-aware mechanism; test actual adapter request sequencing across both callers. Source schedule; not executed by reviewer.
+
+## Reviewed safeguards and evidence limits
+
+No additional concrete high/corruption defect was found in the reviewed piece arithmetic, scoped tickets, hard-link import intent and removal recovery paths. Progressive reads slice at piece boundaries, require fresh healthy epoch/generation snapshots before and after descriptor reads, reject short data and abort incomplete bodies. Watchers recheck authorization and identity; mutations fence readers before upstream effects. Logical offsets/ranges use checked arithmetic, pooled copy buffers and finite data waits. Import/removal retains contained inode identities and durable intent; quota attribution remains on retained user-owned files, rather than disappearing when requests are removed.
+
+Source fetching pins DNS results to outbound connections and revalidates redirects with origin-scoped credentials. Metainfo rejects traversal/collisions/symlinks/webseeds/nodes; source/upload admission and response bounds remain present. This clearance is narrower than daemon egress. Native relay targets remain exact scoped capabilities, redirects/cookies/account headers do not forward, and native config/scripts/reference-loading flags fail closed. The Android emulator EGL correction does not relax those flags. User preferences are actor-keyed and schema-bounded; admin settings retain live-role authorization, version checks and mounted-secret failclosed behavior.
+
+Prior M06 byte-oracle/native/engine successes are preserved; this report neither reruns nor supersedes them. Parent reports current Android pixel/security success and latest M09 regressions separately. M10 still needs executed reproductions above, fuzz/crash/egress proof, full acceptance reconciliation and genuine hardware measurements. No release clearance is issued from this static pass.
+
+## R2 bounded executed reproduction
+
+Follow-up authorized by the parent, 2026-10-13: standalone `/tmp/briani_m10_relay_cancel.dart` imports the production relay by absolute path and uses only owned loopback raw servers/clients. No production/test repository edits. Dart SDK 3.13.5, Linux x64. Imported relay SHA256 before/after: `07ec740dd11e6679efc4eb761e3d5c7741c3fd40eee8c5985881daf1cc44b3ae`.
+
+Commands, each **exit 0**, with a 25-second whole-process bound:
+
+```sh
+timeout --signal=INT 25s /opt/flutter/bin/cache/dart-sdk/bin/dart /tmp/briani_m10_relay_cancel.dart > /tmp/briani-m10-relay-cancel-repro.log 2>&1
+timeout --signal=INT 25s /opt/flutter/bin/cache/dart-sdk/bin/dart /tmp/briani_m10_relay_cancel.dart > /tmp/briani-m10-relay-cancel-repro-latency.log 2>&1
+```
+
+The second run adds exact primitive-disconnect timestamps. Each relay case waits until all four upstream requests arrive; body-gap additionally requires each downstream to receive the complete headers plus its first body byte before cancellation. Upstream raw sockets retain their read listeners to observe closure.
+
+| Executed case | Result 2,100 ms after destroying downstream sockets |
+|---|---|
+| Production relay, upstream withholding headers | Four upstream requests; zero upstream disconnects; next permitted range **429** |
+| Production relay, upstream body gap after one byte | Four upstream requests; zero upstream disconnects; next permitted range **429** |
+| Direct HttpServer, response.done, withheld headers | done remained pending; request body had already completed |
+| Direct HttpServer, response.done, body gap | done remained pending; request body had already completed |
+| Detach socket with writeHeaders:false, withheld headers | Socket read onDone detected disconnect in **0 ms** (millisecond resolution) |
+| Detach socket with writeHeaders:false, body gap | Socket read onDone detected disconnect in **0 ms** (millisecond resolution) |
+
+After relay-wide close, all four upstream sockets disconnected within 4 ms/0 ms in the latency run (3 ms/1 ms in the first run). This separately confirms the existing whole-player cancellation behavior. The experiment establishes R2's slot retention after range cancellation; it does not wait out or measure the entire 65/125-second timeout.
+
+**Actionable primitive:** `HttpResponse.detachSocket(writeHeaders:false)` before upstream waits exposes a supported Socket read-disconnect event and emits no premature HTTP headers. The body-gap fixture sends an ordinary HTTP 200 with Content-Length and one raw byte. However detachment transfers HTTP ownership away from HttpServer: there is no demonstrated drop-in response.done callback that preserves its response writer. A production change using this primitive must explicitly preserve GET/HEAD/status/range/header/body semantics, truthful Content-Length or legal close framing, truncation detection, cancellation/backpressure and rejection of request bodies/pipelining. Sending an early successful header or padding bytes just to detect disconnect would violate the progressive protocol. The parent owns that implementation and its regression tests.
+
+Narrow source follow-up: R3 now reserves/persists `EngineState="starting"` under WriteGate in both start paths, and admission counts starting downloads/seeds. R4 now holds one static ManagedConfiguration semaphore around the entire adapter apply, including reading current settings. These changes close the reported source schedules; their focused regression execution remains the parent's responsibility.
+
+## Explicit relay framing follow-up
+
+Inspected the parent's six passing tests in `/tmp/briani-m10-relay-tests2.log`, then independently exercised owned-loopback framing fixtures using `/tmp/briani_m10_relay_framing.dart`. `timeout --signal=INT 20s /opt/flutter/bin/cache/dart-sdk/bin/dart /tmp/briani_m10_relay_framing.dart` exited 0; stdout captures are `/tmp/briani-m10-relay-framing-review.log`, `...-final.log` and `...-raw.log`.
+
+Actual results: fixed 206, chunked and close-delimited responses delivered the fixture's four bytes; short Content-Length bodies and missing upstream chunk terminators produced downstream errors. HEAD/304 retained declared length with zero body; 204 had zero body. A coalesced pipelined request reached no upstream endpoint. Raw capture of a conflicting upstream Content-Length/Transfer-Encoding fixture showed Dart removed Content-Length and the relay emitted only chunked framing; no ambiguous forwarded-header defect was found. Header parsing is bounded by the locked Dart SDK's 1 MiB aggregate parser limit; the relay separately caps forwarded request field values at 4,096 characters.
+
+One actual input defect surfaced during this pass: a chunked GET with its body withheld bypassed the original contentLength>0 guard and reached the upstream endpoint. Parent added explicit Transfer-Encoding rejection; the final probe observed zero upstream requests. Parent also added a cancellation registry for detached connections, close-before-detach handling and empty-chunk suppression. The owned backpressure fixture `/tmp/briani_m10_relay_backpressure.dart` exited 0 under a 15-second process bound (`/tmp/briani-m10-relay-backpressure-review.log`): 17,891,328 upstream bytes submitted, one active forward before relay.close, close returned in 3 ms, zero active forwards at the 2,100 ms observation. The active count was read through Dart mirrors without modifying the object. This run used the parent's registry correction; it is not claimed as reproduction against its preceding source.
+
+The strengthened original cancellation probe, `/tmp/briani_m10_relay_cancel_fixed.dart`, required each body-gap downstream to receive headers plus the first byte before destruction. Its 25-second bounded run exited 0 (`/tmp/briani-m10-relay-cancel-fixed-review.log`). In both header/body phases all four upstream sockets had disconnected at the 2,100 ms observation, and the next range returned 206 with exact bytes `[10,11,12,13]` while the relay stayed open. Final reviewed relay SHA256: `f7283ffa2cfa3fe0ee07edcaabac55440f3bad322fa9e378bfca13088fd589b4`. No further concrete relay defect was found; this is not a native-player or platform certification.
+
+## R4 assigned regression test
+
+After completing the separate read-only review, the parent assigned ownership of only the new `server/tests/Briani.DownloadTests/ManagedConfigurationConcurrencyTests.cs`. The test uses two actual QBitTorrentClient instances, real temporary SQLite settings and an owned HttpListener. Separate adapter sessions prevent their individual HTTP semaphore from masking missing whole-apply serialization. It authenticates the competing instance, holds V1's setPreferences POST, saves V2 under WriteGate, starts the second apply and observes no second preference read/apply during the barrier. After release it verifies V1→V2 order, every managed preference, both requested speed limits and realistic whole-KiB readback. The complete test has a 15-second cancellation bound and prints no fixture credentials.
+
+```sh
+DOTNET_CLI_HOME=/home/hassan/projects/BrianiPlayer/.tools/dotnet-home NUGET_PACKAGES=/home/hassan/projects/BrianiPlayer/.tools/nuget dotnet test server/tests/Briani.DownloadTests/DownloadTests.csproj --no-restore --filter FullyQualifiedName~ManagedConfigurationConcurrencyTests --nologo
+```
+
+Final **exit 0**, one passed/zero failed/zero skipped; `/tmp/briani-m10-managed-config-concurrency2.log`. Initial compile exited 1 for a missing test-only Identity namespace import, corrected before the final run (`/tmp/briani-m10-managed-config-concurrency.log`). No production/fixture/manifest/lock file was edited. A deliberately weakened production semaphore was not executed; the regression's competing real HTTP call/barrier is the meaningful failure schedule. Parent retains ownership of integrated suites and R3 execution evidence.

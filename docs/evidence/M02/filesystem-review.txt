@@ -1,0 +1,17 @@
+Command: DOTNET_CLI_HOME=/tmp/briani-storage-review/.cli DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet run --project /tmp/briani-storage-review/Storage.csproj --nologo --verbosity quiet --disable-build-servers
+Exit: 0
+Kernel: Linux x86_64 7.2.9-zen1-1-zen
+.NET SDK: 10.0.112
+retained-child creates outside boundary: True
+file rename accepted swapped directory: True
+Fixture: /tmp/briani-storage-review-71f803a5-014c-4822-98d4-beebcfdded09
+Source links current repository ContainedStorage.cs and MutationSandbox.cs at execution. No repository changes.
+
+Final direct-source rerun after parent fixes:
+Command: DOTNET_CLI_HOME=/tmp/briani-storage-review/.cli DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet run --project /tmp/briani-storage-review/Storage.csproj --nologo --verbosity quiet --disable-build-servers
+Exit: 0
+retained-child denied: path_unavailable
+directory swap denied: path_unavailable
+root replacement denied: path_unavailable
+Fixture: /tmp/briani-storage-review-5c655e13-4ca0-4e2f-8f15-99d7cc0da9a7
+Proof is a bounded diagnostic harness with manually inspected outputs, not a replacement for acceptance assertions. Temp stubs generated warnings CS9107/CS9113; production helper compiled and ran.

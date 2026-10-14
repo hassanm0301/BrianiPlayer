@@ -1,0 +1,9 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by org.conscrypt.NativeLibraryUtil in an unnamed module (file:/opt/android-sdk/build-tools/36.0.0/lib/apksigner.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
+Signer #1 certificate SHA-256 digest: bb9501827dbabca30cb9b52cb6490f83278e4cb06ee1f80cd13d35a9080c9dd8
+Signer #1 certificate SHA-1 digest: ecb810a141a76ac9434b74c586d782faa652752d
+Signer #1 certificate MD5 digest: 83bfaa1d50e9ceae9cf08ad011724e49

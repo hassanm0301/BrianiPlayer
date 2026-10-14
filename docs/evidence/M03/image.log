@@ -1,0 +1,1164 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from server.Dockerfile
+#1 transferring dockerfile: 4.25kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317
+#2 DONE 0.4s
+
+#3 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4
+#3 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 99B done
+#4 DONE 0.0s
+
+#5 [stage-2 1/5] FROM mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4
+#5 resolve mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4 0.0s done
+#5 DONE 0.0s
+
+#6 [ffmpeg-build 1/6] FROM mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317
+#6 resolve mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317 0.0s done
+#6 DONE 0.0s
+
+#7 [ffmpeg-build 3/6] WORKDIR /tmp/ffmpeg-build
+#7 CACHED
+
+#8 [ffmpeg-build 4/6] RUN set -eux;     curl --fail --location --retry 3 --output ffmpeg.tar.xz "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz";     curl --fail --location --retry 3 --output ffmpeg.tar.xz.asc "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz.asc";     curl --fail --location --retry 3 --output ffmpeg-devel.asc https://ffmpeg.org/ffmpeg-devel.asc;     actual="$(sha256sum ffmpeg.tar.xz | cut -d' ' -f1)";     test -n "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" && test "$actual" = "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e";     fingerprint="$(gpg --show-keys --with-colons ffmpeg-devel.asc | awk -F: '$1 == "fpr" {print $10; exit}')";     test "$fingerprint" = "FCF986EA15E6E293A5644F10B4322F04D67658D8";     gpg --batch --dearmor --output ffmpeg-keyring.gpg ffmpeg-devel.asc;     gpgv --keyring ./ffmpeg-keyring.gpg ffmpeg.tar.xz.asc ffmpeg.tar.xz;     mkdir source && tar -xJf ffmpeg.tar.xz --strip-components=1 -C source
+#8 CACHED
+
+#9 [ffmpeg-build 2/6] RUN apt-get update && apt-get install -y --no-install-recommends     build-essential=12.10ubuntu1 ca-certificates=20260601~24.04.1     curl=8.5.0-2ubuntu10.15 gpg=2.4.4-2ubuntu17.6 nasm=2.16.01-1build1     pkg-config=1.8.1-2build1 xz-utils=5.6.1+really5.4.5-1ubuntu0.3     zlib1g-dev=1:1.3.dfsg-3.1ubuntu2.2     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ffmpeg-build 5/6] WORKDIR /tmp/ffmpeg-build/source
+#10 CACHED
+
+#11 [internal] load build context
+#11 transferring context: 441.49kB done
+#11 DONE 0.0s
+
+#12 [build 2/6] WORKDIR /src
+#12 CACHED
+
+#13 [build 3/6] COPY global.json ./
+#13 CACHED
+
+#14 [build 4/6] COPY server/ server/
+#14 DONE 0.0s
+
+#15 [build 5/6] RUN dotnet restore server/src/Briani.Api/Briani.Api.csproj --locked-mode
+#15 0.393   Determining projects to restore...
+#15 ...
+
+#16 [ffmpeg-build 6/6] RUN set -eux;     ./configure       --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib       --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect       --disable-doc --disable-debug --disable-network --disable-avdevice       --disable-shared --enable-static --enable-small --enable-zlib       --disable-everything --enable-ffmpeg --enable-ffprobe       --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil       --enable-protocol=file,pipe       --enable-demuxer=mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif       --enable-muxer=image2,image2pipe       --enable-decoder=h264,hevc,mpeg4,mjpeg,png,webp,gif       --enable-encoder=mjpeg       --enable-parser=h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis       --enable-filter=scale,transpose,format,hflip,vflip       --extra-cflags=-fstack-protector-strong --extra-ldflags=-Wl,-z,relro,-z,now;     make -j"2";     make DESTDIR=/out install;     install -D LICENSE.md /out/opt/briani-media/share/ffmpeg/LICENSE.md;     install -D COPYING.LGPLv2.1 /out/opt/briani-media/share/ffmpeg/COPYING.LGPLv2.1;     cp ffbuild/config.log /out/opt/briani-media/share/ffmpeg/config.log;     dpkg-query -W -f='${binary:Package}=${Version}\n' build-essential ca-certificates curl gpg nasm pkg-config xz-utils zlib1g-dev > /out/opt/briani-media/share/ffmpeg/build-packages.txt;     printf '%s  ffmpeg-%s.tar.xz\n' "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" "9.0.2" > /out/opt/briani-media/share/ffmpeg/source.sha256
+#16 0.079 + ./configure --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect --disable-doc --disable-debug --disable-network --disable-avdevice --disable-shared --enable-static --enable-small --enable-zlib --disable-everything --enable-ffmpeg --enable-ffprobe --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil --enable-protocol=file,pipe --enable-demuxer=mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif --enable-muxer=image2,image2pipe --enable-decoder=h264,hevc,mpeg4,mjpeg,png,webp,gif --enable-encoder=mjpeg --enable-parser=h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis --enable-filter=scale,transpose,format,hflip,vflip --extra-cflags=-fstack-protector-strong --extra-ldflags=-Wl,-z,relro,-z,now
+#16 2.719 install prefix            /opt/briani-media
+#16 2.719 source path               .
+#16 2.719 C compiler                gcc
+#16 2.719 C library                 glibc
+#16 2.719 ARCH                      x86 (generic)
+#16 2.719 big-endian                no
+#16 2.719 runtime cpu detection     yes
+#16 2.719 standalone assembly       yes
+#16 2.719 x86 assembler             nasm
+#16 2.719 MMX enabled               yes
+#16 2.719 MMXEXT enabled            yes
+#16 2.719 SSE enabled               yes
+#16 2.719 SSSE3 enabled             yes
+#16 2.719 AESNI enabled             yes
+#16 2.719 CLMUL enabled             yes
+#16 2.719 AVX enabled               yes
+#16 2.719 AVX2 enabled              yes
+#16 2.719 AVX-512 enabled           yes
+#16 2.719 AVX-512ICL enabled        yes
+#16 2.719 XOP enabled               yes
+#16 2.719 FMA3 enabled              yes
+#16 2.719 FMA4 enabled              yes
+#16 2.719 i686 features enabled     yes
+#16 2.719 CMOV is fast              yes
+#16 2.719 EBX available             yes
+#16 2.719 EBP available             yes
+#16 2.719 debug symbols             no
+#16 2.719 strip symbols             yes
+#16 2.719 optimize for size         yes
+#16 2.719 optimizations             yes
+#16 2.719 static                    yes
+#16 2.719 shared                    no
+#16 2.719 network support           no
+#16 2.719 threading support         pthreads
+#16 2.719 safe bitstream reader     yes
+#16 2.719 texi2html enabled         no
+#16 2.719 perl enabled              yes
+#16 2.719 pod2man enabled           yes
+#16 2.719 makeinfo enabled          no
+#16 2.719 makeinfo supports HTML    no
+#16 2.719 experimental features     yes
+#16 2.719 xmllint enabled           no
+#16 2.719 
+#16 2.719 External libraries:
+#16 2.720 iconv                   zlib
+#16 2.720 
+#16 2.720 External libraries providing hardware acceleration:
+#16 2.721 
+#16 2.721 Libraries:
+#16 2.721 avcodec                 avformat                swresample
+#16 2.721 avfilter                avutil                  swscale
+#16 2.721 
+#16 2.721 Programs:
+#16 2.722 ffmpeg                  ffprobe
+#16 2.722 
+#16 2.722 Enabled decoders:
+#16 2.724 gif                     hevc                    png
+#16 2.724 h263                    mjpeg                   vp8
+#16 2.724 h264                    mpeg4                   webp
+#16 2.724 
+#16 2.724 Enabled encoders:
+#16 2.726 mjpeg
+#16 2.726 
+#16 2.726 Enabled hwaccels:
+#16 2.727 
+#16 2.727 Enabled parsers:
+#16 2.728 aac                     h264                    opus
+#16 2.728 ac3                     hevc                    png
+#16 2.728 flac                    mjpeg                   vorbis
+#16 2.728 gif                     mpeg4video              webp
+#16 2.728 
+#16 2.728 Enabled demuxers:
+#16 2.730 avi                     image_jpeg_pipe         mpegps
+#16 2.730 gif                     image_png_pipe          mpegts
+#16 2.730 image2                  image_webp_pipe         mpegvideo
+#16 2.730 image2pipe              matroska                ogg
+#16 2.730 image_gif_pipe          mov
+#16 2.730 
+#16 2.730 Enabled muxers:
+#16 2.731 image2                  image2pipe
+#16 2.731 
+#16 2.731 Enabled protocols:
+#16 2.732 file                    pipe
+#16 2.732 
+#16 2.732 Enabled filters:
+#16 2.734 aformat                 format                  scale
+#16 2.734 anull                   hflip                   transpose
+#16 2.734 atrim                   null                    trim
+#16 2.734 crop                    rotate                  vflip
+#16 2.734 
+#16 2.734 Enabled bsfs:
+#16 2.735 
+#16 2.735 Enabled indevs:
+#16 2.736 
+#16 2.736 Enabled outdevs:
+#16 2.737 
+#16 2.737 License: LGPL version 2.1 or later
+#16 2.794 + make -j2
+#16 2.834 GEN	libavutil/libavutil.version
+#16 2.835 GEN	libswscale/libswscale.version
+#16 2.837 GEN	libswresample/libswresample.version
+#16 2.837 GEN	libavcodec/libavcodec.version
+#16 2.838 GEN	libavformat/libavformat.version
+#16 2.838 GEN	libavfilter/libavfilter.version
+#16 2.878 CC	libavfilter/af_aformat.o
+#16 2.878 CC	libavfilter/af_anull.o
+#16 2.892 CC	libavfilter/allfilters.o
+#16 2.900 CC	libavfilter/audio.o
+#16 2.910 CC	libavfilter/avfilter.o
+#16 2.925 CC	libavfilter/avfiltergraph.o
+#16 3.064 CC	libavfilter/buffersink.o
+#16 3.119 CC	libavfilter/buffersrc.o
+#16 3.136 CC	libavfilter/ccfifo.o
+#16 3.167 CC	libavfilter/colorspace.o
+#16 3.184 CC	libavfilter/drawutils.o
+#16 3.204 CC	libavfilter/formats.o
+#16 3.304 CC	libavfilter/framepool.o
+#16 3.344 CC	libavfilter/framequeue.o
+#16 3.374 CC	libavfilter/framesync.o
+#16 3.407 CC	libavfilter/graphdump.o
+#16 3.435 CC	libavfilter/graphparser.o
+#16 3.443 CC	libavfilter/pthread.o
+#16 3.465 CC	libavfilter/scale_eval.o
+#16 3.494 CC	libavfilter/trim.o
+#16 3.534 CC	libavfilter/version.o
+#16 3.542 CC	libavfilter/vf_crop.o
+#16 3.550 CC	libavfilter/vf_format.o
+#16 3.583 CC	libavfilter/vf_hflip.o
+#16 3.588 CC	libavfilter/vf_null.o
+#16 3.602 CC	libavfilter/vf_rotate.o
+#16 3.631 CC	libavfilter/vf_scale.o
+#16 3.701 CC	libavfilter/vf_transpose.o
+#16 3.737 CC	libavfilter/vf_vflip.o
+#16 3.765 CC	libavfilter/video.o
+#16 3.767 X86ASM	libavfilter/x86/vf_hflip.o
+#16 3.787 CC	libavfilter/x86/vf_hflip_init.o
+#16 3.796 STRIP	libavfilter/x86/vf_hflip.o
+#16 3.797 X86ASM	libavfilter/x86/vf_transpose.o
+#16 3.798 CC	libavfilter/x86/vf_transpose_init.o
+#16 3.806 GEN	libavfilter/libavfilter.pc
+#16 3.809 CC	libavformat/allformats.o
+#16 3.831 CC	libavformat/av1.o
+#16 3.832 STRIP	libavfilter/x86/vf_transpose.o
+#16 3.833 CC	libavformat/avformat.o
+#16 3.910 CC	libavformat/avidec.o
+#16 3.955 CC	libavformat/avio.o
+#16 4.056 CC	libavformat/aviobuf.o
+#16 4.147 CC	libavformat/codecstring.o
+#16 4.188 CC	libavformat/demux.o
+#16 4.257 CC	libavformat/demux_utils.o
+#16 4.306 CC	libavformat/dovi_isom.o
+#16 4.341 CC	libavformat/dump.o
+#16 4.468 CC	libavformat/dv.o
+#16 4.489 CC	libavformat/dvdclut.o
+#16 4.515 CC	libavformat/file.o
+#16 4.563 CC	libavformat/flac_picture.o
+#16 4.576 CC	libavformat/format.o
+#16 4.604 CC	libavformat/gifdec.o
+#16 4.630 CC	libavformat/iamf.o
+#16 4.644 CC	libavformat/iamf_parse.o
+#16 4.654 CC	libavformat/iamf_reader.o
+#16 4.710 CC	libavformat/id3v1.o
+#16 4.734 CC	libavformat/id3v2.o
+#16 4.820 CC	libavformat/img2.o
+#16 4.839 CC	libavformat/img2dec.o
+#16 4.863 libavformat/img2dec.c:1182:12: warning: 'vbn_probe' defined but not used [-Wunused-function]
+#16 4.863  1182 | static int vbn_probe(const AVProbeData *p)
+#16 4.863       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1162:12: warning: 'gem_probe' defined but not used [-Wunused-function]
+#16 4.864  1162 | static int gem_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1145:12: warning: 'qoi_probe' defined but not used [-Wunused-function]
+#16 4.864  1145 | static int qoi_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1134:12: warning: 'photocd_probe' defined but not used [-Wunused-function]
+#16 4.864  1134 | static int photocd_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1091:12: warning: 'xwd_probe' defined but not used [-Wunused-function]
+#16 4.864  1091 | static int xwd_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1082:12: warning: 'xpm_probe' defined but not used [-Wunused-function]
+#16 4.864  1082 | static int xpm_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1072:12: warning: 'xbm_probe' defined but not used [-Wunused-function]
+#16 4.864  1072 | static int xbm_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1065:12: warning: 'hdr_probe' defined but not used [-Wunused-function]
+#16 4.864  1065 | static int hdr_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.864 libavformat/img2dec.c:1060:12: warning: 'pam_probe' defined but not used [-Wunused-function]
+#16 4.864  1060 | static int pam_probe(const AVProbeData *p)
+#16 4.864       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1055:12: warning: 'ppm_probe' defined but not used [-Wunused-function]
+#16 4.865  1055 | static int ppm_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1047:12: warning: 'pgx_probe' defined but not used [-Wunused-function]
+#16 4.865  1047 | static int pgx_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1041:12: warning: 'pgmyuv_probe' defined but not used [-Wunused-function]
+#16 4.865  1041 | static int pgmyuv_probe(const AVProbeData *p) // custom FFmpeg format recognized by file extension
+#16 4.865       |            ^~~~~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1035:12: warning: 'pgm_probe' defined but not used [-Wunused-function]
+#16 4.865  1035 | static int pgm_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1024:12: warning: 'phm_probe' defined but not used [-Wunused-function]
+#16 4.865  1024 | static int phm_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1018:12: warning: 'pfm_probe' defined but not used [-Wunused-function]
+#16 4.865  1018 | static int pfm_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:1013:12: warning: 'pbm_probe' defined but not used [-Wunused-function]
+#16 4.865  1013 | static int pbm_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.865 libavformat/img2dec.c:975:12: warning: 'tiff_probe' defined but not used [-Wunused-function]
+#16 4.865   975 | static int tiff_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~~
+#16 4.865 libavformat/img2dec.c:950:12: warning: 'svg_probe' defined but not used [-Wunused-function]
+#16 4.865   950 | static int svg_probe(const AVProbeData *p)
+#16 4.865       |            ^~~~~~~~~
+#16 4.866 libavformat/img2dec.c:941:12: warning: 'sunrast_probe' defined but not used [-Wunused-function]
+#16 4.866   941 | static int sunrast_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~~~~~
+#16 4.866 libavformat/img2dec.c:929:12: warning: 'sgi_probe' defined but not used [-Wunused-function]
+#16 4.866   929 | static int sgi_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~
+#16 4.866 libavformat/img2dec.c:901:12: warning: 'psd_probe' defined but not used [-Wunused-function]
+#16 4.866   901 | static int psd_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~
+#16 4.866 libavformat/img2dec.c:883:12: warning: 'pictor_probe' defined but not used [-Wunused-function]
+#16 4.866   883 | static int pictor_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~~~~
+#16 4.866 libavformat/img2dec.c:867:12: warning: 'qdraw_probe' defined but not used [-Wunused-function]
+#16 4.866   867 | static int qdraw_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~~~
+#16 4.866 libavformat/img2dec.c:846:12: warning: 'pcx_probe' defined but not used [-Wunused-function]
+#16 4.866   846 | static int pcx_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~
+#16 4.866 libavformat/img2dec.c:837:12: warning: 'jpegxs_probe' defined but not used [-Wunused-function]
+#16 4.866   837 | static int jpegxs_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~~~~
+#16 4.866 libavformat/img2dec.c:819:12: warning: 'jpegxl_probe' defined but not used [-Wunused-function]
+#16 4.866   819 | static int jpegxl_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~~~~
+#16 4.866 libavformat/img2dec.c:810:12: warning: 'jpegls_probe' defined but not used [-Wunused-function]
+#16 4.866   810 | static int jpegls_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~~~~
+#16 4.866 libavformat/img2dec.c:719:12: warning: 'j2k_probe' defined but not used [-Wunused-function]
+#16 4.866   719 | static int j2k_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~
+#16 4.866 libavformat/img2dec.c:710:12: warning: 'exr_probe' defined but not used [-Wunused-function]
+#16 4.866   710 | static int exr_probe(const AVProbeData *p)
+#16 4.866       |            ^~~~~~~~~
+#16 4.867 libavformat/img2dec.c:692:12: warning: 'dpx_probe' defined but not used [-Wunused-function]
+#16 4.867   692 | static int dpx_probe(const AVProbeData *p)
+#16 4.867       |            ^~~~~~~~~
+#16 4.867 libavformat/img2dec.c:681:12: warning: 'dds_probe' defined but not used [-Wunused-function]
+#16 4.867   681 | static int dds_probe(const AVProbeData *p)
+#16 4.867       |            ^~~~~~~~~
+#16 4.867 libavformat/img2dec.c:670:12: warning: 'cri_probe' defined but not used [-Wunused-function]
+#16 4.867   670 | static int cri_probe(const AVProbeData *p)
+#16 4.867       |            ^~~~~~~~~
+#16 4.867 libavformat/img2dec.c:652:12: warning: 'bmp_probe' defined but not used [-Wunused-function]
+#16 4.867   652 | static int bmp_probe(const AVProbeData *p)
+#16 4.867       |            ^~~~~~~~~
+#16 4.876 CC	libavformat/img2enc.o
+#16 4.925 CC	libavformat/isom.o
+#16 4.929 CC	libavformat/isom_tags.o
+#16 4.948 CC	libavformat/lcevc.o
+#16 4.969 CC	libavformat/matroska.o
+#16 4.988 CC	libavformat/matroskadec.o
+#16 5.022 CC	libavformat/metadata.o
+#16 5.063 CC	libavformat/mov.o
+#16 5.387 CC	libavformat/mov_chan.o
+#16 5.452 CC	libavformat/mov_esds.o
+#16 5.472 CC	libavformat/mpeg.o
+#16 5.564 CC	libavformat/mpegts.o
+#16 5.805 libavformat/mpegts.c: In function 'pat_cb':
+#16 5.805 libavformat/mpegts.c:2966:13: warning: stack usage is 134800 bytes [-Wstack-usage=]
+#16 5.805  2966 | static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
+#16 5.805       |             ^~~~~~
+#16 5.921 libavformat/mpegts.c: In function 'pmt_cb':
+#16 5.921 libavformat/mpegts.c:2740:13: warning: stack usage might be 136352 bytes [-Wstack-usage=]
+#16 5.921  2740 | static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
+#16 5.921       |             ^~~~~~
+#16 5.934 CC	libavformat/mpegvideodec.o
+#16 5.963 CC	libavformat/mux.o
+#16 6.118 CC	libavformat/mux_utils.o
+#16 6.148 CC	libavformat/nal.o
+#16 6.181 CC	libavformat/oggdec.o
+#16 6.293 CC	libavformat/oggparsedirac.o
+#16 6.326 CC	libavformat/oggparseflac.o
+#16 6.361 CC	libavformat/oggparseogm.o
+#16 6.407 CC	libavformat/oggparseopus.o
+#16 6.439 CC	libavformat/oggparseskeleton.o
+#16 6.445 CC	libavformat/oggparsespeex.o
+#16 6.466 CC	libavformat/oggparsetheora.o
+#16 6.476 CC	libavformat/oggparsevorbis.o
+#16 6.515 CC	libavformat/oggparsevp8.o
+#16 6.548 CC	libavformat/options.o
+#16 6.558 CC	libavformat/os_support.o
+#16 6.575 CC	libavformat/packet_list.o
+#16 6.638 CC	libavformat/protocols.o
+#16 ...
+
+#15 [build 5/6] RUN dotnet restore server/src/Briani.Api/Briani.Api.csproj --locked-mode
+#15 6.481   Restored /src/server/src/Briani.Api/Briani.Api.csproj (in 5.94 sec).
+#15 DONE 6.7s
+
+#16 [ffmpeg-build 6/6] RUN set -eux;     ./configure       --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib       --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect       --disable-doc --disable-debug --disable-network --disable-avdevice       --disable-shared --enable-static --enable-small --enable-zlib       --disable-everything --enable-ffmpeg --enable-ffprobe       --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil       --enable-protocol=file,pipe       --enable-demuxer=mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif       --enable-muxer=image2,image2pipe       --enable-decoder=h264,hevc,mpeg4,mjpeg,png,webp,gif       --enable-encoder=mjpeg       --enable-parser=h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis       --enable-filter=scale,transpose,format,hflip,vflip       --extra-cflags=-fstack-protector-strong --extra-ldflags=-Wl,-z,relro,-z,now;     make -j"2";     make DESTDIR=/out install;     install -D LICENSE.md /out/opt/briani-media/share/ffmpeg/LICENSE.md;     install -D COPYING.LGPLv2.1 /out/opt/briani-media/share/ffmpeg/COPYING.LGPLv2.1;     cp ffbuild/config.log /out/opt/briani-media/share/ffmpeg/config.log;     dpkg-query -W -f='${binary:Package}=${Version}\n' build-essential ca-certificates curl gpg nasm pkg-config xz-utils zlib1g-dev > /out/opt/briani-media/share/ffmpeg/build-packages.txt;     printf '%s  ffmpeg-%s.tar.xz\n' "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" "9.0.2" > /out/opt/briani-media/share/ffmpeg/source.sha256
+#16 6.639 CC	libavformat/qtpalette.o
+#16 6.660 CC	libavformat/rawdec.o
+#16 6.671 CC	libavformat/replaygain.o
+#16 6.673 libavformat/rawdec.c:106:12: warning: 'raw_data_read_header' defined but not used [-Wunused-function]
+#16 6.673   106 | static int raw_data_read_header(AVFormatContext *s)
+#16 6.673       |            ^~~~~~~~~~~~~~~~~~~~
+#16 6.692 CC	libavformat/riff.o
+#16 6.703 CC	libavformat/riffdec.o
+#16 6.712 CC	libavformat/rmsipr.o
+#16 6.733 CC	libavformat/sdp.o
+#16 6.757 CC	libavformat/seek.o
+#16 6.757 CC	libavformat/url.o
+#16 6.804 CC	libavformat/urldecode.o
+#16 6.823 CC	libavformat/utils.o
+#16 6.857 CC	libavformat/version.o
+#16 6.874 CC	libavformat/vorbiscomment.o
+#16 6.903 CC	libavformat/vpcc.o
+#16 6.916 GEN	libavformat/libavformat.pc
+#16 6.918 CC	libavcodec/aac_ac3_parser.o
+#16 6.947 CC	libavcodec/aac_parser.o
+#16 6.952 CC	libavcodec/aandcttab.o
+#16 6.956 CC	libavcodec/ac3_channel_layout_tab.o
+#16 6.962 CC	libavcodec/ac3_parser.o
+#16 6.972 CC	libavcodec/ac3tab.o
+#16 6.983 CC	libavcodec/adts_header.o
+#16 7.012 CC	libavcodec/adts_parser.o
+#16 7.028 CC	libavcodec/allcodecs.o
+#16 7.042 CC	libavcodec/aom_film_grain.o
+#16 7.052 CC	libavcodec/atsc_a53.o
+#16 7.077 CC	libavcodec/avcodec.o
+#16 7.171 CC	libavcodec/avdct.o
+#16 7.193 CC	libavcodec/bitstream.o
+#16 7.220 CC	libavcodec/bitstream_filters.o
+#16 7.239 CC	libavcodec/blockdsp.o
+#16 7.251 CC	libavcodec/bsf.o
+#16 7.311 CC	libavcodec/bswapdsp.o
+#16 7.322 CC	libavcodec/cabac.o
+#16 7.333 CC	libavcodec/codec_desc.o
+#16 7.337 CC	libavcodec/codec_par.o
+#16 7.359 CC	libavcodec/d3d11va.o
+#16 7.365 CC	libavcodec/decode.o
+#16 7.372 CC	libavcodec/dirac.o
+#16 7.420 CC	libavcodec/dovi_rpu.o
+#16 7.446 CC	libavcodec/dovi_rpudec.o
+#16 7.569 CC	libavcodec/dv_profile.o
+#16 7.590 CC	libavcodec/dynamic_hdr_vivid.o
+#16 7.594 CC	libavcodec/encode.o
+#16 7.631 CC	libavcodec/error_resilience.o
+#16 7.704 CC	libavcodec/exif.o
+#16 7.875 CC	libavcodec/faandct.o
+#16 7.891 CC	libavcodec/faanidct.o
+#16 7.908 CC	libavcodec/fdctdsp.o
+#16 7.925 CC	libavcodec/flac.o
+#16 7.931 CC	libavcodec/flac_parser.o
+#16 7.972 CC	libavcodec/flacdata.o
+#16 7.977 CC	libavcodec/frame_thread_encoder.o
+#16 8.019 CC	libavcodec/get_buffer.o
+#16 8.031 CC	libavcodec/gif_parser.o
+#16 8.060 CC	libavcodec/gifdec.o
+#16 8.061 CC	libavcodec/golomb.o
+#16 8.066 CC	libavcodec/h263.o
+#16 8.106 CC	libavcodec/h263data.o
+#16 8.112 CC	libavcodec/h263dec.o
+#16 8.130 CC	libavcodec/h263dsp.o
+#16 8.134 libavcodec/h263dec.c: In function 'ff_h263_decode_frame':
+#16 8.134 libavcodec/h263dec.c:615:1: warning: label 'frame_end' defined but not used [-Wunused-label]
+#16 8.134   615 | frame_end:
+#16 8.134       | ^~~~~~~~~
+#16 8.158 CC	libavcodec/h2645_parse.o
+#16 8.192 CC	libavcodec/h2645_sei.o
+#16 8.241 CC	libavcodec/h2645_vui.o
+#16 8.272 CC	libavcodec/h2645data.o
+#16 8.277 CC	libavcodec/h264_cabac.o
+#16 8.286 CC	libavcodec/h264_cavlc.o
+#16 8.662 CC	libavcodec/h264_direct.o
+#16 8.727 CC	libavcodec/h264_loopfilter.o
+#16 8.802 CC	libavcodec/h264_mb.o
+#16 9.064 CC	libavcodec/h264_parse.o
+#16 9.163 CC	libavcodec/h264_parser.o
+#16 9.270 CC	libavcodec/h264_picture.o
+#16 9.295 CC	libavcodec/h264_ps.o
+#16 9.314 CC	libavcodec/h264_refs.o
+#16 9.428 CC	libavcodec/h264_sei.o
+#16 9.465 CC	libavcodec/h264_slice.o
+#16 9.511 CC	libavcodec/h264chroma.o
+#16 ...
+
+#17 [build 6/6] RUN dotnet publish server/src/Briani.Api/Briani.Api.csproj --no-restore -c Release -o /out --self-contained false
+#17 2.711   Briani.Api -> /src/server/src/Briani.Api/bin/Release/net10.0/Briani.Api.dll
+#17 2.786   Briani.Api -> /out/
+#17 DONE 2.8s
+
+#16 [ffmpeg-build 6/6] RUN set -eux;     ./configure       --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib       --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect       --disable-doc --disable-debug --disable-network --disable-avdevice       --disable-shared --enable-static --enable-small --enable-zlib       --disable-everything --enable-ffmpeg --enable-ffprobe       --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil       --enable-protocol=file,pipe       --enable-demuxer=mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif       --enable-muxer=image2,image2pipe       --enable-decoder=h264,hevc,mpeg4,mjpeg,png,webp,gif       --enable-encoder=mjpeg       --enable-parser=h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis       --enable-filter=scale,transpose,format,hflip,vflip       --extra-cflags=-fstack-protector-strong --extra-ldflags=-Wl,-z,relro,-z,now;     make -j"2";     make DESTDIR=/out install;     install -D LICENSE.md /out/opt/briani-media/share/ffmpeg/LICENSE.md;     install -D COPYING.LGPLv2.1 /out/opt/briani-media/share/ffmpeg/COPYING.LGPLv2.1;     cp ffbuild/config.log /out/opt/briani-media/share/ffmpeg/config.log;     dpkg-query -W -f='${binary:Package}=${Version}\n' build-essential ca-certificates curl gpg nasm pkg-config xz-utils zlib1g-dev > /out/opt/briani-media/share/ffmpeg/build-packages.txt;     printf '%s  ffmpeg-%s.tar.xz\n' "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" "9.0.2" > /out/opt/briani-media/share/ffmpeg/source.sha256
+#16 9.666 CC	libavcodec/h264data.o
+#16 ...
+
+#18 [stage-2 2/5] WORKDIR /app
+#18 CACHED
+
+#19 [stage-2 3/5] RUN mkdir -p /config /data && chown 1000:1000 /config /data
+#19 CACHED
+
+#20 [stage-2 4/5] COPY --from=build /out ./
+#20 DONE 0.1s
+
+#16 [ffmpeg-build 6/6] RUN set -eux;     ./configure       --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib       --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect       --disable-doc --disable-debug --disable-network --disable-avdevice       --disable-shared --enable-static --enable-small --enable-zlib       --disable-everything --enable-ffmpeg --enable-ffprobe       --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil       --enable-protocol=file,pipe       --enable-demuxer=mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif       --enable-muxer=image2,image2pipe       --enable-decoder=h264,hevc,mpeg4,mjpeg,png,webp,gif       --enable-encoder=mjpeg       --enable-parser=h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis       --enable-filter=scale,transpose,format,hflip,vflip       --extra-cflags=-fstack-protector-strong --extra-ldflags=-Wl,-z,relro,-z,now;     make -j"2";     make DESTDIR=/out install;     install -D LICENSE.md /out/opt/briani-media/share/ffmpeg/LICENSE.md;     install -D COPYING.LGPLv2.1 /out/opt/briani-media/share/ffmpeg/COPYING.LGPLv2.1;     cp ffbuild/config.log /out/opt/briani-media/share/ffmpeg/config.log;     dpkg-query -W -f='${binary:Package}=${Version}\n' build-essential ca-certificates curl gpg nasm pkg-config xz-utils zlib1g-dev > /out/opt/briani-media/share/ffmpeg/build-packages.txt;     printf '%s  ffmpeg-%s.tar.xz\n' "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" "9.0.2" > /out/opt/briani-media/share/ffmpeg/source.sha256
+#16 9.688 CC	libavcodec/h264dec.o
+#16 9.819 CC	libavcodec/h264dsp.o
+#16 9.833 CC	libavcodec/h264idct.o
+#16 10.12 CC	libavcodec/h264pred.o
+#16 10.57 CC	libavcodec/h264qpel.o
+#16 11.12 CC	libavcodec/h274.o
+#16 11.20 CC	libavcodec/hevc/cabac.o
+#16 11.37 CC	libavcodec/hevc/data.o
+#16 11.38 CC	libavcodec/hevc/dsp.o
+#16 12.01 CC	libavcodec/hevc/filter.o
+#16 12.17 CC	libavcodec/hevc/hevcdec.o
+#16 12.69 CC	libavcodec/hevc/mvs.o
+#16 12.81 CC	libavcodec/hevc/parse.o
+#16 12.85 CC	libavcodec/hevc/parser.o
+#16 12.91 CC	libavcodec/hevc/pred.o
+#16 12.99 CC	libavcodec/hevc/ps.o
+#16 13.30 CC	libavcodec/hevc/refs.o
+#16 13.40 CC	libavcodec/hevc/sei.o
+#16 13.47 CC	libavcodec/hpeldsp.o
+#16 13.58 CC	libavcodec/idctdsp.o
+#16 13.63 CC	libavcodec/imgconvert.o
+#16 13.65 CC	libavcodec/ituh263dec.o
+#16 13.83 CC	libavcodec/itut35.o
+#16 13.88 CC	libavcodec/jfdctfst.o
+#16 13.90 CC	libavcodec/jfdctint.o
+#16 13.95 CC	libavcodec/jni.o
+#16 13.96 CC	libavcodec/jpegtables.o
+#16 13.97 CC	libavcodec/jrevdct.o
+#16 14.02 CC	libavcodec/lzw.o
+#16 14.06 CC	libavcodec/mathtables.o
+#16 14.07 CC	libavcodec/me_cmp.o
+#16 14.20 CC	libavcodec/mediacodec.o
+#16 14.22 CC	libavcodec/mjpeg_parser.o
+#16 14.25 CC	libavcodec/mjpegdec.o
+#16 14.26 CC	libavcodec/mjpegdec_common.o
+#16 14.29 CC	libavcodec/mjpegenc.o
+#16 14.37 CC	libavcodec/mjpegenc_common.o
+#16 14.45 CC	libavcodec/mjpegenc_huffman.o
+#16 14.48 CC	libavcodec/motion_est.o
+#16 14.69 CC	libavcodec/mpeg12data.o
+#16 14.70 CC	libavcodec/mpeg12framerate.o
+#16 14.71 CC	libavcodec/mpeg4audio.o
+#16 14.76 CC	libavcodec/mpeg4audio_sample_rates.o
+#16 14.77 CC	libavcodec/mpeg4video.o
+#16 14.81 CC	libavcodec/mpeg4video_parser.o
+#16 14.85 CC	libavcodec/mpeg4videodec.o
+#16 15.18 CC	libavcodec/mpeg4videodsp.o
+#16 15.21 CC	libavcodec/mpeg_er.o
+#16 15.24 CC	libavcodec/mpegpicture.o
+#16 15.28 CC	libavcodec/mpegutils.o
+#16 15.33 CC	libavcodec/mpegvideo.o
+#16 15.35 CC	libavcodec/mpegvideo_dec.o
+#16 15.40 CC	libavcodec/mpegvideo_enc.o
+#16 15.46 libavcodec/mpegvideo_enc.c: In function 'write_mb_info':
+#16 15.46 libavcodec/mpegvideo_enc.c:2887:5: warning: 'pred_x' is used uninitialized [-Wuninitialized]
+#16 15.46  2887 |     bytestream_put_byte(&ptr, pred_x); /* hmv1 */
+#16 15.46       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#16 15.46 libavcodec/mpegvideo_enc.c:2880:9: note: 'pred_x' was declared here
+#16 15.46  2880 |     int pred_x, pred_y;
+#16 15.46       |         ^~~~~~
+#16 15.46 libavcodec/mpegvideo_enc.c:2888:5: warning: 'pred_y' is used uninitialized [-Wuninitialized]
+#16 15.46  2888 |     bytestream_put_byte(&ptr, pred_y); /* vmv1 */
+#16 15.46       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#16 15.46 libavcodec/mpegvideo_enc.c:2880:17: note: 'pred_y' was declared here
+#16 15.46  2880 |     int pred_x, pred_y;
+#16 15.46       |                 ^~~~~~
+#16 15.54 CC	libavcodec/mpegvideo_motion.o
+#16 15.69 CC	libavcodec/mpegvideo_unquantize.o
+#16 15.74 CC	libavcodec/mpegvideodata.o
+#16 15.74 CC	libavcodec/mpegvideoencdsp.o
+#16 15.80 CC	libavcodec/options.o
+#16 15.83 CC	libavcodec/opus/frame_duration_tab.o
+#16 15.84 CC	libavcodec/opus/parse.o
+#16 15.90 CC	libavcodec/opus/parser.o
+#16 15.94 CC	libavcodec/packet.o
+#16 16.02 CC	libavcodec/parser.o
+#16 16.02 CC	libavcodec/parsers.o
+#16 16.03 CC	libavcodec/pixblockdsp.o
+#16 16.06 CC	libavcodec/png.o
+#16 16.06 CC	libavcodec/png_parser.o
+#16 16.06 CC	libavcodec/pngdec.o
+#16 16.08 CC	libavcodec/pngdsp.o
+#16 16.10 CC	libavcodec/profiles.o
+#16 16.12 CC	libavcodec/pthread.o
+#16 16.14 CC	libavcodec/pthread_frame.o
+#16 16.24 CC	libavcodec/pthread_slice.o
+#16 16.27 CC	libavcodec/qpeldsp.o
+#16 16.31 CC	libavcodec/qsv_api.o
+#16 16.31 CC	libavcodec/ratecontrol.o
+#16 16.46 CC	libavcodec/raw.o
+#16 16.48 CC	libavcodec/rl.o
+#16 16.50 CC	libavcodec/simple_idct.o
+#16 16.65 CC	libavcodec/startcode.o
+#16 16.66 CC	libavcodec/threadprogress.o
+#16 16.67 CC	libavcodec/tiff_common.o
+#16 16.69 CC	libavcodec/to_upper4.o
+#16 16.71 CC	libavcodec/utils.o
+#16 16.72 CC	libavcodec/version.o
+#16 16.73 CC	libavcodec/videodsp.o
+#16 16.78 CC	libavcodec/vlc.o
+#16 16.82 CC	libavcodec/vorbis_data.o
+#16 16.84 CC	libavcodec/vorbis_parser.o
+#16 16.89 CC	libavcodec/vp8.o
+#16 16.89 CC	libavcodec/vp8data.o
+#16 16.89 CC	libavcodec/vp8dsp.o
+#16 17.18 CC	libavcodec/vpx_rac.o
+#16 17.20 CC	libavcodec/webp.o
+#16 17.38 CC	libavcodec/webp_parser.o
+#16 17.41 X86ASM	libavcodec/x86/blockdsp.o
+#16 17.45 STRIP	libavcodec/x86/blockdsp.o
+#16 17.45 CC	libavcodec/x86/blockdsp_init.o
+#16 17.46 X86ASM	libavcodec/x86/bswapdsp.o
+#16 17.50 STRIP	libavcodec/x86/bswapdsp.o
+#16 17.50 CC	libavcodec/x86/bswapdsp_init.o
+#16 17.51 CC	libavcodec/x86/constants.o
+#16 17.52 CC	libavcodec/x86/fdct.o
+#16 17.53 CC	libavcodec/x86/fdctdsp_init.o
+#16 17.54 X86ASM	libavcodec/x86/fpel.o
+#16 17.57 STRIP	libavcodec/x86/fpel.o
+#16 17.57 X86ASM	libavcodec/x86/h263_loopfilter.o
+#16 17.61 STRIP	libavcodec/x86/h263_loopfilter.o
+#16 17.61 CC	libavcodec/x86/h263dsp_init.o
+#16 17.62 X86ASM	libavcodec/x86/h264_chromamc.o
+#16 17.74 STRIP	libavcodec/x86/h264_chromamc.o
+#16 17.74 X86ASM	libavcodec/x86/h264_chromamc_10bit.o
+#16 17.77 X86ASM	libavcodec/x86/h264_deblock.o
+#16 17.82 STRIP	libavcodec/x86/h264_chromamc_10bit.o
+#16 17.82 X86ASM	libavcodec/x86/h264_deblock_10bit.o
+#16 18.11 STRIP	libavcodec/x86/h264_deblock_10bit.o
+#16 18.11 X86ASM	libavcodec/x86/h264_idct.o
+#16 18.32 STRIP	libavcodec/x86/h264_idct.o
+#16 18.32 X86ASM	libavcodec/x86/h264_idct_10bit.o
+#16 18.36 STRIP	libavcodec/x86/h264_deblock.o
+#16 18.36 X86ASM	libavcodec/x86/h264_intrapred.o
+#16 18.59 STRIP	libavcodec/x86/h264_idct_10bit.o
+#16 18.59 X86ASM	libavcodec/x86/h264_intrapred_10bit.o
+#16 18.94 STRIP	libavcodec/x86/h264_intrapred.o
+#16 18.94 CC	libavcodec/x86/h264_intrapred_init.o
+#16 18.96 STRIP	libavcodec/x86/h264_intrapred_10bit.o
+#16 18.96 CC	libavcodec/x86/h264_qpel.o
+#16 18.97 X86ASM	libavcodec/x86/h264_qpel_10bit.o
+#16 19.15 X86ASM	libavcodec/x86/h264_qpel_8bit.o
+#16 19.30 STRIP	libavcodec/x86/h264_qpel_10bit.o
+#16 19.30 X86ASM	libavcodec/x86/h264_weight.o
+#16 19.36 STRIP	libavcodec/x86/h264_weight.o
+#16 19.36 X86ASM	libavcodec/x86/h264_weight_10bit.o
+#16 19.45 STRIP	libavcodec/x86/h264_weight_10bit.o
+#16 19.45 CC	libavcodec/x86/h264chroma_init.o
+#16 19.47 CC	libavcodec/x86/h264dsp_init.o
+#16 19.49 X86ASM	libavcodec/x86/h26x/h2656_inter.o
+#16 19.54 STRIP	libavcodec/x86/h264_qpel_8bit.o
+#16 19.54 CC	libavcodec/x86/h26x/h2656dsp.o
+#16 19.96 X86ASM	libavcodec/x86/hevc/add_res.o
+#16 20.05 STRIP	libavcodec/x86/hevc/add_res.o
+#16 20.06 X86ASM	libavcodec/x86/hevc/deblock.o
+#16 21.21 STRIP	libavcodec/x86/h26x/h2656_inter.o
+#16 21.21 X86ASM	libavcodec/x86/hevc/dequant.o
+#16 21.23 STRIP	libavcodec/x86/hevc/dequant.o
+#16 21.23 CC	libavcodec/x86/hevc/dsp_init.o
+#16 21.33 STRIP	libavcodec/x86/hevc/deblock.o
+#16 21.33 X86ASM	libavcodec/x86/hevc/idct.o
+#16 22.21 STRIP	libavcodec/x86/hevc/idct.o
+#16 22.21 X86ASM	libavcodec/x86/hevc/mc.o
+#16 23.04 X86ASM	libavcodec/x86/hevc/sao.o
+#16 23.09 STRIP	libavcodec/x86/hevc/mc.o
+#16 23.09 X86ASM	libavcodec/x86/hevc/sao_10bit.o
+#16 23.33 STRIP	libavcodec/x86/hevc/sao.o
+#16 23.33 X86ASM	libavcodec/x86/hpeldsp.o
+#16 23.47 STRIP	libavcodec/x86/hpeldsp.o
+#16 23.47 CC	libavcodec/x86/hpeldsp_init.o
+#16 23.49 X86ASM	libavcodec/x86/idctdsp.o
+#16 23.52 STRIP	libavcodec/x86/idctdsp.o
+#16 23.53 CC	libavcodec/x86/idctdsp_init.o
+#16 23.55 X86ASM	libavcodec/x86/me_cmp.o
+#16 23.83 STRIP	libavcodec/x86/me_cmp.o
+#16 23.83 CC	libavcodec/x86/me_cmp_init.o
+#16 23.86 CC	libavcodec/x86/mpeg4videodsp.o
+#16 23.88 CC	libavcodec/x86/mpegvideo.o
+#16 23.88 STRIP	libavcodec/x86/hevc/sao_10bit.o
+#16 23.88 CC	libavcodec/x86/mpegvideoenc.o
+#16 23.91 X86ASM	libavcodec/x86/mpegvideoencdsp.o
+#16 23.94 CC	libavcodec/x86/mpegvideoencdsp_init.o
+#16 23.95 STRIP	libavcodec/x86/mpegvideoencdsp.o
+#16 23.95 X86ASM	libavcodec/x86/pixblockdsp.o
+#16 23.97 CC	libavcodec/x86/pixblockdsp_init.o
+#16 23.97 X86ASM	libavcodec/x86/pngdsp.o
+#16 23.98 STRIP	libavcodec/x86/pixblockdsp.o
+#16 23.98 CC	libavcodec/x86/pngdsp_init.o
+#16 23.99 X86ASM	libavcodec/x86/qpel.o
+#16 24.00 STRIP	libavcodec/x86/pngdsp.o
+#16 24.00 X86ASM	libavcodec/x86/qpeldsp.o
+#16 24.02 STRIP	libavcodec/x86/qpel.o
+#16 24.02 CC	libavcodec/x86/qpeldsp_init.o
+#16 24.11 X86ASM	libavcodec/x86/simple_idct10.o
+#16 24.30 STRIP	libavcodec/x86/qpeldsp.o
+#16 24.30 X86ASM	libavcodec/x86/videodsp.o
+#16 24.42 STRIP	libavcodec/x86/videodsp.o
+#16 24.42 CC	libavcodec/x86/videodsp_init.o
+#16 24.46 X86ASM	libavcodec/x86/vp8dsp.o
+#16 24.61 STRIP	libavcodec/x86/vp8dsp.o
+#16 24.61 CC	libavcodec/x86/vp8dsp_init.o
+#16 24.66 X86ASM	libavcodec/x86/vp8dsp_loopfilter.o
+#16 24.78 STRIP	libavcodec/x86/simple_idct10.o
+#16 24.78 X86ASM	libavcodec/x86/xvididct.o
+#16 24.98 STRIP	libavcodec/x86/xvididct.o
+#16 24.99 CC	libavcodec/x86/xvididct_init.o
+#16 24.99 CC	libavcodec/xiph.o
+#16 25.01 CC	libavcodec/xvididct.o
+#16 25.05 CC	libavcodec/zlib_wrapper.o
+#16 25.06 CC	libavcodec/lcevctab.o
+#16 25.06 CC	libavcodec/mpegaudiotabs.o
+#16 25.07 GEN	libavcodec/libavcodec.pc
+#16 25.07 CC	libswresample/audioconvert.o
+#16 25.23 CC	libswresample/dither.o
+#16 25.30 CC	libswresample/options.o
+#16 25.32 STRIP	libavcodec/x86/vp8dsp_loopfilter.o
+#16 25.32 CC	libswresample/rematrix.o
+#16 25.32 CC	libswresample/resample.o
+#16 25.41 CC	libswresample/resample_dsp.o
+#16 25.49 CC	libswresample/swresample.o
+#16 25.49 CC	libswresample/swresample_frame.o
+#16 25.52 CC	libswresample/version.o
+#16 25.53 X86ASM	libswresample/x86/audio_convert.o
+#16 25.62 CC	libswresample/x86/audio_convert_init.o
+#16 25.65 X86ASM	libswresample/x86/rematrix.o
+#16 25.72 STRIP	libswresample/x86/rematrix.o
+#16 25.72 CC	libswresample/x86/rematrix_init.o
+#16 25.75 X86ASM	libswresample/x86/resample.o
+#16 25.89 STRIP	libswresample/x86/resample.o
+#16 25.90 CC	libswresample/x86/resample_init.o
+#16 25.92 GEN	libswresample/libswresample.pc
+#16 25.92 CC	libswscale/alphablend.o
+#16 25.99 CC	libswscale/cms.o
+#16 26.02 STRIP	libswresample/x86/audio_convert.o
+#16 26.02 CC	libswscale/csputils.o
+#16 26.07 CC	libswscale/filters.o
+#16 26.12 CC	libswscale/format.o
+#16 26.12 CC	libswscale/framepool.o
+#16 26.16 CC	libswscale/gamma.o
+#16 26.18 CC	libswscale/graph.o
+#16 26.28 CC	libswscale/hscale.o
+#16 26.32 CC	libswscale/hscale_fast_bilinear.o
+#16 26.34 CC	libswscale/input.o
+#16 26.35 CC	libswscale/lut3d.o
+#16 26.40 CC	libswscale/ops.o
+#16 26.56 CC	libswscale/ops_chain.o
+#16 26.60 CC	libswscale/ops_dispatch.o
+#16 26.71 CC	libswscale/ops_memcpy.o
+#16 26.75 CC	libswscale/ops_optimizer.o
+#16 26.89 CC	libswscale/options.o
+#16 26.91 CC	libswscale/output.o
+#16 27.09 CC	libswscale/rational64.o
+#16 27.12 CC	libswscale/rgb2rgb.o
+#16 27.32 CC	libswscale/slice.o
+#16 27.39 CC	libswscale/swscale.o
+#16 27.62 CC	libswscale/swscale_unscaled.o
+#16 28.77 CC	libswscale/uops.o
+#16 28.91 CC	libswscale/uops_backend.o
+#16 29.01 CC	libswscale/utils.o
+#16 29.31 CC	libswscale/version.o
+#16 29.33 CC	libswscale/vscale.o
+#16 29.39 CC	libswscale/x86/hscale_fast_bilinear_simd.o
+#16 29.43 X86ASM	libswscale/x86/input.o
+#16 29.70 CC	libswscale/x86/ops.o
+#16 29.79 HOSTCC	libswscale/x86/uops_macros.gen.asm
+#16 29.80 X86ASM	libswscale/x86/output.o
+#16 30.12 STRIP	libswscale/x86/input.o
+#16 30.12 X86ASM	libswscale/x86/range_convert.o
+#16 30.21 STRIP	libswscale/x86/range_convert.o
+#16 30.21 CC	libswscale/x86/rgb2rgb.o
+#16 30.34 X86ASM	libswscale/x86/rgb_2_rgb.o
+#16 30.48 STRIP	libswscale/x86/rgb_2_rgb.o
+#16 30.48 X86ASM	libswscale/x86/scale.o
+#16 31.02 STRIP	libswscale/x86/scale.o
+#16 31.02 X86ASM	libswscale/x86/scale_avx2.o
+#16 31.05 STRIP	libswscale/x86/scale_avx2.o
+#16 31.05 CC	libswscale/x86/swscale.o
+#16 31.26 CC	libswscale/x86/yuv2rgb.o
+#16 31.32 X86ASM	libswscale/x86/yuv2yuvX.o
+#16 31.35 STRIP	libswscale/x86/yuv2yuvX.o
+#16 31.36 X86ASM	libswscale/x86/yuv_2_rgb.o
+#16 31.47 STRIP	libswscale/x86/yuv_2_rgb.o
+#16 31.47 CC	libswscale/yuv2rgb.o
+#16 31.51 STRIP	libswscale/x86/output.o
+#16 31.51 GEN	libswscale/libswscale.pc
+#16 31.51 CC	libavutil/adler32.o
+#16 31.53 CC	libavutil/aes.o
+#16 31.58 CC	libavutil/aes_ctr.o
+#16 31.61 CC	libavutil/ambient_viewing_environment.o
+#16 31.63 CC	libavutil/audio_fifo.o
+#16 31.66 CC	libavutil/avsscanf.o
+#16 31.82 CC	libavutil/avstring.o
+#16 31.88 CC	libavutil/base64.o
+#16 31.91 CC	libavutil/blowfish.o
+#16 31.95 CC	libavutil/bprint.o
+#16 31.99 CC	libavutil/buffer.o
+#16 32.04 CC	libavutil/camellia.o
+#16 32.08 CC	libavutil/cast5.o
+#16 32.16 CC	libavutil/channel_layout.o
+#16 32.27 CC	libavutil/container_fifo.o
+#16 32.28 CC	libavutil/cpu.o
+#16 32.31 CC	libavutil/crc.o
+#16 32.31 CC	libavutil/csp.o
+#16 32.35 CC	libavutil/des.o
+#16 32.38 CC	libavutil/detection_bbox.o
+#16 32.40 CC	libavutil/dict.o
+#16 32.40 CC	libavutil/display.o
+#16 32.42 CC	libavutil/dovi_meta.o
+#16 32.43 CC	libavutil/downmix_info.o
+#16 32.44 CC	libavutil/encryption_info.o
+#16 32.45 CC	libavutil/error.o
+#16 32.46 CC	libavutil/eval.o
+#16 32.49 CC	libavutil/executor.o
+#16 32.52 CC	libavutil/fifo.o
+#16 32.55 CC	libavutil/file.o
+#16 32.57 CC	libavutil/file_open.o
+#16 32.58 CC	libavutil/film_grain_params.o
+#16 32.60 CC	libavutil/fixed_dsp.o
+#16 32.60 CC	libavutil/float_dsp.o
+#16 32.63 CC	libavutil/float_scalarproduct.o
+#16 32.63 CC	libavutil/frame.o
+#16 32.64 CC	libavutil/hash.o
+#16 32.67 CC	libavutil/hdr_dynamic_metadata.o
+#16 32.73 CC	libavutil/hdr_dynamic_vivid_metadata.o
+#16 32.75 CC	libavutil/hmac.o
+#16 32.77 CC	libavutil/hwcontext.o
+#16 32.79 CC	libavutil/hwcontext_stub.o
+#16 32.80 CC	libavutil/iamf.o
+#16 32.84 CC	libavutil/imgutils.o
+#16 32.84 CC	libavutil/integer.o
+#16 32.87 CC	libavutil/intmath.o
+#16 32.89 CC	libavutil/lfg.o
+#16 32.91 CC	libavutil/lls.o
+#16 32.94 CC	libavutil/log.o
+#16 32.94 CC	libavutil/log2_tab.o
+#16 32.95 CC	libavutil/lzo.o
+#16 32.98 CC	libavutil/mastering_display_metadata.o
+#16 33.00 CC	libavutil/mathematics.o
+#16 33.00 CC	libavutil/md5.o
+#16 33.03 CC	libavutil/mem.o
+#16 33.04 CC	libavutil/murmur3.o
+#16 33.06 CC	libavutil/opt.o
+#16 33.09 CC	libavutil/parseutils.o
+#16 33.17 CC	libavutil/pixdesc.o
+#16 33.28 CC	libavutil/pixelutils.o
+#16 33.29 CC	libavutil/random_seed.o
+#16 33.32 CC	libavutil/rational.o
+#16 33.36 CC	libavutil/raw_color_params.o
+#16 33.38 CC	libavutil/rc4.o
+#16 33.38 CC	libavutil/refstruct.o
+#16 33.39 CC	libavutil/reverse.o
+#16 33.40 CC	libavutil/ripemd.o
+#16 33.41 CC	libavutil/samplefmt.o
+#16 33.45 CC	libavutil/sha.o
+#16 33.46 CC	libavutil/sha512.o
+#16 33.49 CC	libavutil/side_data.o
+#16 33.49 CC	libavutil/slicethread.o
+#16 33.52 CC	libavutil/spherical.o
+#16 33.53 CC	libavutil/stereo3d.o
+#16 33.53 CC	libavutil/tdrdi.o
+#16 33.54 CC	libavutil/tea.o
+#16 33.56 CC	libavutil/threadmessage.o
+#16 33.57 CC	libavutil/time.o
+#16 33.58 CC	libavutil/timecode.o
+#16 33.58 CC	libavutil/timecode_internal.o
+#16 33.59 CC	libavutil/timestamp.o
+#16 33.61 CC	libavutil/tree.o
+#16 33.62 CC	libavutil/twofish.o
+#16 33.63 CC	libavutil/tx.o
+#16 33.68 CC	libavutil/tx_double.o
+#16 33.77 CC	libavutil/tx_float.o
+#16 34.16 CC	libavutil/tx_int32.o
+#16 34.24 CC	libavutil/utils.o
+#16 34.27 CC	libavutil/uuid.o
+#16 34.28 CC	libavutil/version.o
+#16 34.30 CC	libavutil/video_enc_params.o
+#16 34.32 CC	libavutil/video_hint.o
+#16 34.34 X86ASM	libavutil/x86/aes.o
+#16 34.39 STRIP	libavutil/x86/aes.o
+#16 34.39 CC	libavutil/x86/aes_init.o
+#16 34.40 CC	libavutil/x86/cpu.o
+#16 34.42 X86ASM	libavutil/x86/cpuid.o
+#16 34.45 STRIP	libavutil/x86/cpuid.o
+#16 34.45 X86ASM	libavutil/x86/crc.o
+#16 34.51 STRIP	libavutil/x86/crc.o
+#16 34.51 X86ASM	libavutil/x86/fixed_dsp.o
+#16 34.53 STRIP	libavutil/x86/fixed_dsp.o
+#16 34.53 CC	libavutil/x86/fixed_dsp_init.o
+#16 34.55 X86ASM	libavutil/x86/float_dsp.o
+#16 34.67 STRIP	libavutil/x86/float_dsp.o
+#16 34.67 CC	libavutil/x86/float_dsp_init.o
+#16 34.68 X86ASM	libavutil/x86/imgutils.o
+#16 34.70 STRIP	libavutil/x86/imgutils.o
+#16 34.70 CC	libavutil/x86/imgutils_init.o
+#16 34.71 X86ASM	libavutil/x86/lls.o
+#16 34.75 CC	libavutil/x86/lls_init.o
+#16 34.76 X86ASM	libavutil/x86/tx_float.o
+#16 34.76 STRIP	libavutil/x86/lls.o
+#16 34.76 CC	libavutil/x86/tx_float_init.o
+#16 34.80 CC	libavutil/xga_font_data.o
+#16 34.81 CC	libavutil/xtea.o
+#16 34.84 CC	libavutil/half2float.o
+#16 34.86 GEN	libavutil/libavutil.pc
+#16 34.86 CC	fftools/ffmpeg_dec.o
+#16 35.03 CC	fftools/ffmpeg_demux.o
+#16 35.26 CC	fftools/ffmpeg_enc.o
+#16 35.37 CC	fftools/ffmpeg_filter.o
+#16 35.69 CC	fftools/ffmpeg_hw.o
+#16 35.74 CC	fftools/ffmpeg_mux.o
+#16 35.84 CC	fftools/ffmpeg_mux_init.o
+#16 36.21 CC	fftools/ffmpeg_opt.o
+#16 36.39 CC	fftools/ffmpeg_sched.o
+#16 36.64 CC	fftools/graph/graphprint.o
+#16 36.75 CC	fftools/sync_queue.o
+#16 36.84 CC	fftools/thread_queue.o
+#16 36.88 CC	fftools/textformat/avtextformat.o
+#16 36.96 CC	fftools/textformat/tf_compact.o
+#16 37.00 CC	fftools/textformat/tf_default.o
+#16 37.03 CC	fftools/textformat/tf_flat.o
+#16 37.06 CC	fftools/textformat/tf_ini.o
+#16 37.09 CC	fftools/textformat/tf_json.o
+#16 37.12 CC	fftools/textformat/tf_mermaid.o
+#16 37.19 CC	fftools/textformat/tf_xml.o
+#16 37.22 CC	fftools/textformat/tw_avio.o
+#16 37.24 CC	fftools/textformat/tw_buffer.o
+#16 37.25 CC	fftools/textformat/tw_stdout.o
+#16 37.26 CC	fftools/resources/resman.o
+#16 37.30 HOSTCC	ffbuild/bin2c_host.o
+#16 37.31 CC	fftools/cmdutils.o
+#16 37.49 CC	fftools/opt_common.o
+#16 37.64 CC	fftools/ffmpeg.o
+#16 37.76 GZIP	fftools/resources/graph.html.gz
+#16 37.76 MINIFY	fftools/resources/graph.css.min
+#16 37.76 CC	fftools/ffprobe.o
+#16 38.16 AR	libavfilter/libavfilter.a
+#16 38.16 AR	libavformat/libavformat.a
+#16 38.17 AR	libavcodec/libavcodec.a
+#16 38.20 AR	libswresample/libswresample.a
+#16 38.21 X86ASM	libswscale/x86/ops_common.o
+#16 38.27 STRIP	libavutil/x86/tx_float.o
+#16 38.27 X86ASM	libswscale/x86/ops_float.o
+#16 38.28 STRIP	libswscale/x86/ops_common.o
+#16 38.28 X86ASM	libswscale/x86/ops_int.o
+#16 39.24 STRIP	libswscale/x86/ops_int.o
+#16 39.24 AR	libavutil/libavutil.a
+#16 39.25 HOSTLD	ffbuild/bin2c
+#16 39.26 GZIP	fftools/resources/graph.css.min.gz
+#16 39.26 BIN2C	fftools/resources/graph.html.c
+#16 39.26 BIN2C	fftools/resources/graph.css.c
+#16 39.26 CC	fftools/resources/graph.html.o
+#16 39.26 CC	fftools/resources/graph.css.o
+#16 40.48 STRIP	libswscale/x86/ops_float.o
+#16 40.48 AR	libswscale/libswscale.a
+#16 40.49 LD	ffmpeg_g
+#16 40.49 LD	ffprobe_g
+#16 40.54 STRIP	ffprobe
+#16 40.54 STRIP	ffmpeg
+#16 40.54 + make DESTDIR=/out install
+#16 40.60 INSTALL	install-progs-yes
+#16 40.60 INSTALL	ffmpeg
+#16 40.60 INSTALL	ffprobe
+#16 40.60 INSTALL	presets/libvpx-1080p.ffpreset
+#16 40.60 INSTALL	presets/libvpx-1080p50_60.ffpreset
+#16 40.60 INSTALL	presets/libvpx-360p.ffpreset
+#16 40.60 INSTALL	presets/libvpx-720p.ffpreset
+#16 40.60 INSTALL	presets/libvpx-720p50_60.ffpreset
+#16 40.60 INSTALL	doc/ffprobe.xsd
+#16 40.60 INSTALL	doc/examples/avio_http_serve_files.c
+#16 40.60 INSTALL	doc/examples/avio_list_dir.c
+#16 40.60 INSTALL	doc/examples/avio_read_callback.c
+#16 40.60 INSTALL	doc/examples/decode_audio.c
+#16 40.60 INSTALL	doc/examples/decode_filter_audio.c
+#16 40.60 INSTALL	doc/examples/decode_filter_video.c
+#16 40.60 INSTALL	doc/examples/decode_video.c
+#16 40.60 INSTALL	doc/examples/demux_decode.c
+#16 40.60 INSTALL	doc/examples/encode_audio.c
+#16 40.60 INSTALL	doc/examples/encode_video.c
+#16 40.60 INSTALL	doc/examples/extract_mvs.c
+#16 40.60 INSTALL	doc/examples/filter_audio.c
+#16 40.60 INSTALL	doc/examples/hw_decode.c
+#16 40.60 INSTALL	doc/examples/mux.c
+#16 40.60 INSTALL	doc/examples/qsv_decode.c
+#16 40.60 INSTALL	doc/examples/qsv_transcode.c
+#16 40.60 INSTALL	doc/examples/remux.c
+#16 40.60 INSTALL	doc/examples/resample_audio.c
+#16 40.60 INSTALL	doc/examples/scale_video.c
+#16 40.60 INSTALL	doc/examples/show_metadata.c
+#16 40.60 INSTALL	doc/examples/transcode.c
+#16 40.60 INSTALL	doc/examples/transcode_aac.c
+#16 40.60 INSTALL	doc/examples/vaapi_encode.c
+#16 40.60 INSTALL	doc/examples/vaapi_transcode.c
+#16 40.60 INSTALL	doc/examples/README
+#16 40.60 INSTALL	doc/examples/Makefile
+#16 40.60 INSTALL	doc/examples/avio_http_serve_files.c
+#16 40.60 INSTALL	doc/examples/avio_list_dir.c
+#16 40.60 INSTALL	doc/examples/avio_read_callback.c
+#16 40.60 INSTALL	doc/examples/decode_audio.c
+#16 40.60 INSTALL	doc/examples/decode_filter_audio.c
+#16 40.60 INSTALL	doc/examples/decode_filter_video.c
+#16 40.60 INSTALL	doc/examples/decode_video.c
+#16 40.60 INSTALL	doc/examples/demux_decode.c
+#16 40.60 INSTALL	doc/examples/encode_audio.c
+#16 40.60 INSTALL	doc/examples/encode_video.c
+#16 40.60 INSTALL	doc/examples/extract_mvs.c
+#16 40.60 INSTALL	doc/examples/filter_audio.c
+#16 40.60 INSTALL	doc/examples/hw_decode.c
+#16 40.60 INSTALL	doc/examples/mux.c
+#16 40.60 INSTALL	doc/examples/qsv_decode.c
+#16 40.60 INSTALL	doc/examples/qsv_transcode.c
+#16 40.60 INSTALL	doc/examples/remux.c
+#16 40.60 INSTALL	doc/examples/resample_audio.c
+#16 40.60 INSTALL	doc/examples/scale_video.c
+#16 40.60 INSTALL	doc/examples/show_metadata.c
+#16 40.60 INSTALL	doc/examples/transcode.c
+#16 40.60 INSTALL	doc/examples/transcode_aac.c
+#16 40.60 INSTALL	doc/examples/vaapi_encode.c
+#16 40.60 INSTALL	doc/examples/vaapi_transcode.c
+#16 40.60 INSTALL	doc/examples/README
+#16 40.60 INSTALL	doc/examples/Makefile
+#16 40.60 INSTALL	libavfilter/libavfilter.a
+#16 40.61 INSTALL	libavformat/libavformat.a
+#16 40.61 INSTALL	libavcodec/libavcodec.a
+#16 40.62 INSTALL	libswresample/libswresample.a
+#16 40.63 INSTALL	libswscale/libswscale.a
+#16 40.63 INSTALL	libavutil/libavutil.a
+#16 40.64 INSTALL	libavfilter/avfilter.h
+#16 40.64 INSTALL	libavfilter/buffersink.h
+#16 40.64 INSTALL	libavfilter/buffersrc.h
+#16 40.64 INSTALL	libavfilter/version.h
+#16 40.64 INSTALL	libavfilter/version_major.h
+#16 40.64 INSTALL	libavfilter/libavfilter.pc
+#16 40.64 INSTALL	libavformat/avformat.h
+#16 40.64 INSTALL	libavformat/avio.h
+#16 40.64 INSTALL	libavformat/version.h
+#16 40.64 INSTALL	libavformat/version_major.h
+#16 40.64 INSTALL	libavformat/libavformat.pc
+#16 40.64 INSTALL	libavcodec/ac3_parser.h
+#16 40.64 INSTALL	libavcodec/adts_parser.h
+#16 40.64 INSTALL	libavcodec/avcodec.h
+#16 40.64 INSTALL	libavcodec/avdct.h
+#16 40.64 INSTALL	libavcodec/bsf.h
+#16 40.64 INSTALL	libavcodec/codec.h
+#16 40.64 INSTALL	libavcodec/codec_desc.h
+#16 40.64 INSTALL	libavcodec/codec_id.h
+#16 40.64 INSTALL	libavcodec/codec_par.h
+#16 40.64 INSTALL	libavcodec/d3d11va.h
+#16 40.64 INSTALL	libavcodec/defs.h
+#16 40.64 INSTALL	libavcodec/dirac.h
+#16 40.64 INSTALL	libavcodec/dv_profile.h
+#16 40.64 INSTALL	libavcodec/dxva2.h
+#16 40.64 INSTALL	libavcodec/exif.h
+#16 40.64 INSTALL	libavcodec/jni.h
+#16 40.64 INSTALL	libavcodec/mediacodec.h
+#16 40.64 INSTALL	libavcodec/packet.h
+#16 40.64 INSTALL	libavcodec/qsv.h
+#16 40.64 INSTALL	libavcodec/smpte_436m.h
+#16 40.64 INSTALL	libavcodec/vdpau.h
+#16 40.64 INSTALL	libavcodec/version.h
+#16 40.64 INSTALL	libavcodec/version_major.h
+#16 40.64 INSTALL	libavcodec/videotoolbox.h
+#16 40.64 INSTALL	libavcodec/vorbis_parser.h
+#16 40.64 INSTALL	libavcodec/libavcodec.pc
+#16 40.64 INSTALL	libswresample/swresample.h
+#16 40.64 INSTALL	libswresample/version.h
+#16 40.64 INSTALL	libswresample/version_major.h
+#16 40.64 INSTALL	libswresample/libswresample.pc
+#16 40.64 INSTALL	libswscale/swscale.h
+#16 40.64 INSTALL	libswscale/version.h
+#16 40.64 INSTALL	libswscale/version_major.h
+#16 40.65 INSTALL	libswscale/libswscale.pc
+#16 40.65 INSTALL	libavutil/adler32.h
+#16 40.65 INSTALL	libavutil/aes.h
+#16 40.65 INSTALL	libavutil/aes_ctr.h
+#16 40.65 INSTALL	libavutil/ambient_viewing_environment.h
+#16 40.65 INSTALL	libavutil/attributes.h
+#16 40.65 INSTALL	libavutil/audio_fifo.h
+#16 40.65 INSTALL	libavutil/avassert.h
+#16 40.65 INSTALL	libavutil/avstring.h
+#16 40.65 INSTALL	libavutil/avutil.h
+#16 40.65 INSTALL	libavutil/base64.h
+#16 40.65 INSTALL	libavutil/blowfish.h
+#16 40.65 INSTALL	libavutil/bprint.h
+#16 40.65 INSTALL	libavutil/bswap.h
+#16 40.65 INSTALL	libavutil/buffer.h
+#16 40.65 INSTALL	libavutil/cast5.h
+#16 40.65 INSTALL	libavutil/camellia.h
+#16 40.65 INSTALL	libavutil/channel_layout.h
+#16 40.65 INSTALL	libavutil/common.h
+#16 40.65 INSTALL	libavutil/container_fifo.h
+#16 40.65 INSTALL	libavutil/cpu.h
+#16 40.65 INSTALL	libavutil/crc.h
+#16 40.65 INSTALL	libavutil/csp.h
+#16 40.65 INSTALL	libavutil/des.h
+#16 40.65 INSTALL	libavutil/detection_bbox.h
+#16 40.65 INSTALL	libavutil/dict.h
+#16 40.65 INSTALL	libavutil/display.h
+#16 40.65 INSTALL	libavutil/dovi_meta.h
+#16 40.65 INSTALL	libavutil/downmix_info.h
+#16 40.65 INSTALL	libavutil/encryption_info.h
+#16 40.65 INSTALL	libavutil/error.h
+#16 40.65 INSTALL	libavutil/eval.h
+#16 40.65 INSTALL	libavutil/executor.h
+#16 40.65 INSTALL	libavutil/fifo.h
+#16 40.65 INSTALL	libavutil/file.h
+#16 40.65 INSTALL	libavutil/film_grain_params.h
+#16 40.65 INSTALL	libavutil/frame.h
+#16 40.65 INSTALL	libavutil/hash.h
+#16 40.65 INSTALL	libavutil/hdr_dynamic_metadata.h
+#16 40.65 INSTALL	libavutil/hdr_dynamic_vivid_metadata.h
+#16 40.65 INSTALL	libavutil/hmac.h
+#16 40.65 INSTALL	libavutil/hwcontext.h
+#16 40.65 INSTALL	libavutil/hwcontext_cuda.h
+#16 40.65 INSTALL	libavutil/hwcontext_d3d11va.h
+#16 40.65 INSTALL	libavutil/hwcontext_d3d12va.h
+#16 40.65 INSTALL	libavutil/hwcontext_drm.h
+#16 40.65 INSTALL	libavutil/hwcontext_dxva2.h
+#16 40.65 INSTALL	libavutil/hwcontext_amf.h
+#16 40.65 INSTALL	libavutil/hwcontext_qsv.h
+#16 40.65 INSTALL	libavutil/hwcontext_mediacodec.h
+#16 40.65 INSTALL	libavutil/hwcontext_opencl.h
+#16 40.65 INSTALL	libavutil/hwcontext_oh.h
+#16 40.65 INSTALL	libavutil/hwcontext_vaapi.h
+#16 40.65 INSTALL	libavutil/hwcontext_videotoolbox.h
+#16 40.65 INSTALL	libavutil/hwcontext_vdpau.h
+#16 40.65 INSTALL	libavutil/hwcontext_vulkan.h
+#16 40.65 INSTALL	libavutil/iamf.h
+#16 40.65 INSTALL	libavutil/imgutils.h
+#16 40.65 INSTALL	libavutil/intfloat.h
+#16 40.65 INSTALL	libavutil/intreadwrite.h
+#16 40.65 INSTALL	libavutil/lfg.h
+#16 40.65 INSTALL	libavutil/log.h
+#16 40.65 INSTALL	libavutil/lzo.h
+#16 40.65 INSTALL	libavutil/macros.h
+#16 40.65 INSTALL	libavutil/mathematics.h
+#16 40.65 INSTALL	libavutil/mastering_display_metadata.h
+#16 40.65 INSTALL	libavutil/md5.h
+#16 40.65 INSTALL	libavutil/mem.h
+#16 40.65 INSTALL	libavutil/motion_vector.h
+#16 40.65 INSTALL	libavutil/murmur3.h
+#16 40.65 INSTALL	libavutil/opt.h
+#16 40.65 INSTALL	libavutil/parseutils.h
+#16 40.65 INSTALL	libavutil/pixdesc.h
+#16 40.65 INSTALL	libavutil/pixelutils.h
+#16 40.65 INSTALL	libavutil/pixfmt.h
+#16 40.65 INSTALL	libavutil/random_seed.h
+#16 40.65 INSTALL	libavutil/raw_color_params.h
+#16 40.65 INSTALL	libavutil/rc4.h
+#16 40.65 INSTALL	libavutil/rational.h
+#16 40.65 INSTALL	libavutil/refstruct.h
+#16 40.65 INSTALL	libavutil/replaygain.h
+#16 40.65 INSTALL	libavutil/ripemd.h
+#16 40.65 INSTALL	libavutil/samplefmt.h
+#16 40.65 INSTALL	libavutil/sha.h
+#16 40.65 INSTALL	libavutil/sha512.h
+#16 40.65 INSTALL	libavutil/spherical.h
+#16 40.65 INSTALL	libavutil/stereo3d.h
+#16 40.65 INSTALL	libavutil/tdrdi.h
+#16 40.65 INSTALL	libavutil/threadmessage.h
+#16 40.65 INSTALL	libavutil/time.h
+#16 40.65 INSTALL	libavutil/timecode.h
+#16 40.65 INSTALL	libavutil/timestamp.h
+#16 40.65 INSTALL	libavutil/tree.h
+#16 40.65 INSTALL	libavutil/twofish.h
+#16 40.65 INSTALL	libavutil/uuid.h
+#16 40.65 INSTALL	libavutil/version.h
+#16 40.65 INSTALL	libavutil/video_enc_params.h
+#16 40.65 INSTALL	libavutil/xtea.h
+#16 40.65 INSTALL	libavutil/tea.h
+#16 40.65 INSTALL	libavutil/tx.h
+#16 40.65 INSTALL	libavutil/video_hint.h
+#16 40.65 INSTALL	libavutil/avconfig.h
+#16 40.65 INSTALL	libavutil/ffversion.h
+#16 40.65 INSTALL	libavutil/libavutil.pc
+#16 40.65 + install -D LICENSE.md /out/opt/briani-media/share/ffmpeg/LICENSE.md
+#16 40.65 + install -D COPYING.LGPLv2.1 /out/opt/briani-media/share/ffmpeg/COPYING.LGPLv2.1
+#16 40.65 + cp ffbuild/config.log /out/opt/briani-media/share/ffmpeg/config.log
+#16 40.65 + dpkg-query -W -f=${binary:Package}=${Version}\n build-essential ca-certificates curl gpg nasm pkg-config xz-utils zlib1g-dev
+#16 40.65 + printf %s  ffmpeg-%s.tar.xz\n 8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e 9.0.2
+#16 DONE 40.7s
+
+#21 [stage-2 5/5] COPY --from=ffmpeg-build /out/opt/briani-media /opt/briani-media
+#21 DONE 0.5s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 0.5s done
+#22 exporting manifest sha256:58a84c8e11d90e35affbc3726a3237b8dad5b5d0e67841505e61196b01c2a804 done
+#22 exporting config sha256:c6240d4c1ca281dbddd1d5def5125d6a67adb01d331580b152d0debc312bc885 done
+#22 exporting attestation manifest sha256:aa5aa07fbf8a8faee0f886cd0f0c181ff28279fbf2dcbec826dc12c411e27a39 done
+#22 exporting manifest list sha256:bec38af23825e4d173704c017542b928f19d30007629cc8f63028d7afa391c17 done
+#22 naming to docker.io/library/briani-server:dev done
+#22 unpacking to docker.io/library/briani-server:dev
+#22 unpacking to docker.io/library/briani-server:dev 0.2s done
+#22 DONE 0.8s

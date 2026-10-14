@@ -1,0 +1,11 @@
+Build command: DOTNET_CLI_HOME=/tmp/briani-review-proof-8vvjbrly/.cli DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet build /tmp/briani-review-proof-8vvjbrly/Proof.csproj --nologo --ignore-failed-sources -v quiet
+Build exit: 0
+Run command: ASPNETCORE_TEST_CONTENTROOT_BRIANI_API=/home/hassan/projects/BrianiPlayer/server/src/Briani.Api DOTNET_CLI_HOME=/tmp/briani-review-proof-8vvjbrly/.cli dotnet /tmp/briani-review-proof-8vvjbrly/bin/Debug/net10.0/Proof.dll
+Run exit: 0
+Built DLL snapshot bound pairing approval to session.
+pair approval: 204
+password change: 204
+old access after change: 401
+approved device exchange after password change: 401
+retained parent fd create outside original root: True
+Initial setup attempts failed due sandbox socket prohibition, DOTNET_CLI_HOME default read-only, factory content-root resolution, and missing native sqlite copy; resolved using in-memory TestServer, isolated CLI home, explicit factory content root, and existing native SQLite dependency. No source changes.

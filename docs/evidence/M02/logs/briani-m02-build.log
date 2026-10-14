@@ -1,0 +1,16 @@
+[0] /usr/bin/dotnet build /home/hassan/projects/BrianiPlayer/server/Briani.sln --nologo
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  IntegrationTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll
+  ContractTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll
+  UnitTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll
+  IdentityTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.55
+Evidence: artifacts/dev/20261012T090818.188268Z
+Task exit status: 0

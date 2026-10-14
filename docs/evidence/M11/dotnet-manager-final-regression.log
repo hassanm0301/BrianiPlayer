@@ -1,0 +1,54 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  DownloadTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+  IntegrationTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll
+  UnitTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+  PreferencesTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.PreferencesTests/bin/Debug/net10.0/PreferencesTests.dll
+  Briani.StreamingTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.StreamingTests/bin/Debug/net10.0/Briani.StreamingTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.PreferencesTests/bin/Debug/net10.0/PreferencesTests.dll (.NETCoreApp,Version=v10.0)
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.StreamingTests/bin/Debug/net10.0/Briani.StreamingTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+  DiscoveryTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll (.NETCoreApp,Version=v10.0)
+  MediaTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll
+  OperationsTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll (.NETCoreApp,Version=v10.0)
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 145 ms - UnitTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    47, Skipped:     0, Total:    47, Duration: 1 s - Briani.StreamingTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 5 s - IntegrationTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 12 s - OperationsTests.dll (net10.0)
+  ContractTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    25, Skipped:     0, Total:    25, Duration: 19 s - PreferencesTests.dll (net10.0)
+  IdentityTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 2 s - ContractTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:   108, Skipped:     0, Total:   108, Duration: 26 s - DiscoveryTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    64, Skipped:     0, Total:    64, Duration: 32 s - MediaTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:   106, Skipped:     0, Total:   106, Duration: 44 s - DownloadTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    46, Skipped:     0, Total:    46, Duration: 19 s - IdentityTests.dll (net10.0)
+
+Attachments:
+  /home/hassan/projects/BrianiPlayer/artifacts/coverage-manager-final/3d9551af-5785-45db-a947-61d8e803f2fb/hassan_archlinux_2026-10-13.15_48_11.cobertura.xml

@@ -1,0 +1,58 @@
+{
+  "runId": "4e0be1570c40417b",
+  "result": "failed",
+  "startedUtc": "2026-10-13T11:51:42Z",
+  "error": "DrillError: timed out waiting for Briani source health",
+  "detail": "failure artifacts are retained only with --retain-on-failure; Docker cleanup is exact-label scoped",
+  "cleanupVerification": {
+    "composeProjectResourceIdsBeforeCleanup": {
+      "briani-source-project-f2c340d4e2": {
+        "container": [
+          "fd072ab7f7fe",
+          "4f444030bd12",
+          "024002473cf7",
+          "7db1aecad9fe"
+        ],
+        "network": [
+          "45aeb3795f23",
+          "5a2d4d8e7ae2",
+          "e943a281ac3f",
+          "af4d84ed889e"
+        ],
+        "volume": []
+      },
+      "briani-restore-project-4d204addb5": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-de75bf6107": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "composeProjectsChecked": {
+      "briani-source-project-f2c340d4e2": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-restore-project-4d204addb5": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-de75bf6107": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "fixtureContainerIdsRemoved": [],
+    "fixtureNetworkIdRemoved": "",
+    "scratchRootRemoved": "/tmp/briani-m10-download-restore-4e0be1570c40417b",
+    "verified": true
+  },
+  "finishedUtc": "2026-10-13T11:55:25Z"
+}

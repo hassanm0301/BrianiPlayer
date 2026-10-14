@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "parameters": "--vulnerable --include-transitive",
+  "sources": [
+    "https://api.nuget.org/v3/index.json"
+  ],
+  "projects": [
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/src/Briani.Api/Briani.Api.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/UnitTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/IntegrationTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/ContractTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/IdentityTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/MediaTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/DiscoveryTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/DownloadTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.StreamingTests/Briani.StreamingTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.PreferencesTests/PreferencesTests.csproj"
+    },
+    {
+      "path": "/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/OperationsTests.csproj"
+    }
+  ]
+}

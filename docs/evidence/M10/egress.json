@@ -1,0 +1,15 @@
+{
+  "run": "aca99431d628444785b47c292eed3ce2",
+  "status": "passed",
+  "qBittorrentImage": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+  "daemonPrivateRejectPackets": 5,
+  "privateFixtureRequests": 0,
+  "checks": {
+    "loopback": "denied",
+    "ipv6Loopback": "denied",
+    "cloudMetadata": "denied"
+  },
+  "publicHttps": "passed",
+  "upstreamVersion": "v5.2.4",
+  "cleanup": "owned containers/network/files removed"
+}

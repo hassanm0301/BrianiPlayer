@@ -1,0 +1,70 @@
+{
+  "runId": "aa98de57b8464021",
+  "result": "failed",
+  "startedUtc": "2026-10-13T11:04:00Z",
+  "error": "DrillError: refusing to move the fixture network address while endpoints differ from this run",
+  "detail": "failure artifacts are retained only with --retain-on-failure; Docker cleanup is exact-label scoped",
+  "cleanupVerification": {
+    "composeProjectResourceIdsBeforeCleanup": {
+      "briani-source-project-ae2ce43868": {
+        "container": [
+          "4e7cdb39b6a4",
+          "4e39870051e5",
+          "f32c497ffa6e",
+          "f53a196f6fcf"
+        ],
+        "network": [
+          "d29bd34858e3",
+          "87f2f2d522c4",
+          "8c13757b4747",
+          "83fba84fa435"
+        ],
+        "volume": []
+      },
+      "briani-restore-project-183db63015": {
+        "container": [
+          "79588667add1",
+          "ea0d6d62b8d3",
+          "384fb0c1e50f",
+          "a2b9fbb9c20c"
+        ],
+        "network": [
+          "74072e85246c",
+          "1293a312c68f",
+          "0fc035e09010",
+          "9193f0c640a5"
+        ],
+        "volume": []
+      },
+      "briani-rollback-project-e9e5364ff4": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "composeProjectsChecked": {
+      "briani-source-project-ae2ce43868": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-restore-project-183db63015": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-e9e5364ff4": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "fixtureContainerIdsRemoved": [
+      "6ed22b09be0b7d90d3610e277593c412f1565ed4a55077f590355687aeb6c801"
+    ],
+    "fixtureNetworkIdRemoved": "bb507c270f11181765f4161d8754b0963e56722abbc0235c36d7937df958f98e",
+    "scratchRootRemoved": "/tmp/briani-m10-download-restore-aa98de57b8464021",
+    "verified": true
+  },
+  "finishedUtc": "2026-10-13T11:11:34Z"
+}

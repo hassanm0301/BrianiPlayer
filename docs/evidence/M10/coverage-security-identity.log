@@ -1,0 +1,9 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  IdentityTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 1 s - IdentityTests.dll (net10.0)
+
+Attachments:
+  /home/hassan/projects/BrianiPlayer/artifacts/coverage-security/identity/e1ba79e0-55fe-4ced-9941-2794ed06c222/hassan_archlinux_2026-10-13.12_10_01.cobertura.xml

@@ -1,0 +1,301 @@
+Validating spec (/home/hassan/projects/BrianiPlayer/contracts/openapi.yaml)
+Warnings: 
+	- Unused model: Event
+	- Unused model: MediaPage
+
+[info] Spec has 2 recommendation(s).
+[main] INFO  o.o.codegen.DefaultGenerator - Generating with dryRun=false
+[main] INFO  o.o.c.ignore.CodegenIgnoreProcessor - No .openapi-generator-ignore file found.
+[main] INFO  o.o.codegen.DefaultGenerator - OpenAPI Generator: dart-dio (client)
+[main] INFO  o.o.codegen.DefaultGenerator - Generator 'dart-dio' is considered stable.
+[main] INFO  o.o.c.languages.AbstractDartCodegen - Environment variable DART_POST_PROCESS_FILE not defined so the Dart code may not be properly formatted. To define it, try `export DART_POST_PROCESS_FILE="/usr/local/bin/dartfmt -w"` (Linux/Mac)
+[main] INFO  o.o.c.languages.AbstractDartCodegen - NOTE: To enable file post-processing, 'enablePostProcessFile' must be set to `true` (--enable-post-process-file for CLI).
+[main] WARN  o.o.codegen.utils.ModelUtils - Failed to get the schema name: null
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as getLibraryGrants_200_response. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings getLibraryGrants_200_response=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings getLibraryGrants_200_response=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as uploadTorrent_request. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings uploadTorrent_request=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings uploadTorrent_request=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as liveness_200_response. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings liveness_200_response=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings liveness_200_response=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as UserPreferences_folderPreferences_inner. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings UserPreferences_folderPreferences_inner=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings UserPreferences_folderPreferences_inner=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as UserPreferences_discoveryViews_inner. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings UserPreferences_discoveryViews_inner=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings UserPreferences_discoveryViews_inner=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as Library_capabilities. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings Library_capabilities=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings Library_capabilities=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as DownloadSource_oneOf. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings DownloadSource_oneOf=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings DownloadSource_oneOf=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as DownloadSource_oneOf_1. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings DownloadSource_oneOf_1=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings DownloadSource_oneOf_1=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as DownloadSource_oneOf_2. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings DownloadSource_oneOf_2=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings DownloadSource_oneOf_2=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.utils.URLPathUtils - 'host' (OAS 2.0) or 'servers' (OAS 3.0) not defined in the spec. Default to [http://localhost] for server URL [http://localhost/]
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] INFO  o.o.codegen.DefaultGenerator - Model uploadTorrent_request not generated since it's marked as unused (due to form parameters) and `skipFormModel` (global property) set to true (default)
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/admin_settings.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/AdminSettings.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/audit_entry.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/AuditEntry.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/audit_page.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/AuditPage.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/auth_session.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/AuthSession.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/auth_tokens.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/AuthTokens.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/bootstrap_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/BootstrapRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/continue_watching.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ContinueWatching.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/continue_watching_page.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ContinueWatchingPage.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/create_user.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/CreateUser.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/device_code.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DeviceCode.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/device_code_approve.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DeviceCodeApprove.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/device_code_poll.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DeviceCodePoll.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/device_code_preview.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DeviceCodePreview.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/device_code_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DeviceCodeRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/device_pending.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DevicePending.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/discovery_query.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DiscoveryQuery.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/discovery_result.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DiscoveryResult.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/discovery_snapshot.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DiscoverySnapshot.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Download.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_action.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadAction.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_create.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadCreate.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_diagnostics.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadDiagnostics.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_file.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadFile.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_page.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadPage.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_selection.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadSelection.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_settings.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadSettings.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_source.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadSource.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_source_one_of.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadSourceOneOf.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_source_one_of1.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadSourceOneOf1.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/download_source_one_of2.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadSourceOneOf2.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/entry.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Entry.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/entry_page.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/EntryPage.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/event.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Event.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/file_choice.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/FileChoice.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/get_library_grants200_response.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/GetLibraryGrants200Response.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/grant_update.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/GrantUpdate.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/integration.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Integration.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/integration_update.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/IntegrationUpdate.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/job.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Job.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/library_capabilities.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/LibraryCapabilities.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/library_create.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/LibraryCreate.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/library_grant.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/LibraryGrant.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/library_patch.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/LibraryPatch.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/liveness200_response.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Liveness200Response.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/login_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/LoginRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/maintenance_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/MaintenanceRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/media.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Media.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/media_page.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/MediaPage.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/media_track.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/MediaTrack.md (Skipped by modelDocs options supplied by user.)
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/model_library.dart
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ModelLibrary.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/move_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/MoveRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/operation.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Operation.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/password_change.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PasswordChange.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/password_reset.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PasswordReset.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/patch_user.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PatchUser.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/playback_create.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PlaybackCreate.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/playback_progress.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PlaybackProgress.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/playback_session.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PlaybackSession.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/playback_sidecar.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PlaybackSidecar.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/playback_target.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PlaybackTarget.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/problem.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Problem.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/progress_update.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ProgressUpdate.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/provider.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/Provider.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/refresh_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/RefreshRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/rename_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/RenameRequest.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/server_info.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ServerInfo.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/service_health.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ServiceHealth.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/storage_directory.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/StorageDirectory.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/storage_root.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/StorageRoot.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/torrent_upload.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/TorrentUpload.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/tracker_summary.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/TrackerSummary.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/user.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/User.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/user_preferences.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/UserPreferences.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/user_preferences_discovery_views_inner.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/UserPreferencesDiscoveryViewsInner.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/user_preferences_folder_preferences_inner.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/UserPreferencesFolderPreferencesInner.md (Skipped by modelDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/version_request.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/VersionRequest.md (Skipped by modelDocs options supplied by user.)
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] WARN  o.o.c.languages.AbstractDartCodegen - Library (reserved word) cannot be used as model name. Renamed to ModelLibrary
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/administration_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/administration_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/AdministrationApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/discovery_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/discovery_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DiscoveryApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/downloads_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/downloads_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/DownloadsApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/events_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/events_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/EventsApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/identity_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/identity_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/IdentityApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/libraries_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/libraries_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/LibrariesApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/media_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/media_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/MediaApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/operations_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/operations_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/OperationsApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/playback_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/playback_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PlaybackApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/preferences_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/preferences_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/PreferencesApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api/server_api.dart
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/test/server_api_test.dart (Skipped by apiTests options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - Skipped /tmp/briani-contract-ccs5vauy/doc/ServerApi.md (Skipped by apiDocs options supplied by user.)
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/pubspec.yaml
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/analysis_options.yaml
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/.gitignore
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/README.md
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/briani_api.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/auth/api_key_auth.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/auth/basic_auth.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/auth/bearer_auth.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/auth/oauth.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/auth/auth.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/serializers.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/api_util.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/model/date.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/lib/src/date_serializer.dart
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/.openapi-generator-ignore
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/.openapi-generator/VERSION
+[main] INFO  o.o.codegen.TemplateManager - writing file /tmp/briani-contract-ccs5vauy/.openapi-generator/FILES
+############################################################################################
+# Thanks for using OpenAPI Generator.                                                      #
+# We appreciate your support! Please consider donating to help us maintain this project.   #
+# https://opencollective.com/openapi_generator/donate                                      #
+############################################################################################
+Resolving dependencies...
+Downloading packages...
+Got dependencies!
+  compiling builders/aot
+  16s compiling builders/aot
+  0s built_value_generator:built_value on 98 inputs; lib/briani_api.dart
+  1s built_value_generator:built_value on 98 inputs: 21 not triggered, 73 output; lib/src/model/user_preferences_discovery_views_inner.dart
+  1s built_value_generator:built_value on 98 inputs: 21 not triggered, 77 output
+  0s source_gen:combining_builder on 98 inputs; lib/briani_api.dart
+  0s source_gen:combining_builder on 98 inputs: 77 output, 21 no-op
+  Built with build_runner/aot in 17s; wrote 154 outputs.
+Analyzing briani-contract-ccs5vauy...
+No issues found!
+PASS: deterministic API and serializer regeneration

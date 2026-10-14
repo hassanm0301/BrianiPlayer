@@ -1,0 +1,33 @@
+{
+  "diagnosticRunId": "8c75639461ac4e43",
+  "result": "startup_health_timeout_reproduced; explicit_ipv4_override_did_not_resolve",
+  "imageDigest": "sha256:1df27e12987bc5e3881d56e964d64a57de9837a13aef7eed8182921ba44f2ac8",
+  "sourceComposeProject": "briani-source-project-7ddc4962cb",
+  "originalApiContainerId": "c81ee92dc6eacd93fa9924b1674b094f4d0d22af592f6fe98ef56cb72a7040ca",
+  "overrideApiContainerId": "3cb52b1bb7f77b9ff6b3cb33cf33787b70e46992b494d4ccecb729357e68ca5d",
+  "override": "temporary owned Compose override ASPNETCORE_URLS=http://0.0.0.0:8088; no repository or production manifest edits",
+  "safeEnvironment": {
+    "ASPNETCORE_HTTP_PORTS": "8088",
+    "ASPNETCORE_URLS": "http://0.0.0.0:8088 (override run only)"
+  },
+  "publishedPort": "127.0.0.1:8088 -> container:8088",
+  "networks": {
+    "clientAccess": {"address": "172.26.0.2/16", "gateway": "172.26.0.1", "gatewayPriority": 0},
+    "control": {"address": "172.24.0.4/16 initially; 172.24.0.3/16 after recreated API", "gateway": "", "gatewayPriority": 0}
+  },
+  "listener": "original and override container showed TCP6 [::]:8088 LISTEN; this alone does not establish IPv4 reachability",
+  "sameHostHeaderProbeResults": {
+    "127.0.0.1:8088": "ConnectionResetError",
+    "172.26.0.2:8088": "ConnectionRefusedError",
+    "172.24.0.4:8088 original": "HTTP 200 /healthz",
+    "172.24.0.3:8088 override": "HTTP 200 /healthz"
+  },
+  "hostRouteQueries": {
+    "172.26.0.2": "dev p81 src 172.29.16.150",
+    "172.24.0.3": "dev br-e075c92c1587 src 172.24.0.1",
+    "172.26.0.0/16": "dev br-1d7d1f03d4be src 172.26.0.1"
+  },
+  "apiLogs": {"lineCount": 4, "exceptionOrErrorLines": 0, "observedWarnings": ["ephemeral data-protection key repository", "EF Core unordered Skip/Take"]},
+  "interpretation": "Evidence shows host reachability asymmetry across the client's and control network addresses; an explicit IPv4 Kestrel URL override did not fix it. Host route selection for the client address chooses p81 while the control address uses its Docker bridge. This is a routing/interface issue candidate, not proof of an application bind defect.",
+  "cleanup": {"initialComposeDownInterruptedByOperator": true, "finalComposeDownExit": 0, "ownedComposeProjectRemoved": true, "ownedContainersAndNetworksAbsentVerified": true, "scratchRootRemoved": true, "noHostRouteOrFirewallChanges": true}
+}

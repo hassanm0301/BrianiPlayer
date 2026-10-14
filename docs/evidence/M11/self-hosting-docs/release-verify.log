@@ -1,0 +1,4 @@
+{"status": "invalid", "error": "source tree SHA-256 mismatch"}
+[2] /usr/bin/python3 /home/hassan/projects/BrianiPlayer/tools/release/package_audit.py verify --root /home/hassan/projects/BrianiPlayer --manifest dist/manifest.json
+Evidence: artifacts/dev/20261013T211351.751658Z
+Task exit status: 2

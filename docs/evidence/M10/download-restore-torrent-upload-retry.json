@@ -1,0 +1,8 @@
+{
+  "runId": "7edc5fd14ec94364",
+  "result": "failed",
+  "startedUtc": "2026-10-13T11:12:36Z",
+  "error": "PermissionError: [Errno 1] Operation not permitted",
+  "detail": "failure artifacts are retained only with --retain-on-failure; Docker cleanup is exact-label scoped",
+  "finishedUtc": "2026-10-13T11:12:36Z"
+}

@@ -1,0 +1,94 @@
+{
+  "run": "ddedf365b9a84d0e9d1084c6809c10e7",
+  "status": "passed",
+  "qBittorrentImage": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+  "cases": {
+    "tracker": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18100
+    },
+    "webseed": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18101
+    },
+    "explicitPeer": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18102
+    },
+    "trackerRedirect": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18103
+    },
+    "webseedRedirect": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18104
+    },
+    "trackerDnsRebind": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18105,
+      "dnsAnswers": [
+        "172.24.0.2",
+        "172.24.0.3"
+      ],
+      "prevalidationClient": "owned guard wget; separate daemon resolver"
+    },
+    "webseedDnsRebind": {
+      "status": "passed",
+      "daemonPositiveObserved": true,
+      "blockedTcpPackets": 1,
+      "blockedTargetHits": 0,
+      "blockedTargetPositiveControlHits": 1,
+      "redirectOrDnsPhasesObserved": true,
+      "isolatedDestinationPort": 18106,
+      "dnsAnswers": [
+        "172.24.0.2",
+        "172.24.0.3"
+      ],
+      "prevalidationClient": "owned guard wget; separate daemon resolver"
+    }
+  },
+  "scope": "owned Docker namespace; no host firewall/Pi changes",
+  "fixtureImageId": "sha256:dc17d534e78a256cb3dc377628f36c5a28ed85df866d84eb3110cc46221617a6",
+  "guardImageId": "sha256:d60e1d863b1dee9545d6c75d9266925cb35a0ba23380efc2edc2fdaf3728d3e3",
+  "upstreamVersion": "v5.2.4",
+  "upstreamBuildInfo": {
+    "bitness": 64,
+    "boost": "1.92.0",
+    "libtorrent": "2.0.15.0",
+    "openssl": "4.0.3",
+    "platform": "linux",
+    "qt": "6.12.0",
+    "zlib": "1.3.2"
+  },
+  "cleanup": "exact run-labeled containers/network and owned temporary files removed"
+}

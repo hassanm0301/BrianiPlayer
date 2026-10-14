@@ -1,0 +1,165 @@
+{
+  "runId": "07b4023a7cc24763",
+  "result": "passed",
+  "startedUtc": "2026-10-13T11:12:54Z",
+  "image": "briani-server:m10",
+  "qBittorrentImage": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+  "source": {
+    "partialTransfer": {
+      "media": {
+        "id": "8029e9e6-ef01-4c0e-b04d-09802a08fa26",
+        "downloadId": "f6322a87-e67c-403e-85c6-9e1f9ceb3dac",
+        "name": "M10-restore-generated.mp4",
+        "relativePath": "M10-restore-generated.mp4",
+        "sizeBytes": 8388608,
+        "downloadedBytes": 0,
+        "contiguousBytes": 0,
+        "kind": "video",
+        "selected": false,
+        "priority": "normal",
+        "playbackState": "notSelected",
+        "importedMediaId": null,
+        "version": 1
+      },
+      "downloadedBytes": 786432,
+      "request": {
+        "id": "f6322a87-e67c-403e-85c6-9e1f9ceb3dac",
+        "libraryId": "dcafb89d-7052-4e54-b4fb-8fafa03d0465",
+        "ownerId": "a89a9b1b-c201-463f-b0e2-be8c871995ed",
+        "name": "M10-restore-generated.mp4",
+        "state": "paused",
+        "selectedBytes": 8388608,
+        "downloadedSelectedBytes": 1310720,
+        "torrentBytes": 8388608,
+        "downloadBps": 0,
+        "uploadBps": 0,
+        "seedersConnected": 0,
+        "peersConnected": 0,
+        "etaSeconds": 8640000,
+        "sequential": true,
+        "firstLastMetadataAssist": true,
+        "generation": "ebc1625ce91746e1900c16cfeae8cb85:2",
+        "version": 4,
+        "errorCode": null,
+        "errorDetail": null,
+        "createdAt": "2026-10-13T11:15:30.1450873+00:00",
+        "updatedAt": "2026-10-13T11:15:45.5199653+00:00",
+        "tags": [],
+        "sourceState": "ready",
+        "transferState": "stopped",
+        "importState": "notReady"
+      },
+      "engineDownloaded": 1294261,
+      "engineAmountLeft": 7012352,
+      "payloadSha256": "272d4dcab0b96bfc9b7114753bdba8abd7426f9b582181eac9677e7b6f0e6ba1",
+      "payloadInode": 1931008
+    },
+    "requestId": "f6322a87-e67c-403e-85c6-9e1f9ceb3dac",
+    "memberId": "a89a9b1b-c201-463f-b0e2-be8c871995ed",
+    "requestIdempotencyKey": "m10-restore-07b4023a7cc24763",
+    "libraryId": "dcafb89d-7052-4e54-b4fb-8fafa03d0465",
+    "secretKeySha256": "4c041a4fe2626b6c17dab9a90dd760ab6d32094e6b9eb648ad31262c078e25b4",
+    "fileMetadataCount": 1,
+    "torrentInfoHash": "fa4493f1f329d2d5338850bb13f054621c4ace67",
+    "sourceKind": "torrentUpload",
+    "sourceUploadId": "4e7320f0-b2ab-4a04-af44-f13c0e301070",
+    "magnetMetadataExchangeDiagnosticRun": "download-restore-diagnostic.json"
+  },
+  "restore": {
+    "requestId": "f6322a87-e67c-403e-85c6-9e1f9ceb3dac",
+    "requestOwnerMemberId": "a89a9b1b-c201-463f-b0e2-be8c871995ed",
+    "torrentJobId": "ebc1625ce91746e1900c16cfeae8cb85",
+    "sourceKind": "torrentUpload",
+    "idempotencyKeyReturnedSameRequest": true,
+    "grantRetained": true,
+    "sourceProgressBeforeBackup": 786432,
+    "payloadFileSha256AtPause": "272d4dcab0b96bfc9b7114753bdba8abd7426f9b582181eac9677e7b6f0e6ba1",
+    "payloadInodeAtPause": 1931008,
+    "payloadRestoredSeparately": false,
+    "mediaRetained": true,
+    "restoreMode": "configuration_over_retained_media",
+    "recheckRequested": true,
+    "recheckCheckingStateObserved": true,
+    "recheckCompletionObserved": true,
+    "resumedToBytes": 8388608,
+    "sourceSha256": "12b5468644a0fba24de86d5145fd48bba519d4d7a4244365cc48e74078a61b7e",
+    "restoredSha256": "12b5468644a0fba24de86d5145fd48bba519d4d7a4244365cc48e74078a61b7e",
+    "secretKeySha256": "4c041a4fe2626b6c17dab9a90dd760ab6d32094e6b9eb648ad31262c078e25b4",
+    "qBittorrentTorrentHash": "fa4493f1f329d2d5338850bb13f054621c4ace67",
+    "fixtureSeedIp": "11.86.221.3",
+    "publicAddressSimulationSubnet": "11.86.221.0/29",
+    "networkInternal": true
+  },
+  "cleanup": {
+    "fixtureContainerIdsRemoved": [
+      "b43b97bab6352ec57e13b42b8fe738fd6bff56969ad4f125eaae1bba78b96752"
+    ],
+    "fixtureNetworkIdRemoved": "fe62706ec1a55faf8d42e19365334d43f1c81500176d3bb333c6c4d9c90eba7c",
+    "scratchRoot": "/tmp/briani-m10-download-restore-07b4023a7cc24763",
+    "ownerMarker": "resource-faults:07b4023a7cc24763",
+    "verified": true
+  },
+  "cleanupVerification": {
+    "composeProjectResourceIdsBeforeCleanup": {
+      "briani-source-project-3ec5bc0c61": {
+        "container": [
+          "b74005a6a04a",
+          "417ee25e3dde",
+          "e0f80bb2ddb1",
+          "137894041b84"
+        ],
+        "network": [
+          "dc59f4a0a3b1",
+          "df5ce5b62090",
+          "bd6aea358911",
+          "4a65e2390b94"
+        ],
+        "volume": []
+      },
+      "briani-restore-project-beaa95b5d3": {
+        "container": [
+          "fd62a3d2403c",
+          "4d1030b9ece3",
+          "2bee61c83c31",
+          "119a989fa31c"
+        ],
+        "network": [
+          "5415cc3b5f0c",
+          "c15ea514a852",
+          "092715df870f",
+          "c2dd694ce43f"
+        ],
+        "volume": []
+      },
+      "briani-rollback-project-c49a6047bf": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "composeProjectsChecked": {
+      "briani-source-project-3ec5bc0c61": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-restore-project-beaa95b5d3": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-c49a6047bf": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "fixtureContainerIdsRemoved": [
+      "b43b97bab6352ec57e13b42b8fe738fd6bff56969ad4f125eaae1bba78b96752"
+    ],
+    "fixtureNetworkIdRemoved": "fe62706ec1a55faf8d42e19365334d43f1c81500176d3bb333c6c4d9c90eba7c",
+    "scratchRootRemoved": "/tmp/briani-m10-download-restore-07b4023a7cc24763",
+    "verified": true
+  },
+  "finishedUtc": "2026-10-13T11:20:40Z"
+}

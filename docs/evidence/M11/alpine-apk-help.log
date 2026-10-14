@@ -1,0 +1,43 @@
+apk-tools 3.0.8-r0, compiled for x86_64.
+
+Usage: apk [<GLOBAL OPTIONS>...] COMMAND [<OPTIONS>...] [<ARGUMENTS>...]
+
+Package installation and removal:
+  add        Add or modify constraints in WORLD and commit changes
+  del        Remove constraints from WORLD and commit changes
+
+System maintenance:
+  fix        Fix, reinstall or upgrade packages without modifying WORLD
+  update     Update repository indexes
+  upgrade    Install upgrades available from repositories
+  cache      Manage the local package cache
+
+Querying package information:
+  query      Query information about packages by various criteria
+  list       List packages matching a pattern or other criteria
+  dot        Render dependencies as graphviz graphs
+  policy     Show repository policy for packages
+  search     Search for packages by name or description
+  info       Give detailed information about packages or repositories
+
+Repository and package maintenance:
+  mkndx      Create repository index (v3) file from packages
+  mkpkg      Create package (v3)
+  index      Create repository index (v2) file from packages
+  fetch      Download packages from repositories to a local directory
+  manifest   Show checksums of package contents
+  extract    Extract package file contents
+  verify     Verify package integrity and signature
+  adbsign    Sign, resign or recompress v3 packages and indexes
+
+Miscellaneous:
+  audit      Audit system for changes
+  stats      Show statistics about repositories and installations
+  version    Compare package versions or perform tests on version strings
+  adbdump    Dump v3 files in textual representation
+  adbgen     Generate v3 files from text representation
+  convdb     Convert v2 installed database to v3 format
+  convndx    Convert v2 indexes to v3 format
+
+This apk has coffee making abilities.
+For more information: man 8 apk

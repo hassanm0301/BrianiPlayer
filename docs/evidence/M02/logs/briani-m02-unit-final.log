@@ -1,0 +1,56 @@
+.warning
+.unavailable executable: missing
+.......
+----------------------------------------------------------------------
+Ran 9 tests in 0.002s
+
+OK
+./home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:191: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root), accept)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:200: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:210: DeprecationWarning: files() is deprecated
+  storage = info.files()
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:235: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root))
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:236: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:244: DeprecationWarning: files() is deprecated
+  storage = lt.torrent_info(encoded).files()
+....
+----------------------------------------------------------------------
+Ran 5 tests in 0.602s
+
+OK
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.516s
+
+OK
+[0] /usr/bin/dotnet test /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/UnitTests.csproj --nologo
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  UnitTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 12 ms - UnitTests.dll (net10.0)
+[0] /usr/bin/dotnet run --project /home/hassan/projects/BrianiPlayer/prototypes/playback/tests/ReaderTests.csproj
+PASS: 10043 arithmetic, range, containment, availability, cancellation, ticket and exact-read assertions (fake source; not real engine evidence)
+[0] /usr/bin/python -m unittest discover -s tests/tools
+[2] integration suite has no test project; status=not_run
+[7] tool with space sub --flag a b
+done
+[127] does-not-exist
+[0] ok
+Evidence: /tmp/tmprkfu7sz8
+Task exit status: 0
+[0] /usr/bin/python tools/security/scan_secrets.py
+Secret scan passed: no supported credential patterns found
+[0] /usr/bin/python tools/dependencies/inventory.py
+Wrote docs/development/dependency-inventory.md from 6 committed lock artifacts
+[0] /usr/bin/python -m unittest discover -s /home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures -p test_generate.py
+[0] /usr/bin/python -m unittest discover -s /home/hassan/projects/BrianiPlayer/prototypes/playback/harness -p test_probe.py
+Evidence: artifacts/dev/20261012T091901.126499Z
+Task exit status: 0

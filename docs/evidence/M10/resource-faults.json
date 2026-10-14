@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "runId": "7a85c18f8bb24b3baf667f62dc5db997",
+  "image": "briani-server:m10",
+  "expectedImageId": "sha256:95ab935e5834f4dab1390fbea017dbfd4a99a0d5b998b01e7acf808a89fc9b3b",
+  "startedUtc": "2026-10-13T08:43:53Z",
+  "scenarios": {
+    "diskFull": {
+      "passed": true,
+      "mode": "disk-full",
+      "TotalBytes": 8388608,
+      "writtenBytesBeforeFailure": 8355840,
+      "freeBytesAtFailure": 0,
+      "exception": "IOException",
+      "hresult": 28,
+      "denial": {
+        "status": 507,
+        "code": "disk_full",
+        "jobs": 0,
+        "requests": 0
+      },
+      "retainedSha256": "09FED9CBFB98B6AB0F3E8FF63B7B1F9B0E07D58B225295C78FDC023CC4985A72",
+      "recoveredSha256": "09FED9CBFB98B6AB0F3E8FF63B7B1F9B0E07D58B225295C78FDC023CC4985A72",
+      "reservationPolicyPreserved": true,
+      "exitCode": 0
+    },
+    "prepare": {
+      "passed": true,
+      "mode": "prepare",
+      "libraryIdentity": "259:4:104352970",
+      "retainedSha256": "09FED9CBFB98B6AB0F3E8FF63B7B1F9B0E07D58B225295C78FDC023CC4985A72",
+      "exitCode": 0
+    },
+    "readOnly": {
+      "passed": true,
+      "mode": "readonly",
+      "denial": {
+        "status": 409,
+        "code": "disk_unavailable",
+        "jobs": 0,
+        "requests": 0
+      },
+      "creationError": "path_unavailable",
+      "retainedSha256": "09FED9CBFB98B6AB0F3E8FF63B7B1F9B0E07D58B225295C78FDC023CC4985A72",
+      "exitCode": 0
+    },
+    "missingMount": {
+      "passed": true,
+      "mode": "missing",
+      "denial": {
+        "status": 409,
+        "code": "path_unavailable",
+        "jobs": 0,
+        "requests": 0
+      },
+      "absentLibrary": true,
+      "exitCode": 0
+    },
+    "networkBaseline": {
+      "passed": true,
+      "mode": "network-client",
+      "expectedFailure": false,
+      "receivedBytes": 32768,
+      "sha256": "09FED9CBFB98B6AB0F3E8FF63B7B1F9B0E07D58B225295C78FDC023CC4985A72",
+      "exitCode": 0
+    },
+    "networkDisconnected": {
+      "passed": true,
+      "mode": "network-client",
+      "expectedFailure": true,
+      "exception": "SocketException",
+      "receivedBytes": 0,
+      "exitCode": 0
+    },
+    "networkRecovered": {
+      "passed": true,
+      "mode": "network-client",
+      "expectedFailure": false,
+      "receivedBytes": 32768,
+      "sha256": "09FED9CBFB98B6AB0F3E8FF63B7B1F9B0E07D58B225295C78FDC023CC4985A72",
+      "exitCode": 0
+    }
+  },
+  "cleanup": {
+    "removedContainerIds": [
+      "a5ed598e92b9601ab5ccd1ab541a91651a106a2ec69ae52e9240f37d6aa4f0d3",
+      "52d6aaed2acf2b564ff47e5f3d9dc25cfb468717b401e3797b2a55ab04e05290",
+      "7baeede73d4d84d94b8adc86fb8b2df8b157f793de89a30ec8afe80cfa299217",
+      "50348b77b4c539b07a7220099baa82fec2f42113d8c363bf04f4edcee57f5a36",
+      "ca0d3bff77a46508208c6f738449ef2a5d31e3fffc606fbffb9972faf8a3b64b",
+      "cb8271f69d0ccb3ac9a6ddaeefaa86cce97ab62318f842b4ad9455023dbe8dd4"
+    ],
+    "networkId": "998b1979d3ceb5cfab7e42c1b1e60f7ef034e0caf81a191c71b98ce12ad4caef",
+    "errors": [],
+    "scratchRoot": "/home/hassan/projects/BrianiPlayer/artifacts/resource-faults/7a85c18f8bb24b3baf667f62dc5db997",
+    "ownerMarker": "resource-faults:7a85c18f8bb24b3baf667f62dc5db997"
+  },
+  "result": "passed",
+  "finishedUtc": "2026-10-13T08:44:04Z"
+}

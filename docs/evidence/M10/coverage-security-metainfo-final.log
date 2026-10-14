@@ -1,0 +1,9 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  DiscoveryTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    31, Skipped:     0, Total:    31, Duration: 28 ms - DiscoveryTests.dll (net10.0)
+
+Attachments:
+  /home/hassan/projects/BrianiPlayer/artifacts/coverage-security/metainfo-final/27fa5476-0001-4f3d-a517-3581d670eae5/hassan_archlinux_2026-10-13.12_16_09.cobertura.xml

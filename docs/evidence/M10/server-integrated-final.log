@@ -1,0 +1,115 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  UnitTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.UnitTests/bin/Debug/net10.0/UnitTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+  ContractTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll
+  Briani.StreamingTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.StreamingTests/bin/Debug/net10.0/Briani.StreamingTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll (.NETCoreApp,Version=v10.0)
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.StreamingTests/bin/Debug/net10.0/Briani.StreamingTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+VSTest version 18.0.2-dev (x64)
+
+Starting test execution, please wait...
+Starting test execution, please wait...
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+  MediaTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+
+  DiscoveryTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DiscoveryTests/bin/Debug/net10.0/DiscoveryTests.dll (.NETCoreApp,Version=v10.0)
+  DownloadTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll
+VSTest version 18.0.2-dev (x64)
+
+  OperationsTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll
+  IdentityTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll
+Starting test execution, please wait...
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll (.NETCoreApp,Version=v10.0)
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+VSTest version 18.0.2-dev (x64)
+VSTest version 18.0.2-dev (x64)
+
+
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll (.NETCoreApp,Version=v10.0)
+Starting test execution, please wait...
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+VSTest version 18.0.2-dev (x64)
+
+A total of 1 test files matched the specified pattern.
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+
+Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 24 ms - UnitTests.dll (net10.0)
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+
+Passed!  - Failed:     0, Passed:    47, Skipped:     0, Total:    47, Duration: 1 s - Briani.StreamingTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 2 s - ContractTests.dll (net10.0)
+  PreferencesTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.PreferencesTests/bin/Debug/net10.0/PreferencesTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.PreferencesTests/bin/Debug/net10.0/PreferencesTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+[xUnit.net 00:00:04.18]     Briani.DownloadTests.EngineClientTests.PinnedEngineLiveSmokeWhenConfigured [FAIL]
+  Failed Briani.DownloadTests.EngineClientTests.PinnedEngineLiveSmokeWhenConfigured [6 ms]
+  Error Message:
+   $XunitDynamicSkip$Set the BRIANI_M05_QBIT_* and generated-fixture variables through the isolated engine harness.
+  Stack Trace:
+     at Briani.DownloadTests.EngineClientTests.PinnedEngineLiveSmokeWhenConfigured() in /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/EngineClientTests.cs:line 234
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:07.02]     Briani.DownloadTests.EngineClientTests.LocalSeedMetadataMagnetsMapV1V2HybridAndZeroLengthWithoutPayload [FAIL]
+  Failed Briani.DownloadTests.EngineClientTests.LocalSeedMetadataMagnetsMapV1V2HybridAndZeroLengthWithoutPayload [10 ms]
+  Error Message:
+   $XunitDynamicSkip$Set the local seeder and downloader variables through the isolated M05 transfer harness.
+  Stack Trace:
+     at Briani.DownloadTests.EngineClientTests.LocalSeedMetadataMagnetsMapV1V2HybridAndZeroLengthWithoutPayload() in /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/EngineClientTests.cs:line 297
+--- End of stack trace from previous location ---
+
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 9 s - OperationsTests.dll (net10.0)
+  IntegrationTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IntegrationTests/bin/Debug/net10.0/IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Data collection : Unable to find a datacollector with friendly name 'XPlat Code Coverage'.
+Data collection : Could not find data collector 'XPlat Code Coverage'
+
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2, Duration: 2 s - IntegrationTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    25, Skipped:     0, Total:    25, Duration: 12 s - PreferencesTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:   108, Skipped:     0, Total:   108, Duration: 18 s - DiscoveryTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    62, Skipped:     0, Total:    62, Duration: 22 s - MediaTests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    44, Skipped:     0, Total:    44, Duration: 22 s - IdentityTests.dll (net10.0)
+
+Failed!  - Failed:     2, Passed:    80, Skipped:     0, Total:    82, Duration: 30 s - DownloadTests.dll (net10.0)

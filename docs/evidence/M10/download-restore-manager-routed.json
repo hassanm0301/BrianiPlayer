@@ -1,0 +1,70 @@
+{
+  "runId": "d3462359f72f4691",
+  "result": "failed",
+  "startedUtc": "2026-10-13T12:10:21Z",
+  "error": "DrillError: timed out waiting for authenticated Prowlarr API readiness after 120s (ProwlarrTransientError)",
+  "detail": "failure artifacts are retained only with --retain-on-failure; Docker cleanup is exact-label scoped",
+  "cleanupVerification": {
+    "composeProjectResourceIdsBeforeCleanup": {
+      "briani-source-project-863a3fae46": {
+        "container": [
+          "be76ba3e274d",
+          "91af94f81f53",
+          "b3839f6038f0",
+          "d811a95c0a07"
+        ],
+        "network": [
+          "47a33c45e880",
+          "ce5188e46c8f",
+          "dfcb56d0220a",
+          "e309780e7c45"
+        ],
+        "volume": []
+      },
+      "briani-restore-project-1f12c31d0a": {
+        "container": [
+          "6fbe9fe96c5e",
+          "bb0c95d91089",
+          "d994fb2a573c",
+          "5af6f8d2d05b"
+        ],
+        "network": [
+          "cfddb052389b",
+          "7a944485709a",
+          "282093165ef6",
+          "c4cba75d1c92"
+        ],
+        "volume": []
+      },
+      "briani-rollback-project-722703c5cd": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "composeProjectsChecked": {
+      "briani-source-project-863a3fae46": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-restore-project-1f12c31d0a": {
+        "container": [],
+        "network": [],
+        "volume": []
+      },
+      "briani-rollback-project-722703c5cd": {
+        "container": [],
+        "network": [],
+        "volume": []
+      }
+    },
+    "fixtureContainerIdsRemoved": [
+      "9195dfb18d6f1bb21d7beea6808f444cdec687389aee65f8750df0b92d227149"
+    ],
+    "fixtureNetworkIdRemoved": "897fae8376e60d801d056feef75a25aea60427627ec0be685607936c8feab9ae",
+    "scratchRootRemoved": "/tmp/briani-m10-download-restore-d3462359f72f4691",
+    "verified": true
+  },
+  "finishedUtc": "2026-10-13T12:19:55Z"
+}

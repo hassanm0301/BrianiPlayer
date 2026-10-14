@@ -1,0 +1,9 @@
+ffprobe version 9.0.2 Copyright (c) 2007-2026 the FFmpeg developers
+built with gcc 13 (Ubuntu 13.3.0-6ubuntu2~24.04.1)
+configuration: --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect --disable-doc --disable-debug --disable-network --disable-avdevice --disable-shared --enable-static --enable-small --enable-zlib --disable-everything --enable-ffmpeg --enable-ffprobe --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil --enable-protocol='file,pipe' --enable-demuxer='mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif' --enable-muxer='image2,image2pipe' --enable-decoder='h264,hevc,mpeg4,mjpeg,png,webp,gif' --enable-encoder=mjpeg --enable-parser='h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis' --enable-filter='scale,transpose,format,hflip,vflip' --extra-cflags=-fstack-protector-strong --extra-ldflags='-Wl,-z,relro,-z,now'
+libavutil      61.  1.102 / 61.  1.102
+libavcodec     63.  1.102 / 63.  1.102
+libavformat    63.  1.102 / 63.  1.102
+libavfilter    12.  1.102 / 12.  1.102
+libswscale     10.  1.102 / 10.  1.102
+libswresample   7.  1.102 /  7.  1.102

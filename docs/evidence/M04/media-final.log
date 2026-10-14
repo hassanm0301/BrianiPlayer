@@ -1,0 +1,11 @@
+[0] /usr/bin/dotnet test /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/MediaTests.csproj --nologo
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  MediaTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.MediaTests/bin/Debug/net10.0/MediaTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    49, Skipped:     0, Total:    49, Duration: 6 s - MediaTests.dll (net10.0)
+Evidence: artifacts/dev/20261012T113935.221149Z
+Task exit status: 0

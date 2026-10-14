@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "scope": "ordinary packaged debug APK install and fresh startup only",
+  "package": "org.brianiplayer.app.devtest",
+  "emulator": "API36 x86_64 TV, emulator-5580",
+  "adbInstallExit": 0,
+  "appProcessPresent": true,
+  "playbackVerifiedInThisArtifact": false,
+  "screenshot": "docs/evidence/M11/android-packaged-startup.png",
+  "cleanup": "force-stop and exact package uninstall passed"
+}

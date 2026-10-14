@@ -1,0 +1,38 @@
+ Network briani-smoke-114503_default Creating 
+ Network briani-smoke-114503_default Creating 
+ Volume briani-smoke-114503_test-data Creating 
+ Volume briani-smoke-114503_test-data Creating 
+ Volume briani-smoke-114503_test-config Creating 
+ Volume briani-smoke-114503_test-config Creating 
+ Volume briani-smoke-114503_test-data Created 
+ Volume briani-smoke-114503_test-data Created 
+ Volume briani-smoke-114503_test-config Created 
+ Volume briani-smoke-114503_test-config Created 
+ Network briani-smoke-114503_default Created 
+ Network briani-smoke-114503_default Created 
+ Container briani-smoke-114503-briani-1 Creating 
+ Container briani-smoke-114503-briani-1 Created 
+ Container briani-smoke-114503-briani-1 Starting 
+ Container briani-smoke-114503-briani-1 Started 
+ Container briani-smoke-114503-briani-1 Waiting 
+ Container briani-smoke-114503-briani-1 Healthy 
+ Container briani-smoke-114503-briani-1 Stopping 
+ Container briani-smoke-114503-briani-1 Stopped 
+ Container briani-smoke-114503-briani-1 Removing 
+ Container briani-smoke-114503-briani-1 Removed 
+ Volume briani-smoke-114503_test-config Removing 
+ Network briani-smoke-114503_default Removing 
+ Volume briani-smoke-114503_test-data Removing 
+ Volume briani-smoke-114503_test-config Removed 
+ Volume briani-smoke-114503_test-data Removed 
+ Network briani-smoke-114503_default Removed 
+[0] /usr/bin/docker --config /home/hassan/projects/BrianiPlayer/.tools/docker-config compose -p briani-smoke-114503 -f /home/hassan/projects/BrianiPlayer/infra/compose/compose.test.yaml config --quiet
+[0] /usr/bin/docker --config /home/hassan/projects/BrianiPlayer/.tools/docker-config compose -p briani-smoke-114503 -f /home/hassan/projects/BrianiPlayer/infra/compose/compose.test.yaml up -d --wait
+[0] /usr/bin/docker --config /home/hassan/projects/BrianiPlayer/.tools/docker-config compose -p briani-smoke-114503 -f /home/hassan/projects/BrianiPlayer/infra/compose/compose.test.yaml ps
+NAME                           IMAGE               COMMAND                  SERVICE   CREATED                  STATUS                  PORTS
+briani-smoke-114503-briani-1   briani-server:dev   "dotnet Briani.Api.d…"   briani    Less than a second ago   Up Less than a second   127.0.0.1:18089->8088/tcp
+[0] /usr/bin/python /home/hassan/projects/BrianiPlayer/tools/compose_probe.py
+PASS: actual Compose HTTP readiness and schema initialization
+[0] /usr/bin/docker --config /home/hassan/projects/BrianiPlayer/.tools/docker-config compose -p briani-smoke-114503 -f /home/hassan/projects/BrianiPlayer/infra/compose/compose.test.yaml down --volumes --remove-orphans
+Evidence: artifacts/dev/20261012T114503.234591Z
+Task exit status: 0

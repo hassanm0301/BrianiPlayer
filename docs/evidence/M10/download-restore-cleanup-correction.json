@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "scope": "exact failed local restore run cleanup correction",
+  "runId": "9241485cb505414c",
+  "containersRemoved": [
+    "c5c11e2fb953eae936b3a46d54fc275ca0166cd5d8bec9421ea5b3542eef5490",
+    "d78508897a7c02eb6b06a59cfc7f9d04638f5876c0c3fbc337cd660f4e2ea2f4",
+    "e5c05f81b16dfa3cc4fd2b49f155824214b38a78e1cd650a535e6763460dbdfc",
+    "fe7da5cc32af2f408598d231e423184254e17597cf33e592660dd4318d7ed26d"
+  ],
+  "networksRemoved": [
+    "27c24035bab1f93c857d677d2289daf2c4034286a399a025ef0d898d3803c3ca",
+    "1d46e79278c0c314de0cb7c3a15c668d13db8961af0b845c187318ce87348080",
+    "c1f48392acb20efff1308ffcce09b712f9c356b6fd5032317acb20fe375cb7b0",
+    "bb5a2bb38e1471f77df8e483defbfc5144b2b9ff6e6fc60ccee8558028a2c391"
+  ],
+  "rootAlreadyRemovedByWorker": true,
+  "remainingExactProjectContainers": 0,
+  "remainingExactProjectNetworks": 0
+}

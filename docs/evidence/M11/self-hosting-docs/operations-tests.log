@@ -1,0 +1,14 @@
+.....Prowlarr API readiness: authenticated system/status returned version
+..../usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 500: 'error'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+/usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 401: 'error'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+.................
+----------------------------------------------------------------------
+Ran 26 tests in 0.012s
+
+OK
+Consistent configuration/state backup created at /tmp/tmp6u6gp_pl/backup; media payload excluded.
+Created protected deployment configuration: /tmp/tmp6oo_80hp/project/.env (0600)
+Start Briani to let the server generate its one-time 30-minute bootstrap code, then display it with show-bootstrap-token.
+Prowlarr API key and qBittorrent first-run password must be obtained from the actual private upstream setup; no credential was generated for those services.

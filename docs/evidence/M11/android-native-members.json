@@ -1,0 +1,92 @@
+[
+  {
+    "member": "lib/arm64-v8a/libapp.so",
+    "size": 8782728,
+    "sha256": "7b575549cbe7403ec94251c4d610f3990c6be42a7e279080ec08e696323ebdc3"
+  },
+  {
+    "member": "lib/arm64-v8a/libdartjni.so",
+    "size": 131248,
+    "sha256": "ed1bf5ff172cc5acf29dc96a7e16bbbf9e5f44ed6b48a60dab046d42e4e12e97"
+  },
+  {
+    "member": "lib/arm64-v8a/libdatastore_shared_counter.so",
+    "size": 7112,
+    "sha256": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1"
+  },
+  {
+    "member": "lib/arm64-v8a/libflutter.so",
+    "size": 11747864,
+    "sha256": "f6236b2e26fa8abd9e438f672c88a33b0ba703421fb12edca304efccd2e11a46"
+  },
+  {
+    "member": "lib/arm64-v8a/libmediakitandroidhelper.so",
+    "size": 386696,
+    "sha256": "ab55b1d34665dba8fa7a451e82c466ee71b9698e7da6c9a3cb68a7c0ee7610d4"
+  },
+  {
+    "member": "lib/arm64-v8a/libmpv.so",
+    "size": 12369680,
+    "sha256": "adf83fde58a9f6751ce6e83b9b187f651425d53ec0e20da04deb8dfb4aa775e1"
+  },
+  {
+    "member": "lib/armeabi-v7a/libapp.so",
+    "size": 9699912,
+    "sha256": "53d3fecdf564d737e7c0eda3ee0af9d6f57540b5381779626545621909026818"
+  },
+  {
+    "member": "lib/armeabi-v7a/libdartjni.so",
+    "size": 81444,
+    "sha256": "3436d69fca13459f4bbdc05b318b16151679016a87d59838762944d84f726693"
+  },
+  {
+    "member": "lib/armeabi-v7a/libdatastore_shared_counter.so",
+    "size": 4416,
+    "sha256": "716c5d8d2cac8ca0edf65da8f139c7886b726ac79d542a14edeb94994ba6d3dc"
+  },
+  {
+    "member": "lib/armeabi-v7a/libflutter.so",
+    "size": 8615900,
+    "sha256": "31b3c9fe132d324b4aee885739c105f2bc2aabcc7a9f0733f1c6de4278c6998c"
+  },
+  {
+    "member": "lib/armeabi-v7a/libmediakitandroidhelper.so",
+    "size": 286812,
+    "sha256": "506d0bc7775fe9888be6b6e889d8556ca0574dba65813866e2158cbf52a8c8b1"
+  },
+  {
+    "member": "lib/armeabi-v7a/libmpv.so",
+    "size": 11746532,
+    "sha256": "8aa2b23d16d941a8d685b8eb995b1cb31677ed3e28c55c776954eb1618ab1a2e"
+  },
+  {
+    "member": "lib/x86_64/libapp.so",
+    "size": 9110408,
+    "sha256": "df9799dc3b1a94422014572f30181490b700f35ffad957915d5faa5f349d8716"
+  },
+  {
+    "member": "lib/x86_64/libdartjni.so",
+    "size": 116640,
+    "sha256": "4e9b00769b116823ae82ca45c47296a105d87dc2678453cb369a0c4436748ddb"
+  },
+  {
+    "member": "lib/x86_64/libdatastore_shared_counter.so",
+    "size": 6224,
+    "sha256": "fb6c9208988c49ae94943bc3236fa763ba584722e044fa4ea9a12d2941027105"
+  },
+  {
+    "member": "lib/x86_64/libflutter.so",
+    "size": 13051424,
+    "sha256": "e7233d989b5454bb1ac5ca0359522749c068fa7821e9cdc0c1b056fd43561265"
+  },
+  {
+    "member": "lib/x86_64/libmediakitandroidhelper.so",
+    "size": 367528,
+    "sha256": "6ca2d827a892b8ddd60df64fab81456ad6fd05180dd6c4a0974549858025abc9"
+  },
+  {
+    "member": "lib/x86_64/libmpv.so",
+    "size": 15816336,
+    "sha256": "f030e9a1a4d4664e89d7160a3d4528cd5875ee023ff6262e16e95aac28ffaec5"
+  }
+]

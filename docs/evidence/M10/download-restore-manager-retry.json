@@ -1,0 +1,8 @@
+{
+  "runId": "8c75639461ac4e43",
+  "result": "failed",
+  "startedUtc": "2026-10-13T11:57:12Z",
+  "error": "DrillError: timed out waiting for Briani source health",
+  "detail": "failure artifacts are retained only with --retain-on-failure; Docker cleanup is exact-label scoped",
+  "finishedUtc": "2026-10-13T11:59:45Z"
+}

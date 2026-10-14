@@ -1,0 +1,393 @@
+{
+  "id": "e2280b4c7077068a99155c5125e097ba897933cc170fecf905bb1a18960bad90",
+  "name": "briani-m11-route-reservation-8ec0932fbb75",
+  "labels": {
+    "org.briani.test": "M11-route-reservation",
+    "org.briani.owner": "root",
+    "org.briani.run": "8ec0932fbb754e93817739f68b4085b5"
+  },
+  "subnet": "172.26.0.0/16",
+  "internal": true,
+  "purpose": "Keep automatic fixture IPAM away from pre-existing more-specific host p81 route; no endpoint attaches",
+  "cleanup": "removed_exact_id_labels_and_empty_endpoints_verified",
+  "additionalReservations": [
+    {
+      "id": "3b84f8397596704cc90924dbd361385d69ead842a13cb5b034d7b03fa9c64faa",
+      "name": "briani-m11-route-reserve-28-17e1a416",
+      "labels": {
+        "org.briani.test": "M11-route-reservation",
+        "org.briani.owner": "root",
+        "org.briani.run": "17e1a416353b40b8b6a6567a820a46d0"
+      },
+      "subnet": "172.28.0.0/16",
+      "internal": true,
+      "cleanup": "removed_exact_id_labels_and_empty_endpoints_verified"
+    },
+    {
+      "id": "d4231fe1c585434c148f2290a31f807bf67a76f114034e24d01c063deb2e379a",
+      "name": "briani-m11-route-reserve-29-914d3710",
+      "labels": {
+        "org.briani.test": "M11-route-reservation",
+        "org.briani.owner": "root",
+        "org.briani.run": "914d3710deb5447ab38152b85d3a95ef"
+      },
+      "subnet": "172.29.0.0/16",
+      "internal": true,
+      "cleanup": "removed_exact_id_labels_and_empty_endpoints_verified"
+    },
+    {
+      "id": "0018c914dab8ce850945f096b70aa9aaf4b8ea782e894971eb27f794d713fb1b",
+      "name": "briani-m11-route-reserve-30-79cba96d",
+      "labels": {
+        "org.briani.test": "M11-route-reservation",
+        "org.briani.owner": "root",
+        "org.briani.run": "79cba96d420e4d1494e2d13ccb96beff"
+      },
+      "subnet": "172.30.0.0/16",
+      "internal": true,
+      "cleanup": "removed_exact_id_labels_and_empty_endpoints_verified"
+    },
+    {
+      "id": "d6e2154bc20a97b8eb02ef9dc9854094567f1dae6e13c54a870ad315bd984a37",
+      "name": "briani-m11-route-reserve-31-a6ba8010",
+      "labels": {
+        "org.briani.test": "M11-route-reservation",
+        "org.briani.owner": "root",
+        "org.briani.run": "a6ba8010ec304a8c9c8135b4553dc6a9"
+      },
+      "subnet": "172.31.0.0/16",
+      "internal": true,
+      "cleanup": "removed_exact_id_labels_and_empty_endpoints_verified"
+    }
+  ],
+  "observedPrivateP81Routes": [
+    {
+      "dst": "10.0.0.0/10",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.64.0.0/12",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.80.0.0/13",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.88.0.0/14",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.92.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.93.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.94.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.95.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.96.0.0/11",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.128.0.0/10",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.192.0.0/11",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.224.0.0/12",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.240.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.241.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.0/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.32/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.64/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.96/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.128/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.160/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.192/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.0.224/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.0/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.32/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.64/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.96/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.128/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.160/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.192/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.1.224/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.2.0/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.2.32/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.7.0/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.7.128/27",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.7.198",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.242.7.208",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.243.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.244.0.0/14",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "10.248.0.0/13",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.16.0.0/13",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.24.0.0/15",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.26.0.0/24",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.28.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.29.1.32/29",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.29.16.0/20",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.29.16.1",
+      "dev": "p81",
+      "scope": "link"
+    },
+    {
+      "dst": "172.30.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.31.0.0/16",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.124.184/29",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.126.0/24",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.128.160/28",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.129.72/29",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.129.148",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.129.160/29",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.129.232/29",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.129.240/29",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.167.24",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.203.10",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.220.0/24",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.228.0/28",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.228.176/28",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.228.192/28",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.229.67",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "192.168.253.132",
+      "dev": "p81",
+      "gateway": "172.29.16.150"
+    },
+    {
+      "dst": "172.29.16.150",
+      "dev": "p81",
+      "table": "local",
+      "scope": "host",
+      "prefsrc": "172.29.16.150"
+    }
+  ],
+  "cleanupVerified": true
+}

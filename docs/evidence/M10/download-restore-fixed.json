@@ -1,0 +1,8 @@
+{
+  "runId": "2e6f5b742a8d4e77",
+  "result": "failed",
+  "startedUtc": "2026-10-13T10:36:17Z",
+  "error": "DrillError: required loopback port(s) already occupied: 8088,18080,19696",
+  "detail": "failure artifacts are retained only with --retain-on-failure; Docker cleanup is exact-label scoped",
+  "finishedUtc": "2026-10-13T10:36:17Z"
+}
