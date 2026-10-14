@@ -1,0 +1,477 @@
+{
+  "UserPreferences": {
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1
+      },
+      "theme": {
+        "type": "string",
+        "enum": [
+          "system",
+          "light",
+          "dark"
+        ]
+      },
+      "density": {
+        "type": "string",
+        "enum": [
+          "comfortable",
+          "compact"
+        ]
+      },
+      "libraryLayout": {
+        "type": "string",
+        "enum": [
+          "grid",
+          "list"
+        ]
+      },
+      "showFilenameExtensions": {
+        "type": "boolean"
+      },
+      "showContinueWatching": {
+        "type": "boolean"
+      },
+      "rememberFolderSort": {
+        "type": "boolean"
+      },
+      "torrentColumns": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "title",
+            "size",
+            "seeders",
+            "leechers",
+            "peers",
+            "provider",
+            "publishedAt"
+          ]
+        }
+      },
+      "defaultSort": {
+        "type": "string",
+        "enum": [
+          "name",
+          "date",
+          "size"
+        ],
+        "x-enum-varnames": [
+          "byName",
+          "date",
+          "size"
+        ]
+      },
+      "defaultSortOrder": {
+        "type": "string",
+        "enum": [
+          "asc",
+          "desc"
+        ]
+      },
+      "resumePolicy": {
+        "type": "string",
+        "enum": [
+          "ask",
+          "always",
+          "never"
+        ]
+      },
+      "defaultPlaybackSpeed": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0.25,
+        "maximum": 4
+      },
+      "subtitleScale": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0.5,
+        "maximum": 3
+      },
+      "preferredAudioLanguage": {
+        "type": "string",
+        "maxLength": 50,
+        "nullable": true,
+        "pattern": "^[a-zA-Z0-9_-]{1,50}$"
+      },
+      "preferredSubtitleLanguage": {
+        "type": "string",
+        "maxLength": 50,
+        "nullable": true,
+        "pattern": "^[a-zA-Z0-9_-]{1,50}$"
+      },
+      "slideshowSeconds": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 3600
+      },
+      "locale": {
+        "type": "string",
+        "maxLength": 30
+      },
+      "accentPreset": {
+        "type": "string",
+        "enum": [
+          "blue",
+          "teal",
+          "green",
+          "purple",
+          "orange",
+          "red"
+        ]
+      },
+      "playbackMode": {
+        "type": "string",
+        "enum": [
+          "internal",
+          "ask",
+          "external"
+        ]
+      },
+      "pinnedLibraryIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 200
+      },
+      "keyboardShortcutPreset": {
+        "type": "string",
+        "enum": [
+          "standard",
+          "minimal"
+        ]
+      },
+      "folderPreferences": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "libraryId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "folderId": {
+              "type": "string",
+              "format": "uuid",
+              "nullable": true
+            },
+            "layout": {
+              "type": "string",
+              "enum": [
+                "grid",
+                "list"
+              ]
+            },
+            "sort": {
+              "type": "string",
+              "enum": [
+                "name",
+                "date",
+                "size"
+              ],
+              "x-enum-varnames": [
+                "byName",
+                "date",
+                "size"
+              ]
+            },
+            "order": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          "required": [
+            "libraryId",
+            "folderId",
+            "layout",
+            "sort",
+            "order"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 1000
+      },
+      "discoveryViews": {
+        "type": "array",
+        "maxItems": 3,
+        "items": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "mostSeeded",
+                "search"
+              ]
+            },
+            "sort": {
+              "type": "string",
+              "enum": [
+                "publishedAt",
+                "seeders",
+                "leechers",
+                "peers",
+                "sizeBytes",
+                "title"
+              ]
+            },
+            "order": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "providerIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 100
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "maxItems": 100
+            },
+            "minSizeBytes": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "nullable": true
+            },
+            "maxSizeBytes": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "nullable": true
+            },
+            "minSeeders": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "nullable": true
+            }
+          },
+          "required": [
+            "mode",
+            "sort",
+            "order",
+            "providerIds",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "description": "User-synced per-mode discovery filters and sort; search text is not retained."
+      }
+    },
+    "required": [
+      "version"
+    ],
+    "additionalProperties": false
+  },
+  "AdminSettings": {
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1
+      },
+      "serverName": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "publicBaseUrl": {
+        "type": "string",
+        "format": "uri",
+        "nullable": true
+      },
+      "activeDownloads": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 20
+      },
+      "activeDownloadsPerUser": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 20
+      },
+      "activeSeeds": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "maximum": 50
+      },
+      "globalConnections": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 5000
+      },
+      "connectionsPerTorrent": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 1000
+      },
+      "downloadLimitBytesPerSecond": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "nullable": true,
+        "maximum": 1073741824
+      },
+      "uploadLimitBytesPerSecond": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "nullable": true,
+        "maximum": 1073741824
+      },
+      "defaultRatioLimit": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0,
+        "nullable": true,
+        "maximum": 10000
+      },
+      "defaultSeedTimeMinutes": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "nullable": true,
+        "maximum": 525600
+      },
+      "defaultUserQuotaBytes": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "nullable": true
+      },
+      "lowDiskFloorBytes": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0
+      },
+      "lowDiskFloorFraction": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0,
+        "maximum": 0.5
+      },
+      "thumbnailCacheMaxBytes": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 0,
+        "maximum": 8589934592
+      },
+      "auditRetentionDays": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1,
+        "maximum": 3650
+      },
+      "enabledProviderIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "maxItems": 100,
+        "nullable": true
+      },
+      "enabledCategoryIds": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "maxItems": 100,
+        "nullable": true
+      },
+      "libraryScanIntervalSeconds": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 60,
+        "maximum": 31536000
+      },
+      "discoveryCacheSeconds": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 30,
+        "maximum": 86400
+      },
+      "discoveryRecentRefreshSeconds": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 60,
+        "maximum": 86400
+      }
+    },
+    "required": [
+      "version"
+    ],
+    "additionalProperties": false,
+    "description": "Curated administrator settings, not an arbitrary qBittorrent/Prowlarr configuration proxy. Validate deployment-origin policy before accepting publicBaseUrl."
+  },
+  "VersionRequest": {
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "integer",
+        "format": "int64",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "version"
+    ],
+    "additionalProperties": false
+  },
+  "MaintenanceRequest": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "rescanLibraries",
+          "pruneThumbnailCache",
+          "databaseSnapshot"
+        ]
+      },
+      "libraryId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true
+      }
+    },
+    "required": [
+      "action"
+    ],
+    "additionalProperties": false,
+    "description": "Database snapshot is not a full-stack backup and this endpoint never controls Docker."
+  }
+}
