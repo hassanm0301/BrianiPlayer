@@ -1,0 +1,21 @@
+test_short_legal_fixture_corpus_and_manifest (test_generate.GenerationTests.test_short_legal_fixture_corpus_and_manifest) ... /home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:173: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root), accept)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:182: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:191: DeprecationWarning: files() is deprecated
+  storage = info.files()
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:216: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root))
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:217: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:224: DeprecationWarning: files() is deprecated
+  storage = lt.torrent_info(encoded).files()
+ok
+test_non_aligned_payload_hash_is_independent_of_layout (test_generate.LayoutOracleTests.test_non_aligned_payload_hash_is_independent_of_layout) ... ok
+test_v1_counts_ignored_neighbor_in_global_offsets (test_generate.LayoutOracleTests.test_v1_counts_ignored_neighbor_in_global_offsets) ... ok
+test_v2_and_hybrid_oracle_accounts_for_piece_alignment (test_generate.LayoutOracleTests.test_v2_and_hybrid_oracle_accounts_for_piece_alignment) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.436s
+
+OK

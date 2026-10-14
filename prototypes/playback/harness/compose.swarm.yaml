@@ -1,0 +1,21 @@
+services:
+  seeder:
+    image: ${QB_IMAGE:?set QB_IMAGE to the locked qBittorrent image digest}
+    restart: "no"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      WEBUI_PORT: "8080"
+      TORRENTING_PORT: "6881"
+    volumes:
+      - seeder-config:/config
+      - type: bind
+        source: ../fixtures/generated
+        target: /downloads
+        read_only: true
+    networks: [swarm]
+    expose: ["8080/tcp", "6881/tcp", "6881/udp"]
+
+volumes:
+  seeder-config:
+

@@ -1,0 +1,296 @@
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:173: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root), accept)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:182: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:191: DeprecationWarning: files() is deprecated
+  storage = info.files()
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:216: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root))
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:217: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:224: DeprecationWarning: files() is deprecated
+  storage = lt.torrent_info(encoded).files()
+{
+  "manifest": "/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generated/manifest.json",
+  "torrent": {
+    "binding_version": "2.1.2.0",
+    "generated": [
+      {
+        "mode": "v1",
+        "status": "generated",
+        "path": "fixture-v1.torrent",
+        "layout_oracle": {
+          "format": "v1",
+          "piece_length": 262144,
+          "torrent_length": 49205651,
+          "files": [
+            {
+              "path": "corpus/Tail metadata.mp4",
+              "length": 15787543,
+              "torrent_offset": 0,
+              "first_piece": 0,
+              "last_piece": 60,
+              "padding": false
+            },
+            {
+              "path": "corpus/Faststart café [test].mp4",
+              "length": 15787543,
+              "torrent_offset": 15787543,
+              "first_piece": 60,
+              "last_piece": 120,
+              "padding": false
+            },
+            {
+              "path": "corpus/payloads/media/雪片.dat",
+              "length": 524301,
+              "torrent_offset": 31575086,
+              "first_piece": 120,
+              "last_piece": 122,
+              "padding": false
+            },
+            {
+              "path": "corpus/payloads/ignored Ω.bin",
+              "length": 73123,
+              "torrent_offset": 32099387,
+              "first_piece": 122,
+              "last_piece": 122,
+              "padding": false
+            },
+            {
+              "path": "corpus/payloads/neighbour one.bin",
+              "length": 131071,
+              "torrent_offset": 32172510,
+              "first_piece": 122,
+              "last_piece": 123,
+              "padding": false
+            },
+            {
+              "path": "corpus/Tracks 演示.mkv",
+              "length": 16902070,
+              "torrent_offset": 32303581,
+              "first_piece": 123,
+              "last_piece": 187,
+              "padding": false
+            }
+          ]
+        }
+      },
+      {
+        "mode": "v2",
+        "status": "generated",
+        "path": "fixture-v2.torrent",
+        "layout_oracle": {
+          "format": "v2",
+          "piece_length": 262144,
+          "torrent_length": 50331648,
+          "files": [
+            {
+              "path": "corpus/Faststart café [test].mp4",
+              "length": 15787543,
+              "torrent_offset": 0,
+              "first_piece": 0,
+              "last_piece": 60,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/203241",
+              "length": 203241,
+              "torrent_offset": 15787543,
+              "first_piece": 60,
+              "last_piece": 60,
+              "padding": true
+            },
+            {
+              "path": "corpus/Tail metadata.mp4",
+              "length": 15787543,
+              "torrent_offset": 15990784,
+              "first_piece": 61,
+              "last_piece": 121,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/203241",
+              "length": 203241,
+              "torrent_offset": 31778327,
+              "first_piece": 121,
+              "last_piece": 121,
+              "padding": true
+            },
+            {
+              "path": "corpus/Tracks 演示.mkv",
+              "length": 16902070,
+              "torrent_offset": 31981568,
+              "first_piece": 122,
+              "last_piece": 186,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/137290",
+              "length": 137290,
+              "torrent_offset": 48883638,
+              "first_piece": 186,
+              "last_piece": 186,
+              "padding": true
+            },
+            {
+              "path": "corpus/payloads/ignored Ω.bin",
+              "length": 73123,
+              "torrent_offset": 49020928,
+              "first_piece": 187,
+              "last_piece": 187,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/189021",
+              "length": 189021,
+              "torrent_offset": 49094051,
+              "first_piece": 187,
+              "last_piece": 187,
+              "padding": true
+            },
+            {
+              "path": "corpus/payloads/media/雪片.dat",
+              "length": 524301,
+              "torrent_offset": 49283072,
+              "first_piece": 188,
+              "last_piece": 190,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/262131",
+              "length": 262131,
+              "torrent_offset": 49807373,
+              "first_piece": 190,
+              "last_piece": 190,
+              "padding": true
+            },
+            {
+              "path": "corpus/payloads/neighbour one.bin",
+              "length": 131071,
+              "torrent_offset": 50069504,
+              "first_piece": 191,
+              "last_piece": 191,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/131073",
+              "length": 131073,
+              "torrent_offset": 50200575,
+              "first_piece": 191,
+              "last_piece": 191,
+              "padding": true
+            }
+          ]
+        }
+      },
+      {
+        "mode": "hybrid",
+        "status": "generated",
+        "path": "fixture-hybrid.torrent",
+        "layout_oracle": {
+          "format": "hybrid",
+          "piece_length": 262144,
+          "torrent_length": 50331648,
+          "files": [
+            {
+              "path": "corpus/Faststart café [test].mp4",
+              "length": 15787543,
+              "torrent_offset": 0,
+              "first_piece": 0,
+              "last_piece": 60,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/203241",
+              "length": 203241,
+              "torrent_offset": 15787543,
+              "first_piece": 60,
+              "last_piece": 60,
+              "padding": true
+            },
+            {
+              "path": "corpus/Tail metadata.mp4",
+              "length": 15787543,
+              "torrent_offset": 15990784,
+              "first_piece": 61,
+              "last_piece": 121,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/203241",
+              "length": 203241,
+              "torrent_offset": 31778327,
+              "first_piece": 121,
+              "last_piece": 121,
+              "padding": true
+            },
+            {
+              "path": "corpus/Tracks 演示.mkv",
+              "length": 16902070,
+              "torrent_offset": 31981568,
+              "first_piece": 122,
+              "last_piece": 186,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/137290",
+              "length": 137290,
+              "torrent_offset": 48883638,
+              "first_piece": 186,
+              "last_piece": 186,
+              "padding": true
+            },
+            {
+              "path": "corpus/payloads/ignored Ω.bin",
+              "length": 73123,
+              "torrent_offset": 49020928,
+              "first_piece": 187,
+              "last_piece": 187,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/189021",
+              "length": 189021,
+              "torrent_offset": 49094051,
+              "first_piece": 187,
+              "last_piece": 187,
+              "padding": true
+            },
+            {
+              "path": "corpus/payloads/media/雪片.dat",
+              "length": 524301,
+              "torrent_offset": 49283072,
+              "first_piece": 188,
+              "last_piece": 190,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/262131",
+              "length": 262131,
+              "torrent_offset": 49807373,
+              "first_piece": 190,
+              "last_piece": 190,
+              "padding": true
+            },
+            {
+              "path": "corpus/payloads/neighbour one.bin",
+              "length": 131071,
+              "torrent_offset": 50069504,
+              "first_piece": 191,
+              "last_piece": 191,
+              "padding": false
+            },
+            {
+              "path": "corpus/.pad/131073",
+              "length": 131073,
+              "torrent_offset": 50200575,
+              "first_piece": 191,
+              "last_piece": 191,
+              "padding": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

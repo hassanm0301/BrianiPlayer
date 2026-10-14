@@ -1,0 +1,29 @@
+name: briani-m00-harness
+
+# Both image refs must be immutable name@sha256:... values supplied from the
+# repository lock. No tag fallback is accepted by the harness wrapper.
+services:
+  qbittorrent:
+    image: ${QB_IMAGE:?set QB_IMAGE to the locked qBittorrent image digest}
+    restart: "no"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      WEBUI_PORT: "8080"
+      TORRENTING_PORT: "6881"
+    volumes:
+      - qb-config:/config
+      - type: bind
+        source: ./state/data
+        target: /downloads
+    networks: [swarm]
+    ports:
+      - "127.0.0.1:18081:8080"
+    expose: ["6881/tcp", "6881/udp"]
+networks:
+  swarm:
+    internal: true
+    driver: bridge
+
+volumes:
+  qb-config:

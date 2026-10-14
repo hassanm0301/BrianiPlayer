@@ -1,0 +1,4 @@
+<stdin>:4: DeprecationWarning: files() is deprecated
+fixture-hybrid.torrent v1= True v2= True files= 12 padding= 6
+fixture-v1.torrent v1= True v2= False files= 6 padding= 0
+fixture-v2.torrent v1= False v2= True files= 12 padding= 6
