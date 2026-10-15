@@ -41,9 +41,9 @@ class _DeviceLinkState extends ConsumerState<DeviceLinkScreen> {
       } else if (mounted && _code != null && !DateTime.now().isBefore(_code!.expiresAt)) {
         _timer?.cancel(); setState(() => _error = 'This code expired. Request a new code.');
       }
-    } catch (_) {
+    } catch (error) {
       _timer?.cancel();
-      if (mounted) setState(() => _error = 'Device linking failed or expired. Check the connection and request a new code.');
+      if (mounted) setState(() => _error = clientError(error));
     } finally { _polling = false; }
   }
   @override void dispose() {
@@ -91,7 +91,7 @@ class _ApproveDeviceState extends ConsumerState<ApproveDeviceDialog> {
       final preview = (await requireActiveApi(ref).getIdentityApi().inspectDeviceCode(
         deviceCodeApprove: DeviceCodeApprove((b) => b.userCode = code))).data!;
       if (mounted) setState(() { _preview = preview; _checkedCode = code; });
-    } catch (_) { if (mounted) setState(() => _error = 'The code is unavailable or expired. Check the server and code.'); }
+    } catch (error) { if (mounted) setState(() => _error = clientError(error)); }
     finally { if (mounted) setState(() => _busy = false); }
   }
   Future<void> _approve() async {
@@ -101,7 +101,7 @@ class _ApproveDeviceState extends ConsumerState<ApproveDeviceDialog> {
       await requireActiveApi(ref).getIdentityApi().approveDeviceCode(
         deviceCodeApprove: DeviceCodeApprove((b) => b.userCode = _checkedCode!));
       if (mounted) Navigator.pop(context);
-    } catch (_) { if (mounted) setState(() => _error = 'Approval failed. The code may have expired or already been used.'); }
+    } catch (error) { if (mounted) setState(() => _error = clientError(error)); }
     finally { if (mounted) setState(() => _busy = false); }
   }
   @override void dispose() { _code.dispose(); super.dispose(); }

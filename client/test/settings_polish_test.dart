@@ -70,6 +70,7 @@ class _AdminAdapter implements HttpClientAdapter {
   _AdminAdapter({this.failUsers = false});
   final bool failUsers;
   final paths = <String>[];
+  final requestBodies = <Object?>[];
   @override
   Future<ResponseBody> fetch(
     RequestOptions options,
@@ -77,6 +78,21 @@ class _AdminAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     paths.add(options.path);
+    if (options.method == 'POST' && options.path.endsWith('/admin/users')) {
+      requestBodies.add(options.data);
+      return ResponseBody.fromString(
+        jsonEncode({
+          'title': 'The passwords do not match.',
+          'status': 400,
+          'code': 'password_mismatch',
+          'detail': 'The passwords do not match.',
+        }),
+        400,
+        headers: {
+          Headers.contentTypeHeader: ['application/problem+json'],
+        },
+      );
+    }
     if (failUsers && options.path.endsWith('/admin/users')) {
       throw DioException(
         requestOptions: options,
@@ -185,7 +201,7 @@ void main() {
     expect(find.text('Service health and integrations'), findsOneWidget);
   });
 
-  testWidgets('invalid create-member fields stay open with inline feedback', (
+  testWidgets('rejected create-member stays open with the server message', (
     tester,
   ) async {
     final adapter = _AdminAdapter();
@@ -209,11 +225,21 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(create);
     await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Initial password'),
+      'a',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm initial password'),
+      'b',
+    );
     await tester.tap(find.widgetWithText(FilledButton, 'Create').last);
     await tester.pumpAndSettle();
     expect(find.text('Create member account'), findsOneWidget);
-    expect(find.text('Enter a username.'), findsOneWidget);
-    expect(find.text('Enter a display name.'), findsOneWidget);
-    expect(find.text('Use 12–128 characters.'), findsOneWidget);
+    expect(find.text('The passwords do not match.'), findsOneWidget);
+    final raw = adapter.requestBodies.single;
+    final sent = (raw is String ? jsonDecode(raw) : raw) as Map;
+    expect(sent['password'], 'a');
+    expect(sent['confirmPassword'], 'b');
   });
 }

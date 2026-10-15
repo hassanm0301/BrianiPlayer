@@ -148,7 +148,7 @@ public sealed class DeliveryApiTests : IAsyncLifetime
 
         var password = Credentials.NewToken();
         using var userCreated = await IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken)
-            .PostAsJsonAsync("/api/v1/admin/users", new { username = "image-reader", displayName = "Image Reader", password, role = "member" });
+            .PostAsJsonAsync("/api/v1/admin/users", new { username = "image-reader", displayName = "Image Reader", password, confirmPassword = password, role = "member" });
         userCreated.EnsureSuccessStatusCode();
         using var loginResponse = await fixture.Host.CreateClient().PostAsJsonAsync("/api/v1/auth/login", new { username = "image-reader", password, deviceName = "test" });
         var login = (await loginResponse.Content.ReadFromJsonAsync<AuthReply>())!;
@@ -213,7 +213,7 @@ public sealed class DeliveryApiTests : IAsyncLifetime
         var target = await AddMedia("movie.mp4", [1, 2, 3]);
         var admin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         var password = Credentials.NewToken();
-        using var createdUser = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "delivery-status", displayName = "Delivery Status", password, role = "member" });
+        using var createdUser = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "delivery-status", displayName = "Delivery Status", password, confirmPassword = password, role = "member" });
         createdUser.EnsureSuccessStatusCode();
         using var firstLoginResponse = await fixture.Host.CreateClient().PostAsJsonAsync("/api/v1/auth/login", new { username = "delivery-status", password, deviceName = "first" });
         var firstLogin = (await firstLoginResponse.Content.ReadFromJsonAsync<AuthReply>())!;
@@ -249,7 +249,7 @@ public sealed class DeliveryApiTests : IAsyncLifetime
 
         using var memberAdmin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         var password = Credentials.NewToken();
-        using var userResponse = await memberAdmin.PostAsJsonAsync("/api/v1/admin/users", new { username = "delivery-member", displayName = "Delivery Member", password, role = "member" });
+        using var userResponse = await memberAdmin.PostAsJsonAsync("/api/v1/admin/users", new { username = "delivery-member", displayName = "Delivery Member", password, confirmPassword = password, role = "member" });
         userResponse.EnsureSuccessStatusCode();
         using var loginResponse = await fixture.Host.CreateClient().PostAsJsonAsync("/api/v1/auth/login", new { username = "delivery-member", password, deviceName = "test" });
         var login = (await loginResponse.Content.ReadFromJsonAsync<AuthReply>())!;
@@ -283,7 +283,7 @@ public sealed class DeliveryApiTests : IAsyncLifetime
         var target = await AddMedia("movie.mp4", payload);
         var admin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         var password = Credentials.NewToken();
-        using var createdUser = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "delivery-reader", displayName = "Delivery Reader", password, role = "member" });
+        using var createdUser = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "delivery-reader", displayName = "Delivery Reader", password, confirmPassword = password, role = "member" });
         createdUser.EnsureSuccessStatusCode();
         using var loginResponse = await fixture.Host.CreateClient().PostAsJsonAsync("/api/v1/auth/login", new { username = "delivery-reader", password, deviceName = "test" });
         var login = (await loginResponse.Content.ReadFromJsonAsync<AuthReply>())!;

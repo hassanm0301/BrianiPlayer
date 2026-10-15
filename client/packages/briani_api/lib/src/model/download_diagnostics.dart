@@ -18,7 +18,7 @@ part 'download_diagnostics.g.dart';
 /// * [engineState] 
 /// * [generation] 
 /// * [trackers] 
-/// * [warnings] 
+/// * [warnings] - Human-readable warnings written by the server for display as-is.
 @BuiltValue()
 abstract class DownloadDiagnostics implements Built<DownloadDiagnostics, DownloadDiagnosticsBuilder> {
   @BuiltValueField(wireName: r'downloadId')
@@ -33,6 +33,7 @@ abstract class DownloadDiagnostics implements Built<DownloadDiagnostics, Downloa
   @BuiltValueField(wireName: r'trackers')
   BuiltList<TrackerSummary> get trackers;
 
+  /// Human-readable warnings written by the server for display as-is.
   @BuiltValueField(wireName: r'warnings')
   BuiltList<String> get warnings;
 

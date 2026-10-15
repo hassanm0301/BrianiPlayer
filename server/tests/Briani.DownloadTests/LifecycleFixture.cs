@@ -107,7 +107,7 @@ internal sealed class LifecycleFixture : IAsyncDisposable
     public async Task<UserSession> CreateUser(string username)
     {
         var password = "Lifecycle-User-" + Credentials.NewToken();
-        using var created = await Client.PostAsJsonAsync("/api/v1/admin/users", new { username, displayName = username, password, role = "member" });
+        using var created = await Client.PostAsJsonAsync("/api/v1/admin/users", new { username, displayName = username, password, confirmPassword = password, role = "member" });
         created.EnsureSuccessStatusCode();
         var user = (await created.Content.ReadFromJsonAsync<UserReply>())!;
         using var login = await Client.PostAsJsonAsync("/api/v1/auth/login", new { username, password, deviceName = "lifecycle-test" });

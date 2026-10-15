@@ -482,7 +482,7 @@ def main() -> int:
         bootstrap = (api_state / "bootstrap.code").read_text(encoding="utf-8").strip()
         admin_password = uuid.uuid4().hex + "Aa1!"
         auth = api.json("/api/v1/bootstrap", {"code": bootstrap, "username": "m08-tv-admin",
-            "displayName": "M08 TV E2E", "password": admin_password})
+            "displayName": "M08 TV E2E", "password": admin_password, "confirmPassword": admin_password})
         api.token = auth["accessToken"]
         root = api.json("/api/v1/admin/storage")[0]
         library_name = "M08 TV generated playback"
@@ -492,7 +492,7 @@ def main() -> int:
             pair_username = "m08pair" + run_short
             pair_password = uuid.uuid4().hex + "Aa1!"
             pair_actor = api.json("/api/v1/admin/users", {"username": pair_username,
-                "displayName": "M08 Pairing Actor", "password": pair_password, "role": "member"})
+                "displayName": "M08 Pairing Actor", "password": pair_password, "confirmPassword": pair_password, "role": "member"})
             (data / "pair-visible").mkdir()
             (data / "pair-restricted").mkdir()
             visible_library = api.json("/api/v1/libraries", {"name": "M08 Pairing Visible",

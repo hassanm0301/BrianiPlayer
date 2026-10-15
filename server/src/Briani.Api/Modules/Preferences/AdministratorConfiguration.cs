@@ -43,13 +43,13 @@ public static class AdministratorConfiguration
                 uri.HostNameType==UriHostNameType.Unknown)throw new ApiException(400,"invalid_public_origin");
         }
         foreach(var name in new[]{"downloadLimitBytesPerSecond","uploadLimitBytesPerSecond"})
-            if(input.TryGetProperty(name,out var speed) && speed.ValueKind!=JsonValueKind.Null && speed.GetInt64()>1073741824)throw new ApiException(400,"invalid_settings");
-        if(input.TryGetProperty("defaultRatioLimit",out var ratio) && ratio.ValueKind!=JsonValueKind.Null && ratio.GetDouble()>10000)throw new ApiException(400,"invalid_settings");
-        if(input.TryGetProperty("defaultSeedTimeMinutes",out var minutes) && minutes.ValueKind!=JsonValueKind.Null && minutes.GetInt64()>525600)throw new ApiException(400,"invalid_settings");
-        if(input.TryGetProperty("thumbnailCacheMaxBytes",out var cache) && cache.GetInt64()>8589934592)throw new ApiException(400,"invalid_settings");
-        if(input.TryGetProperty("libraryScanIntervalSeconds",out var scan) && scan.GetInt64()>31536000)throw new ApiException(400,"invalid_settings");
-        if(input.TryGetProperty("enabledProviderIds",out var providers) && providers.ValueKind==JsonValueKind.Array && providers.EnumerateArray().Any(x=>x.GetString() is not {Length:>0 and <=200}))throw new ApiException(400,"invalid_settings");
-        if(input.TryGetProperty("enabledCategoryIds",out var categories) && categories.ValueKind==JsonValueKind.Array && categories.EnumerateArray().Any(x=>x.GetInt64()<0))throw new ApiException(400,"invalid_settings");
+            if(input.TryGetProperty(name,out var speed) && speed.ValueKind!=JsonValueKind.Null && speed.GetInt64()>1073741824)throw new ApiException(400,"invalid_settings",$"{ConfigurationSchema.Label(name)} must be at most 1 GiB/s (1073741824 bytes per second).");
+        if(input.TryGetProperty("defaultRatioLimit",out var ratio) && ratio.ValueKind!=JsonValueKind.Null && ratio.GetDouble()>10000)throw new ApiException(400,"invalid_settings","Default ratio limit must be at most 10000.");
+        if(input.TryGetProperty("defaultSeedTimeMinutes",out var minutes) && minutes.ValueKind!=JsonValueKind.Null && minutes.GetInt64()>525600)throw new ApiException(400,"invalid_settings","Default seed time must be at most 525600 minutes (one year).");
+        if(input.TryGetProperty("thumbnailCacheMaxBytes",out var cache) && cache.GetInt64()>8589934592)throw new ApiException(400,"invalid_settings","Thumbnail cache size must be at most 8 GiB.");
+        if(input.TryGetProperty("libraryScanIntervalSeconds",out var scan) && scan.GetInt64()>31536000)throw new ApiException(400,"invalid_settings","Library scan interval must be at most one year (31536000 seconds).");
+        if(input.TryGetProperty("enabledProviderIds",out var providers) && providers.ValueKind==JsonValueKind.Array && providers.EnumerateArray().Any(x=>x.GetString() is not {Length:>0 and <=200}))throw new ApiException(400,"invalid_settings","Indexer IDs must be 1–200 characters each.");
+        if(input.TryGetProperty("enabledCategoryIds",out var categories) && categories.ValueKind==JsonValueKind.Array && categories.EnumerateArray().Any(x=>x.GetInt64()<0))throw new ApiException(400,"invalid_settings","Category IDs must be whole numbers of zero or more.");
     }
     public static async Task<string> OriginAsync(BrianiDb db,HttpContext context,CancellationToken ct=default) =>
         (await ReadAsync(db,ct))["publicBaseUrl"]?.GetValue<string>()?.TrimEnd('/') ?? $"{context.Request.Scheme}://{context.Request.Host}";

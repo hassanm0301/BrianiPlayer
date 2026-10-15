@@ -147,9 +147,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
     } catch (error) {
       if (!current()) return;
       setState(() {
-        _error = error is DioException && error.response?.statusCode == 400
-            ? 'Downloads changed while refreshing. Refresh again to get the latest list.'
-            : clientError(error);
+        _error = clientError(error);
         if (error is DioException &&
             [401, 403, 404].contains(error.response?.statusCode)) {
           _items.clear();
@@ -325,9 +323,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
               '↓ ${formatRate(download.downloadBps, locale: locale)}   ↑ ${formatRate(download.uploadBps, locale: locale)}   Connected seeders ${formatCount(download.seedersConnected, locale: locale)} · peers ${formatCount(download.peersConnected, locale: locale)}',
             ),
             if (download.errorCode != null)
-              Text(
-                'Error: ${download.errorCode}${download.errorDetail == null ? '' : ' · ${download.errorDetail}'}',
-              ),
+              Text(download.errorDetail ?? 'The download failed.'),
             if (download.tags.isNotEmpty)
               Wrap(
                 spacing: 4,
@@ -914,10 +910,7 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
                     Card(
                       child: ListTile(
                         leading: const Icon(Icons.error_outline),
-                        title: Text(download.errorCode!),
-                        subtitle: Text(
-                          download.errorDetail ?? 'The server reported an error without additional detail.',
-                        ),
+                        title: Text(download.errorDetail ?? 'The download failed.'),
                       ),
                     ),
                   if (download.tags.isNotEmpty)

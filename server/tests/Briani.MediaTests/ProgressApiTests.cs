@@ -143,7 +143,7 @@ public sealed class ProgressApiTests : IAsyncLifetime
     private async Task<Member> CreateMemberWithGrant(params Guid[] libraryIds)
     {
         var password = Credentials.NewToken();
-        using var created = await AdminClient().PostAsJsonAsync("/api/v1/admin/users", new { username = "progressmember", displayName = "Progress Member", password, role = "member" });
+        using var created = await AdminClient().PostAsJsonAsync("/api/v1/admin/users", new { username = "progressmember", displayName = "Progress Member", password, confirmPassword = password, role = "member" });
         created.EnsureSuccessStatusCode(); var user = (await created.Content.ReadFromJsonAsync<UserView>())!;
         await fixture.Host.InDb(async db =>
         {

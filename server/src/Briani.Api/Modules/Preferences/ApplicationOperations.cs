@@ -142,7 +142,7 @@ public static class ApplicationOperations
     }
 
     internal static JobDto ToDto(WorkJob j) => new(j.Id, j.Kind, j.State, j.Progress,
-        j.LastErrorCode is null ? null : new { code = j.LastErrorCode }, j.CreatedAt, j.UpdatedAt);
+        j.LastErrorCode is null ? null : ErrorMessages.Problem(j.LastErrorCode, 500), j.CreatedAt, j.UpdatedAt);
 }
 
 /// <summary>Claims one maintenance/configuration job per call so tests and hosts can drive bounded work.</summary>

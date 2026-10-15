@@ -73,7 +73,7 @@ public sealed class FinalAcceptanceTests : IAsyncLifetime
         using var admin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new
         {
-            username = "finalmediareader", displayName = "Final Media Reader", password, role = "member"
+            username = "finalmediareader", displayName = "Final Media Reader", password, confirmPassword = password, role = "member"
         });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var user = (await created.Content.ReadFromJsonAsync<UserReply>())!;
@@ -86,7 +86,7 @@ public sealed class FinalAcceptanceTests : IAsyncLifetime
         using var member = IdentityFixture.As(fixture.Host.CreateClient(), login.AccessToken);
         using var otherCreated = await admin.PostAsJsonAsync("/api/v1/admin/users", new
         {
-            username = "finalmediareader2", displayName = "Other Media Reader", password, role = "member"
+            username = "finalmediareader2", displayName = "Other Media Reader", password, confirmPassword = password, role = "member"
         });
         Assert.Equal(HttpStatusCode.Created, otherCreated.StatusCode);
         var otherUser = (await otherCreated.Content.ReadFromJsonAsync<UserReply>())!;

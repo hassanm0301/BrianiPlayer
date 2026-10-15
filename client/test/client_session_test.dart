@@ -126,11 +126,16 @@ void main() {
     expect(adapter.requests, isEmpty);
   });
 
-  test('error presentation never reveals private headers, URLs or response detail', () {
+  test('error presentation shows the server message but never private headers or URLs', () {
     final error = DioException(requestOptions: RequestOptions(path: 'https://private/secret', headers: {'Authorization': 'secret'}),
-      response: Response(requestOptions: RequestOptions(path: ''), statusCode: 403, data: {'detail': 'secret'}));
+      message: 'GET https://private/secret failed',
+      response: Response(requestOptions: RequestOptions(path: ''), statusCode: 403,
+        data: {'code': 'forbidden', 'detail': 'Your account does not have permission for this action.'}));
     expect(clientError(error), isNot(contains('secret')));
-    expect(clientError(error), contains('permission'));
+    expect(clientError(error), 'Your account does not have permission for this action.');
+    final bare = DioException(requestOptions: RequestOptions(path: 'https://private/secret', headers: {'Authorization': 'secret'}),
+      response: Response(requestOptions: RequestOptions(path: ''), statusCode: 403, data: 'secret'));
+    expect(clientError(bare), isNot(contains('secret')));
   });
 
   test('disconnect during login response cannot resurrect the session', () async {

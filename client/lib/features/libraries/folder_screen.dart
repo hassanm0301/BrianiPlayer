@@ -171,11 +171,11 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
       await ref
           .read(userPreferencesProvider.notifier)
           .update((b) => b.folderPreferences.replace(updated));
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Folder preference could not be saved.'),
+          SnackBar(
+            content: Text(clientError(error)),
           ),
         );
       }
@@ -803,8 +803,6 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
       if (mounted) {
         final message = error is _MutationFailure
             ? error.message
-            : error is DioException && error.response?.statusCode == 409
-            ? 'This file is in use or changed. Close active playback or refresh before retrying.'
             : clientError(error);
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(message)));
@@ -845,20 +843,9 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
     }
   }
 
-  String _operationProblem(Problem? problem) {
-    if (problem == null) return 'The server could not complete this change.';
-    final code = problem.code.toLowerCase();
-    if (code.contains('inuse') || code.contains('in_use')) {
-      return 'This file is in use. Close active playback and retry.';
-    }
-    if (problem.status == 409 || code.contains('conflict')) {
-      return 'This file changed or is in use. Refresh and try again.';
-    }
-    final trace = problem.traceId;
-    return trace == null || trace.isEmpty
-        ? problem.title
-        : '${problem.title} (reference $trace)';
-  }
+  String _operationProblem(Problem? problem) =>
+      serverMessage(problem) ?? 'The server did not explain why this change failed.';
+
 }
 
 class _MutationFailure implements Exception {

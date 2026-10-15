@@ -99,7 +99,7 @@ In the app:
 1. Choose **Servers → Add server** and enter a name.
 2. Enter `http://192.168.1.50:8088`, using your actual server IP.
 3. Enable **Allow unencrypted HTTP for a trusted LAN/VPN server**, then **Save → Connect**.
-4. Enter the **Bootstrap code**, **Display name**, **Username**, and a **Password** of 12–128 characters. Choose **Create administrator**.
+4. Enter the **Bootstrap code**, **Display name**, **Username**, **Password**, and **Confirm password**. Choose **Create administrator**. If anything is wrong, the server explains what to fix.
 
 The code is private and expires 30 minutes after the server first creates it. [Renew an expired code](advanced.md#troubleshooting) if needed. Use this HTTP setup only on a trusted network; [remote access](advanced.md#access-away-from-home) needs additional setup. There is no Briani browser app.
 

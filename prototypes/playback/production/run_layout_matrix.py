@@ -459,7 +459,7 @@ def main() -> int:
         common.wait_for("Briani API readiness", lambda: common._api_ready(api), 150)
         bootstrap = (state / "bootstrap.code").read_text().strip()
         password = uuid.uuid4().hex + "Aa1!"
-        auth = api.json("/api/v1/bootstrap", {"code": bootstrap, "username": "m06-layout", "displayName": "M06 Layout Matrix", "password": password})
+        auth = api.json("/api/v1/bootstrap", {"code": bootstrap, "username": "m06-layout", "displayName": "M06 Layout Matrix", "password": password, "confirmPassword": password})
         api.token = auth["accessToken"]
         storage_id = api.json("/api/v1/admin/storage")[0]["id"]
         library = api.json("/api/v1/libraries", {"name": "M06 layout matrix", "description": "",

@@ -18,7 +18,7 @@ part 'media_page.g.dart';
 /// * [nextCursor] 
 /// * [totalKnown] 
 /// * [truncated] 
-/// * [warnings] 
+/// * [warnings] - Human-readable warnings written by the server for display as-is.
 @BuiltValue()
 abstract class MediaPage implements Built<MediaPage, MediaPageBuilder> {
   @BuiltValueField(wireName: r'items')
@@ -33,6 +33,7 @@ abstract class MediaPage implements Built<MediaPage, MediaPageBuilder> {
   @BuiltValueField(wireName: r'truncated')
   bool get truncated;
 
+  /// Human-readable warnings written by the server for display as-is.
   @BuiltValueField(wireName: r'warnings')
   BuiltList<String> get warnings;
 

@@ -49,7 +49,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
   }
 
   Future<void> _change() async {
-    if (_busy || !_form.currentState!.validate()) return;
+    if (_busy) return;
     final account = ref.read(clientSessionProvider);
     if (account == null) return;
     setState(() {
@@ -61,7 +61,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
         passwordChange: PasswordChange(
           (b) => b
             ..currentPassword = _current.text
-            ..newPassword = _replacement.text,
+            ..newPassword = _replacement.text
+            ..confirmNewPassword = _confirmation.text,
         ),
         cancelToken: _cancel,
       );
@@ -178,9 +179,6 @@ class _AccountState extends ConsumerState<AccountScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Current password',
                       ),
-                      validator: (v) => v == null || v.isEmpty
-                          ? 'Enter your current password.'
-                          : null,
                     ),
                     TextFormField(
                       controller: _replacement,
@@ -190,10 +188,6 @@ class _AccountState extends ConsumerState<AccountScreen> {
                       decoration: const InputDecoration(
                         labelText: 'New password',
                       ),
-                      validator: (v) =>
-                          v == null || v.length < 12 || v.length > 128
-                          ? 'Use 12–128 characters.'
-                          : null,
                     ),
                     TextFormField(
                       controller: _confirmation,
@@ -201,11 +195,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
                       autocorrect: false,
                       enableSuggestions: false,
                       decoration: const InputDecoration(
-                        labelText: 'Repeat new password',
+                        labelText: 'Confirm new password',
                       ),
-                      validator: (v) => v != _replacement.text
-                          ? 'The passwords do not match.'
-                          : null,
                     ),
                     if (_error != null) Text(_error!),
                     const SizedBox(height: 16),

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Briani.Api.Infrastructure.Persistence;
 using Briani.Api.Infrastructure.Security;
@@ -27,7 +28,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
         var calls = Enumerable.Range(0, 2).Select(async i =>
         {
             using var client = host.CreateClient();
-            return await client.PostAsJsonAsync("/api/v1/bootstrap", new { code, username = $"winner{i}", displayName = "Winner", password = TestPasswords.BootstrapRace });
+            return await client.PostAsJsonAsync("/api/v1/bootstrap", new { code, username = $"winner{i}", displayName = "Winner", password = TestPasswords.BootstrapRace, confirmPassword = TestPasswords.BootstrapRace });
         }).ToArray();
         var results = await Task.WhenAll(calls);
         Assert.Single(results, x => x.StatusCode == HttpStatusCode.Created);
@@ -42,7 +43,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
         var demote = await admin.PatchAsJsonAsync($"/api/v1/admin/users/{f.Admin.User.Id}", new { version = f.Admin.User.Version, role = "member" });
         Assert.Equal(HttpStatusCode.Conflict, demote.StatusCode);
         Assert.Equal("last_enabled_administrator", await Code(demote));
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "member1", displayName = "Member", password = TestPasswords.Member, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "member1", displayName = "Member", password = TestPasswords.Member, confirmPassword = TestPasswords.Member, role = "member" });
         created.EnsureSuccessStatusCode();
         var member = (await created.Content.ReadFromJsonAsync<UserReply>())!;
         var login = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "member1", password = TestPasswords.Member, deviceName = "test" });
@@ -60,9 +61,62 @@ public sealed class IdentityApiTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.BadRequest, unknown.StatusCode);
         var missing = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "nobody" });
         Assert.Equal(HttpStatusCode.BadRequest, missing.StatusCode);
-        var shortPassword = await f.Client.PostAsJsonAsync("/api/v1/bootstrap", new { code = "bad", username = "newuser", displayName = "New", password = new string('x', 5) });
-        Assert.Equal(HttpStatusCode.BadRequest, shortPassword.StatusCode);
+        var missingConfirmation = await f.Client.PostAsJsonAsync("/api/v1/bootstrap", new { code = "bad", username = "newuser", displayName = "New", password = "x" });
+        Assert.Equal(HttpStatusCode.BadRequest, missingConfirmation.StatusCode);
     }
+
+    [Fact]
+    public async Task Passwords_have_no_content_rules_but_confirmation_must_match()
+    {
+        var admin = IdentityFixture.As(f.Client, f.Admin.AccessToken);
+        foreach (var (name, password) in new[] { ("tinypass", "x"), ("emptypass", ""), ("longpass", new string('p', 5000)) })
+        {
+            using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = name, displayName = name, password, confirmPassword = password, role = "member" });
+            Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+            using var login = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = name, password, deviceName = "test" });
+            Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        }
+        using var mismatch = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "mismatch", displayName = "Mismatch", password = "one", confirmPassword = "two", role = "member" });
+        Assert.Equal(HttpStatusCode.BadRequest, mismatch.StatusCode);
+        using var problem = JsonDocument.Parse(await mismatch.Content.ReadAsStringAsync());
+        Assert.Equal("password_mismatch", problem.RootElement.GetProperty("code").GetString());
+        Assert.Equal("The passwords do not match.", problem.RootElement.GetProperty("detail").GetString());
+        var bootstrapMismatch = await f.Client.PostAsJsonAsync("/api/v1/bootstrap", new { code = "bad", username = "newuser", displayName = "New", password = "a", confirmPassword = "b" });
+        Assert.Equal(HttpStatusCode.BadRequest, bootstrapMismatch.StatusCode);
+        Assert.Equal("password_mismatch", await Code(bootstrapMismatch));
+    }
+
+    [Fact]
+    public async Task Problems_carry_human_readable_server_messages()
+    {
+        var admin = IdentityFixture.As(f.Client, f.Admin.AccessToken);
+        using var badName = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "x", displayName = "Bad", password = "p", confirmPassword = "p", role = "member" });
+        using var body = JsonDocument.Parse(await badName.Content.ReadAsStringAsync());
+        Assert.Equal("validation_failed", body.RootElement.GetProperty("code").GetString());
+        Assert.StartsWith("Usernames must be 3–64 characters", body.RootElement.GetProperty("detail").GetString());
+        var wrong = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "nobody", password = TestPasswords.Wrong, deviceName = "test" });
+        using var wrongBody = JsonDocument.Parse(await wrong.Content.ReadAsStringAsync());
+        Assert.Equal("The username or password is incorrect.", wrongBody.RootElement.GetProperty("detail").GetString());
+        using var missing = await admin.GetAsync("/api/v1/no-such-route");
+        using var missingBody = JsonDocument.Parse(await missing.Content.ReadAsStringAsync());
+        Assert.Equal(ErrorMessages.For("not_found"), missingBody.RootElement.GetProperty("detail").GetString());
+    }
+
+    [Fact]
+    public void Every_error_code_thrown_by_the_server_has_a_message()
+    {
+        var source = Path.GetFullPath(Path.Combine(SourceDirectory(), "..", "..", "src", "Briani.Api"));
+        var codes = Directory.EnumerateFiles(source, "*.cs", SearchOption.AllDirectories)
+            .Where(x => !x.Contains($"{Path.DirectorySeparatorChar}Migrations{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .SelectMany(x => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(x),
+                "(?:ApiException\\([^\"()]*|Problems\\.WriteAsync\\([^\"]*?,[^\"]*?,\\s*|ErrorCode\\s*=\\s*(?:[^;\"]*\\?)?)\"([a-z_]+)\"(?:\\s*:\\s*\"([a-z_]+)\")?"))
+            .SelectMany(m => new[] { m.Groups[1].Value, m.Groups[2].Value })
+            .Where(x => x.Length > 0).Distinct().Order().ToArray();
+        Assert.NotEmpty(codes);
+        Assert.All(codes, x => Assert.True(ErrorMessages.IsKnown(x), $"Missing message for {x}"));
+    }
+
+    private static string SourceDirectory([System.Runtime.CompilerServices.CallerFilePath] string path = "") => Path.GetDirectoryName(path)!;
 
     [Fact]
     public async Task Refresh_rotation_replay_revokes_session_and_tokens_are_hashed_at_rest()
@@ -112,7 +166,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
         var secondLogin = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "rootuser", password = TestPasswords.Root, deviceName = "second" });
         var second = (await secondLogin.Content.ReadFromJsonAsync<AuthReply>())!;
         IdentityFixture.As(f.Client, f.Admin.AccessToken);
-        var changed = await f.Client.PostAsJsonAsync("/api/v1/me/password", new { currentPassword = TestPasswords.Root, newPassword = TestPasswords.Replacement });
+        var changed = await f.Client.PostAsJsonAsync("/api/v1/me/password", new { currentPassword = TestPasswords.Root, newPassword = TestPasswords.Replacement, confirmNewPassword = TestPasswords.Replacement });
         Assert.Equal(HttpStatusCode.NoContent, changed.StatusCode);
         var oldAccess = await f.Client.GetAsync("/api/v1/me");
         Assert.Equal(HttpStatusCode.Unauthorized, oldAccess.StatusCode);
@@ -129,11 +183,11 @@ public sealed class IdentityApiTests : IAsyncLifetime
     public async Task Administrator_password_reset_and_disable_revoke_user_sessions()
     {
         var admin = IdentityFixture.As(f.Client, f.Admin.AccessToken);
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "resetuser", displayName = "Reset User", password = TestPasswords.Initial, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "resetuser", displayName = "Reset User", password = TestPasswords.Initial, confirmPassword = TestPasswords.Initial, role = "member" });
         var user = (await created.Content.ReadFromJsonAsync<UserReply>())!;
         var login = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "resetuser", password = TestPasswords.Initial, deviceName = "tablet" });
         var original = (await login.Content.ReadFromJsonAsync<AuthReply>())!;
-        using var reset = await admin.PostAsJsonAsync($"/api/v1/admin/users/{user.Id}/reset-password", new { newPassword = TestPasswords.Reset, version = user.Version });
+        using var reset = await admin.PostAsJsonAsync($"/api/v1/admin/users/{user.Id}/reset-password", new { newPassword = TestPasswords.Reset, confirmNewPassword = TestPasswords.Reset, version = user.Version });
         Assert.Equal(HttpStatusCode.NoContent, reset.StatusCode);
         using var stale = f.Host.CreateClient();
         IdentityFixture.As(stale, original.AccessToken);
@@ -188,7 +242,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
     public async Task Approved_pairing_cannot_exchange_after_approving_session_is_revoked(string revocation)
     {
         var admin = IdentityFixture.As(f.Host.CreateClient(), f.Admin.AccessToken);
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "pairmember", displayName = "Pair Member", password = TestPasswords.Member, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "pairmember", displayName = "Pair Member", password = TestPasswords.Member, confirmPassword = TestPasswords.Member, role = "member" });
         var user = (await created.Content.ReadFromJsonAsync<UserReply>())!;
         var memberClient = f.Host.CreateClient();
         var login = await memberClient.PostAsJsonAsync("/api/v1/auth/login", new { username = "pairmember", password = TestPasswords.Member, deviceName = "phone" });
@@ -205,7 +259,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
         }
         else if (revocation == "password-change")
         {
-            Assert.Equal(HttpStatusCode.NoContent, (await memberClient.PostAsJsonAsync("/api/v1/me/password", new { currentPassword = TestPasswords.Member, newPassword = TestPasswords.Replacement })).StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, (await memberClient.PostAsJsonAsync("/api/v1/me/password", new { currentPassword = TestPasswords.Member, newPassword = TestPasswords.Replacement, confirmNewPassword = TestPasswords.Replacement })).StatusCode);
         }
         else
         {
@@ -606,7 +660,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
     public async Task Own_sessions_are_scoped_to_authenticated_user()
     {
         var admin = IdentityFixture.As(f.Client, f.Admin.AccessToken);
-        var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "owncheck", displayName = "Own Check", password = TestPasswords.OwnSession, role = "member" });
+        var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "owncheck", displayName = "Own Check", password = TestPasswords.OwnSession, confirmPassword = TestPasswords.OwnSession, role = "member" });
         created.EnsureSuccessStatusCode();
         var login = await f.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "owncheck", password = TestPasswords.OwnSession, deviceName = "phone" });
         var member = (await login.Content.ReadFromJsonAsync<AuthReply>())!;
@@ -623,7 +677,7 @@ public sealed class IdentityApiTests : IAsyncLifetime
     public async Task Grant_updates_are_idempotent_in_shape_and_inaccessible_libraries_are_hidden()
     {
         var admin = IdentityFixture.As(f.Client, f.Admin.AccessToken);
-        using var userResponse = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "grantuser", displayName = "Grant User", password = TestPasswords.Grant, role = "member" });
+        using var userResponse = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "grantuser", displayName = "Grant User", password = TestPasswords.Grant, confirmPassword = TestPasswords.Grant, role = "member" });
         var user = (await userResponse.Content.ReadFromJsonAsync<UserReply>())!;
         var rootId = Guid.Parse(await f.Host.InDb(async db => (await db.Settings.SingleAsync(x => x.Key == "storage_root_id")).ValueJson));
         Directory.CreateDirectory(Path.Combine(f.Host.Root, "data", "library"));

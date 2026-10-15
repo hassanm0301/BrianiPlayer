@@ -31,7 +31,7 @@ part 'download.g.dart';
 /// * [generation] 
 /// * [version] 
 /// * [errorCode] 
-/// * [errorDetail] 
+/// * [errorDetail] - Human-readable error message written by the server for display as-is.
 /// * [createdAt] 
 /// * [updatedAt] 
 /// * [tags] 
@@ -95,6 +95,7 @@ abstract class Download implements Built<Download, DownloadBuilder> {
   @BuiltValueField(wireName: r'errorCode')
   String? get errorCode;
 
+  /// Human-readable error message written by the server for display as-is.
   @BuiltValueField(wireName: r'errorDetail')
   String? get errorDetail;
 

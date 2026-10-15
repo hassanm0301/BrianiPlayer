@@ -1,0 +1,21 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  IdentityTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/bin/Debug/net10.0/IdentityTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2-dev (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:12.86]     Briani.IdentityTests.IdentityApiTests.Every_error_code_thrown_by_the_server_has_a_message [FAIL]
+  Failed Briani.IdentityTests.IdentityApiTests.Every_error_code_thrown_by_the_server_has_a_message [6 ms]
+  Error Message:
+   Assert.All() Failure: 1 out of 148 items in the collection did not pass.
+[95]: Item:  "permission_changed"
+      Error: Missing message for permission_changed
+  Stack Trace:
+     at Briani.IdentityTests.IdentityApiTests.Every_error_code_thrown_by_the_server_has_a_message() in /home/hassan/projects/BrianiPlayer/server/tests/Briani.IdentityTests/IdentityApiTests.cs:line 116
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Failed!  - Failed:     1, Passed:    54, Skipped:     0, Total:    55, Duration: 14 s - IdentityTests.dll (net10.0)

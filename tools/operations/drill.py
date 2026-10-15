@@ -310,7 +310,7 @@ class IntegratedDrill:
         admin_password = secrets.token_urlsafe(32)
         admin_username = "drilladmin" + prefix
         tokens = self.api_client.request("POST", "/api/v1/bootstrap", {
-            "code": code, "username": admin_username, "displayName": "M09 Isolated Drill", "password": admin_password
+            "code": code, "username": admin_username, "displayName": "M09 Isolated Drill", "password": admin_password, "confirmPassword": admin_password
         }, expected=(201,), label="claim bootstrap")
         if not isinstance(tokens, dict) or not tokens.get("accessToken"):
             raise DrillError("bootstrap response omitted authentication tokens")
@@ -320,7 +320,7 @@ class IntegratedDrill:
         log_line("bootstrap token claimed over HTTP; token and generated account password withheld")
         created = self.api_client.request("POST", "/api/v1/admin/users", {
             "username": self.creds["memberUsername"], "displayName": "M09 Drill Member",
-            "password": self.creds["memberPassword"], "role": "member"
+            "password": self.creds["memberPassword"], "confirmPassword": self.creds["memberPassword"], "role": "member"
         }, token=self.creds["adminToken"], expected=(201,), label="create drill member")
         self.member_id = created["id"]
 

@@ -36,6 +36,9 @@ builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = 
 {
     context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
     if (!context.ProblemDetails.Extensions.ContainsKey("code")) context.ProblemDetails.Extensions["code"] = "request_failed";
+    var code = context.ProblemDetails.Extensions["code"] as string;
+    context.ProblemDetails.Title = ErrorMessages.For(code);
+    context.ProblemDetails.Detail ??= ErrorMessages.For(code);
 });
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o=>{o.MultipartBodyLengthLimit=16777216;o.ValueLengthLimit=16384;o.ValueCountLimit=16;o.MultipartHeadersCountLimit=16;o.MultipartHeadersLengthLimit=16384;});
 builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);

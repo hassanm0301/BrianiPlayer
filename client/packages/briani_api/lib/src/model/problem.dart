@@ -10,7 +10,7 @@ import 'package:built_value/serializer.dart';
 
 part 'problem.g.dart';
 
-/// Problem
+/// Error returned by the server. title and detail are human-readable messages written by the server; clients display detail (falling back to title) verbatim and never map code to their own text. code is a stable machine identifier.
 ///
 /// Properties:
 /// * [type] 

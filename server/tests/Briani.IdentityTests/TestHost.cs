@@ -66,7 +66,7 @@ public sealed class IdentityFixture : IAsyncLifetime
     public Task DisposeAsync() { Client.Dispose(); Host.Dispose(); return Task.CompletedTask; }
     public static async Task<AuthReply> Bootstrap(HttpClient client, string code, string username, string display, string password)
     {
-        using var response = await client.PostAsJsonAsync("/api/v1/bootstrap", new { code, username, displayName = display, password });
+        using var response = await client.PostAsJsonAsync("/api/v1/bootstrap", new { code, username, displayName = display, password, confirmPassword = password });
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<AuthReply>())!;
     }

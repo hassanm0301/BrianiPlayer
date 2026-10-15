@@ -15,6 +15,8 @@ class _$BootstrapRequest extends BootstrapRequest {
   final String displayName;
   @override
   final String password;
+  @override
+  final String confirmPassword;
 
   factory _$BootstrapRequest(
           [void Function(BootstrapRequestBuilder)? updates]) =>
@@ -24,7 +26,8 @@ class _$BootstrapRequest extends BootstrapRequest {
       {required this.code,
       required this.username,
       required this.displayName,
-      required this.password})
+      required this.password,
+      required this.confirmPassword})
       : super._();
   @override
   BootstrapRequest rebuild(void Function(BootstrapRequestBuilder) updates) =>
@@ -41,7 +44,8 @@ class _$BootstrapRequest extends BootstrapRequest {
         code == other.code &&
         username == other.username &&
         displayName == other.displayName &&
-        password == other.password;
+        password == other.password &&
+        confirmPassword == other.confirmPassword;
   }
 
   @override
@@ -51,6 +55,7 @@ class _$BootstrapRequest extends BootstrapRequest {
     _$hash = $jc(_$hash, username.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, password.hashCode);
+    _$hash = $jc(_$hash, confirmPassword.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -61,7 +66,8 @@ class _$BootstrapRequest extends BootstrapRequest {
           ..add('code', code)
           ..add('username', username)
           ..add('displayName', displayName)
-          ..add('password', password))
+          ..add('password', password)
+          ..add('confirmPassword', confirmPassword))
         .toString();
   }
 }
@@ -86,6 +92,11 @@ class BootstrapRequestBuilder
   String? get password => _$this._password;
   set password(String? password) => _$this._password = password;
 
+  String? _confirmPassword;
+  String? get confirmPassword => _$this._confirmPassword;
+  set confirmPassword(String? confirmPassword) =>
+      _$this._confirmPassword = confirmPassword;
+
   BootstrapRequestBuilder() {
     BootstrapRequest._defaults(this);
   }
@@ -97,6 +108,7 @@ class BootstrapRequestBuilder
       _username = $v.username;
       _displayName = $v.displayName;
       _password = $v.password;
+      _confirmPassword = $v.confirmPassword;
       _$v = null;
     }
     return this;
@@ -126,6 +138,8 @@ class BootstrapRequestBuilder
               displayName, r'BootstrapRequest', 'displayName'),
           password: BuiltValueNullFieldError.checkNotNull(
               password, r'BootstrapRequest', 'password'),
+          confirmPassword: BuiltValueNullFieldError.checkNotNull(
+              confirmPassword, r'BootstrapRequest', 'confirmPassword'),
         );
     replace(_$result);
     return _$result;

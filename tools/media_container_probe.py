@@ -33,7 +33,8 @@ def main():
                 if time.monotonic()>deadline:raise RuntimeError('Container readiness timed out')
                 time.sleep(.2)
         code=(state/'bootstrap.code').read_text()
-        auth=json_request('/api/v1/bootstrap',{'code':code,'username':'fixture-admin','displayName':'Fixture','password':secrets.token_urlsafe(32)})
+        password=secrets.token_urlsafe(32)
+        auth=json_request('/api/v1/bootstrap',{'code':code,'username':'fixture-admin','displayName':'Fixture','password':password,'confirmPassword':password})
         token=auth['accessToken'];storage=json_request('/api/v1/admin/storage')
         roots=storage if isinstance(storage,list) else storage['items'];rootid=roots[0]['id']
         library=json_request('/api/v1/libraries',{'name':'Offline generated media','storageRootId':rootid,'relativePath':'library','readOnly':False})

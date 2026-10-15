@@ -44,7 +44,7 @@ public sealed class QueryApiTests
         var done = await read.Content.ReadFromJsonAsync<DiscoverySnapshotView>();
         Assert.NotNull(done);
         Assert.Equal("partial", done.State);
-        Assert.Contains(done.Warnings, x => x.StartsWith("provider_failed:c:", StringComparison.Ordinal));
+        Assert.Contains(done.Warnings, x => x.StartsWith("Indexer 'c' ", StringComparison.Ordinal));
         var item = Assert.Single(done.Items);
         Assert.Equal("first", item.Title);
         Assert.Null(item.Peers); // overflowing and unknown-compatible aggregate counts remain null
@@ -71,7 +71,7 @@ public sealed class QueryApiTests
 
         Assert.NotNull(view);
         Assert.Equal("partial", view.State);
-        Assert.Contains("provider_health:a:provider_temporarily_disabled", view.Warnings);
+        Assert.Contains(ErrorMessages.Warning("provider_health:a:provider_temporarily_disabled"), view.Warnings);
         Assert.Equal("release-1", Assert.Single(view.Items).Title);
     }
 
@@ -94,8 +94,8 @@ public sealed class QueryApiTests
         Assert.NotEqual(first.Id, stale.Id);
         Assert.NotNull(view);
         Assert.Equal("partial", view.State);
-        Assert.Contains("stale_results", view.Warnings);
-        Assert.Contains("provider_health:a:provider_temporarily_disabled", view.Warnings);
+        Assert.Contains(ErrorMessages.Warning("stale_results"), view.Warnings);
+        Assert.Contains(ErrorMessages.Warning("provider_health:a:provider_temporarily_disabled"), view.Warnings);
         Assert.Equal("release-1", Assert.Single(view.Items).Title);
     }
 
@@ -123,7 +123,7 @@ public sealed class QueryApiTests
         Assert.NotEqual("lookup-1", storedKey);
 
         using var created = await fixture.Client.PostAsJsonAsync("/api/v1/admin/users", new
-        { username = "seconduser", displayName = "Second", password = TestPasswords.Member, role = "member" });
+        { username = "seconduser", displayName = "Second", password = TestPasswords.Member, confirmPassword = TestPasswords.Member, role = "member" });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var second = await created.Content.ReadFromJsonAsync<UserReply>();
         Assert.NotNull(second);
@@ -248,7 +248,7 @@ public sealed class QueryApiTests
         using var response = await fixture.Client.GetAsync($"/api/v1/discovery/queries/{snapshot.Id}");
         var view = await response.Content.ReadFromJsonAsync<DiscoverySnapshotView>();
         Assert.NotNull(view);
-        Assert.Contains("resolution_alternative_limit", view.Warnings);
+        Assert.Contains(ErrorMessages.Warning("resolution_alternative_limit"), view.Warnings);
         Assert.True(Assert.Single(view.Items).Downloadable);
         var encrypted = await fixture.InDb(db => db.DiscoveryResults.AsNoTracking().Where(x => x.SnapshotId == snapshot.Id)
             .Select(x => x.EncryptedResolutionJson).SingleAsync());
@@ -419,7 +419,7 @@ public sealed class QueryApiTests
         var staleView = await staleResponse.Content.ReadFromJsonAsync<DiscoverySnapshotView>();
         Assert.NotNull(staleView);
         Assert.Equal("partial", staleView.State);
-        Assert.Contains("stale_results", staleView.Warnings);
+        Assert.Contains(ErrorMessages.Warning("stale_results"), staleView.Warnings);
         Assert.True(Assert.Single(staleView.Items).Stale);
         Assert.NotEqual(first.Id, stale.Id);
 

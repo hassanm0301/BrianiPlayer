@@ -12,12 +12,18 @@ part 'password_reset.g.dart';
 /// PasswordReset
 ///
 /// Properties:
-/// * [newPassword] 
+/// * [newPassword] - Any value is accepted; there are no length or content rules.
+/// * [confirmNewPassword] - Must equal newPassword; the server rejects a mismatch with code password_mismatch.
 /// * [version] 
 @BuiltValue()
 abstract class PasswordReset implements Built<PasswordReset, PasswordResetBuilder> {
+  /// Any value is accepted; there are no length or content rules.
   @BuiltValueField(wireName: r'newPassword')
   String get newPassword;
+
+  /// Must equal newPassword; the server rejects a mismatch with code password_mismatch.
+  @BuiltValueField(wireName: r'confirmNewPassword')
+  String get confirmNewPassword;
 
   @BuiltValueField(wireName: r'version')
   int get version;
@@ -48,6 +54,11 @@ class _$PasswordResetSerializer implements PrimitiveSerializer<PasswordReset> {
     yield r'newPassword';
     yield serializers.serialize(
       object.newPassword,
+      specifiedType: const FullType(String),
+    );
+    yield r'confirmNewPassword';
+    yield serializers.serialize(
+      object.confirmNewPassword,
       specifiedType: const FullType(String),
     );
     yield r'version';
@@ -84,6 +95,13 @@ class _$PasswordResetSerializer implements PrimitiveSerializer<PasswordReset> {
             specifiedType: const FullType(String),
           ) as String;
           result.newPassword = valueDes;
+          break;
+        case r'confirmNewPassword':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.confirmNewPassword = valueDes;
           break;
         case r'version':
           final valueDes = serializers.deserialize(

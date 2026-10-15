@@ -11,11 +11,16 @@ class _$PasswordChange extends PasswordChange {
   final String currentPassword;
   @override
   final String newPassword;
+  @override
+  final String confirmNewPassword;
 
   factory _$PasswordChange([void Function(PasswordChangeBuilder)? updates]) =>
       (PasswordChangeBuilder()..update(updates))._build();
 
-  _$PasswordChange._({required this.currentPassword, required this.newPassword})
+  _$PasswordChange._(
+      {required this.currentPassword,
+      required this.newPassword,
+      required this.confirmNewPassword})
       : super._();
   @override
   PasswordChange rebuild(void Function(PasswordChangeBuilder) updates) =>
@@ -29,7 +34,8 @@ class _$PasswordChange extends PasswordChange {
     if (identical(other, this)) return true;
     return other is PasswordChange &&
         currentPassword == other.currentPassword &&
-        newPassword == other.newPassword;
+        newPassword == other.newPassword &&
+        confirmNewPassword == other.confirmNewPassword;
   }
 
   @override
@@ -37,6 +43,7 @@ class _$PasswordChange extends PasswordChange {
     var _$hash = 0;
     _$hash = $jc(_$hash, currentPassword.hashCode);
     _$hash = $jc(_$hash, newPassword.hashCode);
+    _$hash = $jc(_$hash, confirmNewPassword.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -45,7 +52,8 @@ class _$PasswordChange extends PasswordChange {
   String toString() {
     return (newBuiltValueToStringHelper(r'PasswordChange')
           ..add('currentPassword', currentPassword)
-          ..add('newPassword', newPassword))
+          ..add('newPassword', newPassword)
+          ..add('confirmNewPassword', confirmNewPassword))
         .toString();
   }
 }
@@ -63,6 +71,11 @@ class PasswordChangeBuilder
   String? get newPassword => _$this._newPassword;
   set newPassword(String? newPassword) => _$this._newPassword = newPassword;
 
+  String? _confirmNewPassword;
+  String? get confirmNewPassword => _$this._confirmNewPassword;
+  set confirmNewPassword(String? confirmNewPassword) =>
+      _$this._confirmNewPassword = confirmNewPassword;
+
   PasswordChangeBuilder() {
     PasswordChange._defaults(this);
   }
@@ -72,6 +85,7 @@ class PasswordChangeBuilder
     if ($v != null) {
       _currentPassword = $v.currentPassword;
       _newPassword = $v.newPassword;
+      _confirmNewPassword = $v.confirmNewPassword;
       _$v = null;
     }
     return this;
@@ -97,6 +111,8 @@ class PasswordChangeBuilder
               currentPassword, r'PasswordChange', 'currentPassword'),
           newPassword: BuiltValueNullFieldError.checkNotNull(
               newPassword, r'PasswordChange', 'newPassword'),
+          confirmNewPassword: BuiltValueNullFieldError.checkNotNull(
+              confirmNewPassword, r'PasswordChange', 'confirmNewPassword'),
         );
     replace(_$result);
     return _$result;

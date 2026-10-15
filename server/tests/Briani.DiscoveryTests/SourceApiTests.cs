@@ -44,7 +44,7 @@ public sealed class SourceApiTests : IAsyncLifetime
     {
         using var admin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         var password = Credentials.NewToken();
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "source-member", displayName = "Source Member", password, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "source-member", displayName = "Source Member", password, confirmPassword = password, role = "member" });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         using var loginResponse = await fixture.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "source-member", password, deviceName = "test" });
         loginResponse.EnsureSuccessStatusCode();
@@ -117,7 +117,7 @@ public sealed class SourceApiTests : IAsyncLifetime
         }
 
         var password = Credentials.NewToken();
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "upload-other-user", displayName = "Upload Other User", password, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "upload-other-user", displayName = "Upload Other User", password, confirmPassword = password, role = "member" });
         created.EnsureSuccessStatusCode();
         var user = await created.Content.ReadFromJsonAsync<UserReply>();
         Assert.NotNull(user);

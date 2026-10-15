@@ -8,7 +8,7 @@ Main protections cover unauthorized file access, credential leakage, SSRF, path 
 
 ## Authentication
 
-Use the framework PasswordHasher implementation, not custom cryptography. Password length 12–128 characters; no logging. Rate limit login by account and source IP with safe proxy handling. Failed login messages do not reveal whether an account exists. Persist user disable and revoke effects.
+Use the framework PasswordHasher implementation, not custom cryptography. Passwords have no length or content rules (owner decision, 2026-10-16); account creation and password changes require a matching confirmation checked server-side; no logging. Rate limit login by account and source IP with safe proxy handling. Failed login messages do not reveal whether an account exists. Persist user disable and revoke effects.
 
 Opaque access tokens: 32 random bytes, hashed at rest, 15-minute lifetime. Refresh tokens: independent 32 random bytes, hashed, 30-day absolute lifetime, rotated on use with reuse detection. Tokens are associated with named device sessions; user can revoke one or all. Change/reset password revokes prior sessions. Use TLS or a trusted VPN; “LAN” does not make credentials cryptographically protected.
 

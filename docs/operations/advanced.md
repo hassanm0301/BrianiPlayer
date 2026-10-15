@@ -186,7 +186,7 @@ In the client:
 1. Open **Servers → Add server**.
 2. Give it a name and enter `http://192.168.1.50:8088`, using your actual server IP.
 3. For this trusted-LAN HTTP setup, enable **Allow unencrypted HTTP for a trusted LAN/VPN server**, then **Save** and **Connect**.
-4. The fresh server opens **Create the administrator**. Enter the **Bootstrap code**, **Display name**, **Username**, and a **Password** of 12–128 characters, then choose **Create administrator**.
+4. The fresh server opens **Create the administrator**. Enter the **Bootstrap code**, **Display name**, **Username**, **Password**, and **Confirm password**, then choose **Create administrator**.
 
 Keep the code private. Your Briani administrator password is separate from the qBittorrent password. After setup, other users sign in with accounts you create, or use the TV device-code flow.
 

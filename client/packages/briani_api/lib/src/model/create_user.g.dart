@@ -67,6 +67,8 @@ class _$CreateUser extends CreateUser {
   @override
   final String password;
   @override
+  final String confirmPassword;
+  @override
   final CreateUserRoleEnum role;
 
   factory _$CreateUser([void Function(CreateUserBuilder)? updates]) =>
@@ -76,6 +78,7 @@ class _$CreateUser extends CreateUser {
       {required this.username,
       required this.displayName,
       required this.password,
+      required this.confirmPassword,
       required this.role})
       : super._();
   @override
@@ -92,6 +95,7 @@ class _$CreateUser extends CreateUser {
         username == other.username &&
         displayName == other.displayName &&
         password == other.password &&
+        confirmPassword == other.confirmPassword &&
         role == other.role;
   }
 
@@ -101,6 +105,7 @@ class _$CreateUser extends CreateUser {
     _$hash = $jc(_$hash, username.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, password.hashCode);
+    _$hash = $jc(_$hash, confirmPassword.hashCode);
     _$hash = $jc(_$hash, role.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -112,6 +117,7 @@ class _$CreateUser extends CreateUser {
           ..add('username', username)
           ..add('displayName', displayName)
           ..add('password', password)
+          ..add('confirmPassword', confirmPassword)
           ..add('role', role))
         .toString();
   }
@@ -132,6 +138,11 @@ class CreateUserBuilder implements Builder<CreateUser, CreateUserBuilder> {
   String? get password => _$this._password;
   set password(String? password) => _$this._password = password;
 
+  String? _confirmPassword;
+  String? get confirmPassword => _$this._confirmPassword;
+  set confirmPassword(String? confirmPassword) =>
+      _$this._confirmPassword = confirmPassword;
+
   CreateUserRoleEnum? _role;
   CreateUserRoleEnum? get role => _$this._role;
   set role(CreateUserRoleEnum? role) => _$this._role = role;
@@ -146,6 +157,7 @@ class CreateUserBuilder implements Builder<CreateUser, CreateUserBuilder> {
       _username = $v.username;
       _displayName = $v.displayName;
       _password = $v.password;
+      _confirmPassword = $v.confirmPassword;
       _role = $v.role;
       _$v = null;
     }
@@ -174,6 +186,8 @@ class CreateUserBuilder implements Builder<CreateUser, CreateUserBuilder> {
               displayName, r'CreateUser', 'displayName'),
           password: BuiltValueNullFieldError.checkNotNull(
               password, r'CreateUser', 'password'),
+          confirmPassword: BuiltValueNullFieldError.checkNotNull(
+              confirmPassword, r'CreateUser', 'confirmPassword'),
           role: BuiltValueNullFieldError.checkNotNull(
               role, r'CreateUser', 'role'),
         );

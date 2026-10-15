@@ -31,8 +31,8 @@ public static class QueryRules
             _ => throw new ApiException(400, "validation_failed")
         };
         var text = query.Query?.Trim();
-        if (text?.Length > 200 || text?.Any(char.IsControl) == true) throw new ApiException(400, "validation_failed");
-        if (mode == "search" && string.IsNullOrWhiteSpace(text)) throw new ApiException(400, "validation_failed");
+        if (text?.Length > 200 || text?.Any(char.IsControl) == true) throw new ApiException(400, "validation_failed", "Search text must be at most 200 characters without control characters.");
+        if (mode == "search" && string.IsNullOrWhiteSpace(text)) throw new ApiException(400, "validation_failed", "Enter something to search for.");
         if (mode == "latest") text = null;
 
         var providerIds = query.ProviderIds ?? [];

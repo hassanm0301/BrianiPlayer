@@ -15,7 +15,8 @@ part 'bootstrap_request.g.dart';
 /// * [code] 
 /// * [username] 
 /// * [displayName] 
-/// * [password] 
+/// * [password] - Any value is accepted; there are no length or content rules.
+/// * [confirmPassword] - Must equal password; the server rejects a mismatch with code password_mismatch.
 @BuiltValue()
 abstract class BootstrapRequest implements Built<BootstrapRequest, BootstrapRequestBuilder> {
   @BuiltValueField(wireName: r'code')
@@ -27,8 +28,13 @@ abstract class BootstrapRequest implements Built<BootstrapRequest, BootstrapRequ
   @BuiltValueField(wireName: r'displayName')
   String get displayName;
 
+  /// Any value is accepted; there are no length or content rules.
   @BuiltValueField(wireName: r'password')
   String get password;
+
+  /// Must equal password; the server rejects a mismatch with code password_mismatch.
+  @BuiltValueField(wireName: r'confirmPassword')
+  String get confirmPassword;
 
   BootstrapRequest._();
 
@@ -71,6 +77,11 @@ class _$BootstrapRequestSerializer implements PrimitiveSerializer<BootstrapReque
     yield r'password';
     yield serializers.serialize(
       object.password,
+      specifiedType: const FullType(String),
+    );
+    yield r'confirmPassword';
+    yield serializers.serialize(
+      object.confirmPassword,
       specifiedType: const FullType(String),
     );
   }
@@ -123,6 +134,13 @@ class _$BootstrapRequestSerializer implements PrimitiveSerializer<BootstrapReque
             specifiedType: const FullType(String),
           ) as String;
           result.password = valueDes;
+          break;
+        case r'confirmPassword':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.confirmPassword = valueDes;
           break;
         default:
           unhandled.add(key);

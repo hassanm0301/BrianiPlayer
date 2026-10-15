@@ -23,7 +23,7 @@ public sealed class FinalAcceptanceTests : IAsyncLifetime
         {
             username = "refreshdisable",
             displayName = "Refresh Disable",
-            password = TestPasswords.Initial,
+            password = TestPasswords.Initial, confirmPassword = TestPasswords.Initial,
             role = "member"
         });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);

@@ -15,6 +15,7 @@ class SignInScreen extends ConsumerStatefulWidget {
 class _SignInState extends ConsumerState<SignInScreen> {
   final _username = TextEditingController();
   final _password = TextEditingController();
+  final _confirmPassword = TextEditingController();
   final _code = TextEditingController();
   final _displayName = TextEditingController();
   final _form = GlobalKey<FormState>();
@@ -39,22 +40,23 @@ class _SignInState extends ConsumerState<SignInScreen> {
     }
   }
   Future<void> _submit() async {
-    if (!_form.currentState!.validate() || _busy) return;
+    if (_busy) return;
     setState(() { _busy = true; _error = null; });
     try {
       await ref.read(clientSessionProvider.notifier).login(widget.profile,
         _username.text.trim(), _password.text,
         bootstrapCode: _bootstrap ? _code.text.trim() : null,
-        displayName: _displayName.text.trim(), cancelToken: _cancel);
+        displayName: _displayName.text.trim(),
+        confirmPassword: _bootstrap ? _confirmPassword.text : null, cancelToken: _cancel);
       if (!mounted) return;
-      _password.clear(); _code.clear();
+      _password.clear(); _confirmPassword.clear(); _code.clear();
       if (mounted) context.go('/libraries');
     } catch (error) {
       if (mounted) setState(() => _error = clientError(error));
     } finally { if (mounted) setState(() => _busy = false); }
   }
   @override
-  void dispose() { _cancel.cancel('Connection screen closed.'); _username.dispose(); _password.dispose(); _code.dispose(); _displayName.dispose(); super.dispose(); }
+  void dispose() { _cancel.cancel('Connection screen closed.'); _username.dispose(); _password.dispose(); _confirmPassword.dispose(); _code.dispose(); _displayName.dispose(); super.dispose(); }
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(widget.profile.label), leading: BackButton(onPressed: () => context.go('/servers'))),
@@ -66,16 +68,20 @@ class _SignInState extends ConsumerState<SignInScreen> {
           if (!_bootstrap) OutlinedButton(onPressed: _busy ? null : () => context.go('/link/${widget.profile.id}'), child: const Text('Link using another signed-in device')),
           if (_bootstrap) ...[
             const Text('Enter the one-time bootstrap code from the server configuration directory.'),
-            TextFormField(controller: _code, decoration: const InputDecoration(labelText: 'Bootstrap code'),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Enter the code.' : null),
+            TextFormField(controller: _code, decoration: const InputDecoration(labelText: 'Bootstrap code')),
             TextFormField(controller: _displayName, decoration: const InputDecoration(labelText: 'Display name')),
           ],
           TextFormField(controller: _username, autofocus: true, autofillHints: const [AutofillHints.username],
-            decoration: const InputDecoration(labelText: 'Username'),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Enter your username.' : null),
+            decoration: const InputDecoration(labelText: 'Username')),
           TextFormField(controller: _password, obscureText: true, autocorrect: false, enableSuggestions: false,
-            autofillHints: const [AutofillHints.password], decoration: const InputDecoration(labelText: 'Password'),
-            onFieldSubmitted: (_) => _submit(), validator: (v) => v == null || v.isEmpty ? 'Enter your password.' : null),
+            autofillHints: [_bootstrap ? AutofillHints.newPassword : AutofillHints.password],
+            decoration: const InputDecoration(labelText: 'Password'),
+            onFieldSubmitted: _bootstrap ? null : (_) => _submit()),
+          if (_bootstrap)
+            TextFormField(controller: _confirmPassword, obscureText: true, autocorrect: false, enableSuggestions: false,
+              autofillHints: const [AutofillHints.newPassword],
+              decoration: const InputDecoration(labelText: 'Confirm password'),
+              onFieldSubmitted: (_) => _submit()),
           const SizedBox(height: 16),
           if (_error != null) ...[Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
             TextButton(onPressed: _busy ? null : _check, child: const Text('Check connection again'))],

@@ -203,7 +203,12 @@ class _PhotoFailureAdapter implements HttpClientAdapter {
   ) async {
     if (options.path.endsWith('/image')) {
       return ResponseBody.fromString(
-        jsonEncode({'title': 'Not ready'}),
+        jsonEncode({
+          'title': 'Media details are unavailable.',
+          'status': 503,
+          'code': 'metadata_unavailable',
+          'detail': 'Media details are unavailable.',
+        }),
         503,
         headers: {
           Headers.contentTypeHeader: [Headers.jsonContentType],
@@ -488,9 +493,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(
-        find.text(
-          'A required service or media data is not ready. Retry shortly.',
-        ),
+        find.text('Media details are unavailable.'),
         findsOneWidget,
       );
       expect(find.text('Retry'), findsOneWidget);

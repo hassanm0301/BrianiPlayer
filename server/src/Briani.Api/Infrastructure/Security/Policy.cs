@@ -7,13 +7,19 @@ using Briani.Api.Modules.Identity;
 using Microsoft.EntityFrameworkCore;
 namespace Briani.Api.Infrastructure.Security;
 public sealed class ApiException(int status,string code,string? detail=null,int? retryAfterSeconds=null) : Exception(code)
-{ public int Status { get; }=status; public string Code { get; }=code; public string SafeDetail { get; }=detail ?? code.Replace('_',' '); public int? RetryAfterSeconds {get;}=retryAfterSeconds; }
+{ public int Status { get; }=status; public string Code { get; }=code; public string SafeDetail { get; }=detail ?? ErrorMessages.For(code); public int? RetryAfterSeconds {get;}=retryAfterSeconds; }
 public static class IdentityInput
 {
-    public static void Username(string? value) { if(value is null || !Regex.IsMatch(value,"\\A[A-Za-z0-9._-]{3,64}\\z")) throw new ApiException(400,"validation_failed"); }
-    public static void Password(string? value) { if(value is null || value.Length is <12 or >128) throw new ApiException(400,"validation_failed"); }
-    public static string Text(string? value,int max=200,bool required=true) { if(value is null || value.Length>max || value.Any(char.IsControl) || (required && string.IsNullOrWhiteSpace(value))) throw new ApiException(400,"validation_failed"); return value; }
-    public static void Role(string? role) { if(role is not ("administrator" or "member")) throw new ApiException(400,"validation_failed"); }
+    public static void Username(string? value) { if(value is null || !Regex.IsMatch(value,"\\A[A-Za-z0-9._-]{3,64}\\z")) throw new ApiException(400,"validation_failed","Usernames must be 3–64 characters using only letters, numbers, dots, underscores or hyphens."); }
+    // Passwords have no content rules; only presence and the confirmation match are checked.
+    public static void Password(string? value) { if(value is null) throw new ApiException(400,"validation_failed","Enter a password."); }
+    public static void Password(string? value,string? confirmation) { Password(value); if(!string.Equals(value,confirmation,StringComparison.Ordinal)) throw new ApiException(400,"password_mismatch"); }
+    public static string Text(string? value,int max=200,bool required=true,string field="This value") {
+        if(value is null || (required && string.IsNullOrWhiteSpace(value))) throw new ApiException(400,"validation_failed",$"{field} is required.");
+        if(value.Length>max) throw new ApiException(400,"validation_failed",$"{field} must be at most {max} characters.");
+        if(value.Any(char.IsControl)) throw new ApiException(400,"validation_failed",$"{field} cannot contain control characters.");
+        return value; }
+    public static void Role(string? role) { if(role is not ("administrator" or "member")) throw new ApiException(400,"validation_failed","The role must be administrator or member."); }
 }
 public static class Credentials
 {

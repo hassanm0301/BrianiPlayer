@@ -78,11 +78,11 @@ public sealed class AuditEvent
 public sealed record UserView(Guid Id, string Username, string DisplayName, string Role, bool Enabled, long Version, bool MustChangePassword)
 { public static UserView Of(User u) => new(u.Id,u.Username,u.DisplayName,u.Role,u.Enabled,u.Version,u.MustChangePassword); }
 public sealed record AuthTokens(string AccessToken, DateTimeOffset AccessExpiresAt, string RefreshToken, DateTimeOffset RefreshExpiresAt, Guid SessionId, UserView User);
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record BootstrapRequest([property: JsonRequired] string Code,[property: JsonRequired] string Username,[property: JsonRequired] string DisplayName,[property: JsonRequired] string Password);
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record BootstrapRequest([property: JsonRequired] string Code,[property: JsonRequired] string Username,[property: JsonRequired] string DisplayName,[property: JsonRequired] string Password,[property: JsonRequired] string ConfirmPassword);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record LoginRequest([property: JsonRequired] string Username,[property: JsonRequired] string Password,[property: JsonRequired] string DeviceName);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record RefreshRequest([property: JsonRequired] string RefreshToken);
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record PasswordChange([property: JsonRequired] string CurrentPassword,[property: JsonRequired] string NewPassword);
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record PasswordReset([property: JsonRequired] string NewPassword,[property: JsonRequired] long Version);
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record PasswordChange([property: JsonRequired] string CurrentPassword,[property: JsonRequired] string NewPassword,[property: JsonRequired] string ConfirmNewPassword);
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record PasswordReset([property: JsonRequired] string NewPassword,[property: JsonRequired] string ConfirmNewPassword,[property: JsonRequired] long Version);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record DeviceCodeRequest([property: JsonRequired] string DeviceName);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record DeviceCodePoll([property: JsonRequired] string DeviceSecret);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record DeviceCodeApprove([property: JsonRequired] string UserCode);

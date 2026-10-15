@@ -133,7 +133,7 @@ void main() {
         await t.tap(find.text(option.key));
         await t.pumpAndSettle();
         expect(sorts.last, option.value);
-        expect(find.text('Check the values and try again.'), findsNothing);
+        expect(find.text('Invalid sort'), findsNothing);
         expect(find.text('This folder is empty.'), findsNothing);
         expect(find.text('Visible film.mkv'), findsOneWidget);
         await t.pumpWidget(const SizedBox());

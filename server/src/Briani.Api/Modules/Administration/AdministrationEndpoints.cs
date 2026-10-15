@@ -15,9 +15,9 @@ namespace Briani.Api.Modules.Administration;
 // live in the request and the framework hash; idempotency records contain digests.
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record CreateUserRequest(
     [property: JsonRequired] string Username, [property: JsonRequired] string DisplayName,
-    [property: JsonRequired] string Password, [property: JsonRequired] string Role);
+    [property: JsonRequired] string Password, [property: JsonRequired] string ConfirmPassword, [property: JsonRequired] string Role);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record PatchUserRequest(string? DisplayName, string? Role, bool? Enabled, [property: JsonRequired] long Version);
-[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record ResetPasswordRequest([property: JsonRequired] string NewPassword, [property: JsonRequired] long Version);
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record ResetPasswordRequest([property: JsonRequired] string NewPassword, [property: JsonRequired] string ConfirmNewPassword, [property: JsonRequired] long Version);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)] public sealed record LibraryCreateRequest(
     [property: JsonRequired] string Name, string? Description, [property: JsonRequired] Guid StorageRootId,
     [property: JsonRequired] string RelativePath, [property: JsonRequired] bool ReadOnly);
@@ -69,8 +69,8 @@ public static class AdministrationEndpoints
     private static async Task<IResult> CreateUser(HttpContext context, CreateUserRequest request, BrianiDb db,
         WriteGate gate, IPasswordHasher<User> hasher, Audit audit, TimeProvider clock, SecretStore secrets, CancellationToken ct)
     {
-        IdentityInput.Username(request.Username); IdentityInput.Password(request.Password); IdentityInput.Role(request.Role);
-        var display = IdentityInput.Text(request.DisplayName);
+        IdentityInput.Username(request.Username); IdentityInput.Password(request.Password, request.ConfirmPassword); IdentityInput.Role(request.Role);
+        var display = IdentityInput.Text(request.DisplayName, field: "Display name");
         var normalized = request.Username.ToUpperInvariant();
         var actor = Actor.From(context.User);
         var key = context.Request.Headers["Idempotency-Key"].FirstOrDefault();
@@ -106,7 +106,7 @@ public static class AdministrationEndpoints
     {
         var user = await db.Users.SingleOrDefaultAsync(x => x.Id == id, ct) ?? throw NotFound();
         if (request.Version != user.Version) throw Conflict();
-        if (request.DisplayName is not null) user.DisplayName = IdentityInput.Text(request.DisplayName);
+        if (request.DisplayName is not null) user.DisplayName = IdentityInput.Text(request.DisplayName, field: "Display name");
         if (request.Role is not null) { IdentityInput.Role(request.Role); user.Role = request.Role; }
         if (request.Enabled is not null) user.Enabled = request.Enabled.Value;
         await EnsureEnabledAdminRemains(db, user, ct);
@@ -131,7 +131,7 @@ public static class AdministrationEndpoints
     private static async Task<IResult> ResetPassword(Guid id, ResetPasswordRequest request, HttpContext context, BrianiDb db,
         WriteGate gate, IPasswordHasher<User> hasher, Audit audit, TimeProvider clock, CancellationToken ct)
     {
-        IdentityInput.Password(request.NewPassword);
+        IdentityInput.Password(request.NewPassword, request.ConfirmNewPassword);
         var user = await db.Users.SingleOrDefaultAsync(x => x.Id == id, ct) ?? throw NotFound();
         if (request.Version != user.Version) throw Conflict();
         user.PasswordHash = hasher.HashPassword(user, request.NewPassword); user.MustChangePassword = true;
@@ -161,9 +161,9 @@ public static class AdministrationEndpoints
     private static async Task<IResult> CreateLibrary(HttpContext context, LibraryCreateRequest request, BrianiDb db,
         WriteGate gate, Audit audit, TimeProvider clock, SecretStore secrets, CancellationToken ct)
     {
-        IdentityInput.Text(request.Name); if (request.Name.Length > 200) throw BadRequest();
-        if (request.Description?.Length > 2000) throw BadRequest();
-        IdentityInput.Text(request.RelativePath, 4096);
+        IdentityInput.Text(request.Name, field: "Library name");
+        if (request.Description?.Length > 2000) throw BadRequest("Library description must be at most 2000 characters.");
+        IdentityInput.Text(request.RelativePath, 4096, field: "Library folder");
         var actor = Actor.From(context.User); var key = context.Request.Headers["Idempotency-Key"].FirstOrDefault();
         if (key is { Length: > 200 } || (key is not null && (key.Length == 0 || key.Any(char.IsControl)))) throw BadRequest();
         var digest = secrets.Digest(JsonSerializer.Serialize(request,JsonOptions));
@@ -197,11 +197,11 @@ public static class AdministrationEndpoints
     {
         var lib = await db.Libraries.SingleOrDefaultAsync(x => x.Id == id, ct) ?? throw NotFound();
         if (request.Version != lib.Version) throw Conflict();
-        if (request.Name is not null) { IdentityInput.Text(request.Name); if (request.Name.Length > 200) throw BadRequest(); lib.Name = request.Name.Trim(); }
-        if (request.Description is not null) { if (request.Description.Length > 2000) throw BadRequest(); lib.Description = request.Description; }
+        if (request.Name is not null) { IdentityInput.Text(request.Name, field: "Library name"); lib.Name = request.Name.Trim(); }
+        if (request.Description is not null) { if (request.Description.Length > 2000) throw BadRequest("Library description must be at most 2000 characters."); lib.Description = request.Description; }
         if (request.Enabled is not null) lib.Enabled = request.Enabled.Value;
         if (request.ReadOnly is not null) lib.ReadOnly = request.ReadOnly.Value;
-        if (request.ScanIntervalSeconds is not null && request.ScanIntervalSeconds < 60) throw BadRequest();
+        if (request.ScanIntervalSeconds is not null && request.ScanIntervalSeconds < 60) throw BadRequest("The scan interval must be at least 60 seconds.");
         lib.ScanIntervalSeconds = request.ScanIntervalSeconds; lib.Version++;
         audit.Add(Actor.From(context.User).UserId, "library.updated", "library", id.ToString("D"), context.TraceIdentifier);
         await db.SaveChangesAsync(ct); return Results.Ok(View(lib, new(true, !lib.ReadOnly, !lib.ReadOnly), lib.RootPath));
@@ -246,13 +246,13 @@ public static class AdministrationEndpoints
     private static async Task<IResult> SetGrants(Guid id, GrantUpdateRequest request, HttpContext context, BrianiDb db,
         WriteGate gate, Audit audit, CancellationToken ct)
     {
-        if (request.Grants is null || request.Grants.Count > 1000 || request.Grants.Any(x => x is null)) throw BadRequest();
-        if (request.Grants.Select(x => x.UserId).Distinct().Count() != request.Grants.Count) throw BadRequest();
-        if (request.Grants.Any(x => (x.Download || x.Manage) && !x.Read || x.QuotaBytes < 0)) throw BadRequest();
+        if (request.Grants is null || request.Grants.Count > 1000 || request.Grants.Any(x => x is null)) throw BadRequest("Provide at most 1000 access grants.");
+        if (request.Grants.Select(x => x.UserId).Distinct().Count() != request.Grants.Count) throw BadRequest("Each user can only appear once in the access list.");
+        if (request.Grants.Any(x => (x.Download || x.Manage) && !x.Read || x.QuotaBytes < 0)) throw BadRequest("Download and manage access also need read access, and quotas cannot be negative.");
         var lib = await db.Libraries.SingleOrDefaultAsync(x => x.Id == id, ct) ?? throw NotFound();
         if (request.Version != lib.Version) throw Conflict();
         var users = request.Grants.Select(x => x.UserId).ToArray();
-        if (await db.Users.CountAsync(x => users.Contains(x.Id) && x.Enabled, ct) != users.Distinct().Count()) throw BadRequest();
+        if (await db.Users.CountAsync(x => users.Contains(x.Id) && x.Enabled, ct) != users.Distinct().Count()) throw BadRequest("Access can only be granted to existing, enabled users.");
         var existing = await db.LibraryGrants.Where(x => x.LibraryId == id).ToDictionaryAsync(x => x.UserId, ct);
         foreach(var old in existing.Values.Where(x => !users.Contains(x.UserId))) db.LibraryGrants.Remove(old);
         foreach (var grant in request.Grants) {
@@ -285,7 +285,7 @@ public static class AdministrationEndpoints
 
     private static LibraryView View(Library x, Capabilities c, string? root) => new(x.Id, x.Name, x.Description, x.ReadOnly, x.Enabled, x.Version, c, root, x.ScanIntervalSeconds);
     private static ApiException NotFound() => new(404, "not_found");
-    private static ApiException BadRequest() => new(400, "validation_failed");
+    private static ApiException BadRequest(string? detail = null) => new(400, "validation_failed", detail);
     private static ApiException Conflict() => new(409, "version_conflict");
     private sealed record IdempotencyValue(string RequestDigest, string ResultJson);
     private static string IdemKey(Guid actor, string op, string key) => $"admin-idem:{actor:N}:{op}:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(key)))}";

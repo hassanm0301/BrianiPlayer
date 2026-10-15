@@ -221,12 +221,6 @@ class _ServerSettings extends StatelessWidget {
         settings.publicBaseUrl ?? '',
         (value) {
           final text = value.trim();
-          final uri = text.isEmpty ? null : Uri.tryParse(text);
-          if (text.isNotEmpty &&
-              (uri == null || !uri.hasScheme || uri.host.isEmpty)) {
-            _toast(context, 'Enter a valid absolute URL.');
-            return;
-          }
           _putSettings(
             context,
             settings.rebuild(
@@ -581,25 +575,12 @@ class _DiscoveryScopeState extends ConsumerState<_DiscoveryScope> {
     final categoryStrings = _categoryMode == 'all'
         ? null
         : _parseTokens(_categories.text);
-    if (providerIds != null &&
-        (providerIds.length > 100 ||
-            providerIds.any((id) => id.length > 128))) {
-      _toast(
-        context,
-        'Use at most 100 provider IDs, each no longer than 128 characters.',
-      );
-      return;
-    }
     final categoryIds = <int>[];
     if (categoryStrings != null) {
-      if (categoryStrings.length > 100) {
-        _toast(context, 'Use at most 100 category IDs.');
-        return;
-      }
       for (final token in categoryStrings) {
         final id = int.tryParse(token);
-        if (id == null || id < 0) {
-          _toast(context, 'Category IDs must be non-negative whole numbers.');
+        if (id == null) {
+          _toast(context, '"$token" is not a whole number.');
           return;
         }
         categoryIds.add(id);
@@ -1105,15 +1086,8 @@ Widget _saveOptionalUnit(
   (raw) {
     final text = raw.trim();
     final parsed = text.isEmpty ? null : double.tryParse(text);
-    if (text.isNotEmpty &&
-        (parsed == null ||
-            !parsed.isFinite ||
-            parsed < 0 ||
-            parsed * multiplier > max)) {
-      _toast(
-        context,
-        '$label must be zero or greater within the supported range, or blank for unlimited.',
-      );
+    if (text.isNotEmpty && (parsed == null || !parsed.isFinite)) {
+      _toast(context, '$label must be a number, or blank for unlimited.');
       return;
     }
     save(parsed == null ? null : (parsed * multiplier).round());
@@ -1129,11 +1103,8 @@ Widget _saveUnit(
   ValueChanged<int> save,
 ) => _saveText(context, label, (value / multiplier).toStringAsFixed(9), (raw) {
   final parsed = double.tryParse(raw.trim());
-  if (parsed == null ||
-      !parsed.isFinite ||
-      parsed < 0 ||
-      parsed * multiplier > max) {
-    _toast(context, '$label is outside its allowed range.');
+  if (parsed == null || !parsed.isFinite) {
+    _toast(context, '$label must be a number.');
     return;
   }
   save((parsed * multiplier).round());
@@ -1148,8 +1119,8 @@ Widget _saveInt(
   ValueChanged<int> save,
 ) => _saveText(context, label, '$value', (raw) {
   final parsed = int.tryParse(raw.trim());
-  if (parsed == null || parsed < min || parsed > max) {
-    _toast(context, '$label must be between $min and $max.');
+  if (parsed == null) {
+    _toast(context, '$label must be a whole number.');
     return;
   }
   save(parsed);
@@ -1164,8 +1135,8 @@ Widget _saveDouble(
   ValueChanged<double> save,
 ) => _saveText(context, label, '$value', (raw) {
   final parsed = double.tryParse(raw.trim());
-  if (parsed == null || !parsed.isFinite || parsed < min || parsed > max) {
-    _toast(context, '$label is outside its allowed range.');
+  if (parsed == null || !parsed.isFinite) {
+    _toast(context, '$label must be a number.');
     return;
   }
   save(parsed);
@@ -1179,8 +1150,8 @@ Widget _saveNullableInt(
 ) => _saveText(context, label, value?.toString() ?? '', (raw) {
   final text = raw.trim();
   final parsed = text.isEmpty ? null : int.tryParse(text);
-  if (text.isNotEmpty && (parsed == null || parsed < 0)) {
-    _toast(context, '$label must be zero or greater.');
+  if (text.isNotEmpty && parsed == null) {
+    _toast(context, '$label must be a whole number, or blank.');
     return;
   }
   save(parsed);
@@ -1194,8 +1165,8 @@ Widget _saveNullableDouble(
 ) => _saveText(context, label, value?.toString() ?? '', (raw) {
   final text = raw.trim();
   final parsed = text.isEmpty ? null : double.tryParse(text);
-  if (text.isNotEmpty && (parsed == null || !parsed.isFinite || parsed < 0)) {
-    _toast(context, '$label must be zero or greater.');
+  if (text.isNotEmpty && (parsed == null || !parsed.isFinite)) {
+    _toast(context, '$label must be a number, or blank.');
     return;
   }
   save(parsed);
@@ -1216,10 +1187,10 @@ Future<void> _putSettings(BuildContext context, AdminSettings settings) async {
         identical(container.read(clientSessionProvider), session)) {
       container.invalidate(_adminSnapshotProvider);
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted &&
         identical(container.read(clientSessionProvider), session)) {
-      _toast(context, 'The server rejected this setting. Refresh and retry.');
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1244,7 +1215,8 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
   final _form = GlobalKey<FormState>();
   final _username = TextEditingController(),
       _name = TextEditingController(),
-      _password = TextEditingController();
+      _password = TextEditingController(),
+      _confirmPassword = TextEditingController();
   bool _busy = false;
   String? _error;
   @override
@@ -1252,11 +1224,12 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
     _username.dispose();
     _name.dispose();
     _password.dispose();
+    _confirmPassword.dispose();
     super.dispose();
   }
 
   Future<void> _create() async {
-    if (_busy || !_form.currentState!.validate()) return;
+    if (_busy) return;
     if (!_sameAdminSession(ref, widget.session)) {
       setState(
         () => _error = 'Your administrator session changed. Close this dialog and try again.',
@@ -1274,6 +1247,7 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
             ..username = _username.text.trim()
             ..displayName = _name.text.trim()
             ..password = _password.text
+            ..confirmPassword = _confirmPassword.text
             ..role = CreateUserRoleEnum.member,
         ),
         idempotencyKey: 'create-user-${DateTime.now().microsecondsSinceEpoch}',
@@ -1281,11 +1255,11 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
       if (!mounted) return;
       ref.invalidate(_adminSnapshotProvider);
       Navigator.pop(context);
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         setState(
           () => _error =
-              'The account could not be created. Check the server and retry.',
+              clientError(error),
         );
       }
     } finally {
@@ -1308,16 +1282,11 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
                 controller: _username,
                 enabled: !_busy,
                 decoration: const InputDecoration(labelText: 'Username'),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Enter a username.' : null,
               ),
               TextFormField(
                 controller: _name,
                 enabled: !_busy,
                 decoration: const InputDecoration(labelText: 'Display name'),
-                validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Enter a display name.'
-                    : null,
               ),
               TextFormField(
                 controller: _password,
@@ -1325,11 +1294,15 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'Initial password',
-                  helperText: 'Use 12–128 characters.',
                 ),
-                validator: (v) => v == null || v.length < 12 || v.length > 128
-                    ? 'Use 12–128 characters.'
-                    : null,
+              ),
+              TextFormField(
+                controller: _confirmPassword,
+                enabled: !_busy,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm initial password',
+                ),
               ),
               if (_error != null)
                 Padding(
@@ -1382,9 +1355,9 @@ Future<void> _editUser(
       ),
     );
     if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'The account could not be updated.');
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1397,14 +1370,27 @@ Future<void> _resetPassword(
   final session = _captureAdminSession(ref);
   if (session == null) return;
   var password = '';
+  var confirmation = '';
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
       title: Text('Reset ${user.displayName} password?'),
-      content: TextFormField(
-        obscureText: true,
-        decoration: const InputDecoration(labelText: 'New password'),
-        onChanged: (v) => password = v,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'New password'),
+            onChanged: (v) => password = v,
+          ),
+          TextFormField(
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Confirm new password',
+            ),
+            onChanged: (v) => confirmation = v,
+          ),
+        ],
       ),
       actions: [
         TextButton(
@@ -1421,16 +1407,13 @@ Future<void> _resetPassword(
   if (!context.mounted) return;
   if (!_sameAdminSession(ref, session)) return;
   if (confirmed != true) return;
-  if (password.length < 12 || password.length > 128) {
-    _toast(context, 'Password must be 12–128 characters.');
-    return;
-  }
   try {
     await session.api.getAdministrationApi().resetUserPassword(
       id: user.id,
       passwordReset: PasswordReset(
         (b) => b
           ..newPassword = password
+          ..confirmNewPassword = confirmation
           ..version = user.version,
       ),
     );
@@ -1440,9 +1423,9 @@ Future<void> _resetPassword(
         'Password changed; the user’s other sessions were revoked.',
       );
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'The password could not be reset.');
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1468,9 +1451,9 @@ Future<void> _createLibrary(
     for (var i = 0; i < availableRoots.length; i++) {
       directories[availableRoots[i].id] = responses[i].data!.toList();
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'Could not browse this mounted storage root.');
+      _toast(context, clientError(error));
     }
     return;
   }
@@ -1565,10 +1548,6 @@ Future<void> _createLibrary(
   if (!context.mounted) return;
   if (!_sameAdminSession(ref, session)) return;
   if (result == null) return;
-  if (result.$1.trim().isEmpty) {
-    _toast(context, 'Enter a library name.');
-    return;
-  }
   try {
     await session.api.getLibrariesApi().createLibrary(
       libraryCreate: LibraryCreate(
@@ -1582,9 +1561,9 @@ Future<void> _createLibrary(
       idempotencyKey: 'create-library-${DateTime.now().microsecondsSinceEpoch}',
     );
     if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'The library could not be added.');
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1612,9 +1591,9 @@ Future<void> _scanLibrary(
     if (context.mounted && _sameAdminSession(ref, session)) {
       _toast(context, 'Library scan queued.');
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'Could not queue the library scan.');
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1640,11 +1619,11 @@ Future<void> _saveGrants(
     if (context.mounted && _sameAdminSession(ref, session)) {
       _toast(context, 'Library access saved.');
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
       _toast(
         context,
-        'Access changed elsewhere or could not be saved. Reload and retry.',
+        clientError(error),
       );
     }
   }
@@ -1668,11 +1647,11 @@ Future<void> _testIntegration(
       );
     }
     if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
       _toast(
         context,
-        'Integration test failed. Check service health and configuration.',
+        clientError(error),
       );
     }
   }
@@ -1733,11 +1712,6 @@ Future<void> _editIntegration(
   if (!context.mounted) return;
   if (!_sameAdminSession(ref, session)) return;
   if (result == null) return;
-  final uri = Uri.tryParse(result.$1.trim());
-  if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
-    _toast(context, 'Enter an absolute service URL.');
-    return;
-  }
   try {
     await session.api.getAdministrationApi().setIntegration(
       kind: integration.kind.name,
@@ -1753,9 +1727,9 @@ Future<void> _editIntegration(
     if (context.mounted && _sameAdminSession(ref, session)) {
       _toast(context, 'Integration settings saved.');
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'Could not save integration settings.');
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1787,9 +1761,9 @@ Future<void> _maintenance(
     if (context.mounted && _sameAdminSession(ref, session)) {
       _toast(context, '${job.kind}: ${job.state.name}');
     }
-  } catch (_) {
+  } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'Maintenance job could not be started.');
+      _toast(context, clientError(error));
     }
   }
 }

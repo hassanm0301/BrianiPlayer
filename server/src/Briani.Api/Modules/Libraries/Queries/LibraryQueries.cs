@@ -45,7 +45,7 @@ public static class LibraryQueries
         var library = await permissions.RequireLibraryAsync(actor, id, "read", ct);
         var size = limit ?? 50;
         if (size is < 1 or > MaxPageSize) throw new ApiException(400, "validation_failed");
-        if (query is { Length: > 200 } || query?.Any(char.IsControl) == true) throw new ApiException(400, "validation_failed");
+        if (query is { Length: > 200 } || query?.Any(char.IsControl) == true) throw new ApiException(400, "validation_failed", "Search text must be at most 200 characters without control characters.");
         var normalizedQuery = (query ?? "").Normalize(NormalizationForm.FormKC).ToUpperInvariant();
         var selectedKind = (kind ?? "all").ToLowerInvariant();
         var selectedSort = (sort ?? "name").ToLowerInvariant();
@@ -180,7 +180,7 @@ public static class LibraryQueries
     }
 
     private static JobDto ToJob(WorkJob j) => new(j.Id, j.Kind, j.State, j.Progress,
-        j.LastErrorCode is null ? null : new { code = j.LastErrorCode }, j.CreatedAt, j.UpdatedAt);
+        j.LastErrorCode is null ? null : ErrorMessages.Problem(j.LastErrorCode, 500), j.CreatedAt, j.UpdatedAt);
     private static bool Hidden(string path) => path == ".briani" || path.StartsWith(".briani/", StringComparison.Ordinal) ||
         path.Contains("/.briani/", StringComparison.Ordinal) || path.EndsWith("/.briani", StringComparison.Ordinal);
     private static string EscapeLike(string value) => value.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("%", "\\%", StringComparison.Ordinal).Replace("_", "\\_", StringComparison.Ordinal);

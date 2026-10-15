@@ -22,7 +22,7 @@ public sealed class OpaqueAuthentication(IOptionsMonitor<AuthenticationSchemeOpt
 public static class Problems
 {
     public static Task WriteAsync(HttpContext c,int status,string code,string? detail=null,int? retry=null)
-    { if(retry is int seconds)c.Response.Headers.RetryAfter=seconds.ToString(System.Globalization.CultureInfo.InvariantCulture);c.Response.ContentLength=null;c.Response.Headers.Remove("ETag");c.Response.Headers.Remove("Content-Disposition");if(status!=416){c.Response.Headers.Remove("Content-Range");c.Response.Headers.Remove("Accept-Ranges");}c.Response.StatusCode=status;return c.Response.WriteAsJsonAsync(new {type="about:blank",title=code.Replace('_',' '),status,code,detail=detail??code.Replace('_',' '),traceId=c.TraceIdentifier,retryAfterSeconds=retry},options:(System.Text.Json.JsonSerializerOptions?)null,contentType:"application/problem+json",cancellationToken:c.RequestAborted); }
+    { if(retry is int seconds)c.Response.Headers.RetryAfter=seconds.ToString(System.Globalization.CultureInfo.InvariantCulture);c.Response.ContentLength=null;c.Response.Headers.Remove("ETag");c.Response.Headers.Remove("Content-Disposition");if(status!=416){c.Response.Headers.Remove("Content-Range");c.Response.Headers.Remove("Accept-Ranges");}c.Response.StatusCode=status;return c.Response.WriteAsJsonAsync(new {type="about:blank",title=ErrorMessages.For(code),status,code,detail=detail??ErrorMessages.For(code),traceId=c.TraceIdentifier,retryAfterSeconds=retry},options:(System.Text.Json.JsonSerializerOptions?)null,contentType:"application/problem+json",cancellationToken:c.RequestAborted); }
 }
 public sealed class AuthLimiter(TimeProvider clock)
 {

@@ -124,7 +124,7 @@ def setup(args):
  if not admin_credential.exists():_private(admin_credential,secrets.token_urlsafe(32))
  password=admin_credential.read_text()
  if api.json('/api/v1/server')['bootstrapRequired']:
-  auth=api.json('/api/v1/bootstrap',{'code':(runtime/'state/briani/bootstrap.code').read_text().strip(),'username':'pibenchadmin','displayName':'Owned Pi fixture','password':password})
+  auth=api.json('/api/v1/bootstrap',{'code':(runtime/'state/briani/bootstrap.code').read_text().strip(),'username':'pibenchadmin','displayName':'Owned Pi fixture','password':password,'confirmPassword':password})
  else:auth=api.json('/api/v1/auth/login',{'username':'pibenchadmin','password':password,'deviceName':'Owned Pi setup resume'})
  api.token=auth['accessToken']
  root_id=api.json('/api/v1/admin/storage')[0]['id']
@@ -145,7 +145,7 @@ def setup(args):
  users=[]
  for i in range(5):
   username=f'pibenchuser{i}';user_password=secrets.token_urlsafe(32)
-  user=api.json('/api/v1/admin/users',{'username':username,'displayName':username,'password':user_password,'role':'member'})
+  user=api.json('/api/v1/admin/users',{'username':username,'displayName':username,'password':user_password,'confirmPassword':user_password,'role':'member'})
   granted=api.json('/api/v1/libraries/'+library_id+'/grants')
   api.json('/api/v1/libraries/'+library_id+'/grants',{'version':granted['version'],'grants':[{key:value for key,value in g.items() if key in {'userId','read','download','manage','quotaBytes'}} for g in granted['grants']]+[{'userId':user['id'],'read':True,'download':False,'manage':False,'quotaBytes':None}]},method='PUT')
   token=api.json('/api/v1/auth/login',{'username':username,'password':user_password,'deviceName':f'Pi folder workload {i}'})

@@ -343,7 +343,7 @@ def main() -> int:
         seed_qb.call("torrents/start", {"hashes": torrent_hash})
         api, api_origin = api_start()
         bootstrap_code = (state / "bootstrap.code").read_text().strip()
-        auth = api.json("/api/v1/bootstrap", {"code": bootstrap_code, "username": "m05-admin", "displayName": "M05 API Proof", "password": administrator_password})
+        auth = api.json("/api/v1/bootstrap", {"code": bootstrap_code, "username": "m05-admin", "displayName": "M05 API Proof", "password": administrator_password, "confirmPassword": administrator_password})
         api.token = auth["accessToken"]
         roots = api.json("/api/v1/admin/storage")
         root_id = roots[0]["id"]

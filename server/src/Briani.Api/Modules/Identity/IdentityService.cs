@@ -20,14 +20,14 @@ public sealed class IdentityService(BrianiDb db,IPasswordHasher<User> hasher,Tim
     private sealed record BootstrapState(string Hash,DateTimeOffset ExpiresAt);
     public async Task<AuthTokens> BootstrapAsync(BootstrapRequest r,string trace,CancellationToken ct)
     {
-        IdentityInput.Username(r.Username);IdentityInput.Text(r.DisplayName);IdentityInput.Password(r.Password);
+        IdentityInput.Username(r.Username);IdentityInput.Text(r.DisplayName,field:"Display name");IdentityInput.Password(r.Password,r.ConfirmPassword);
         var s=await db.Settings.FindAsync(["bootstrap"],ct);var code=s is null?null:JsonSerializer.Deserialize<BootstrapState>(s.ValueJson);
         if(r.Code is null || r.Code.Length!=43 || await db.Users.AnyAsync(ct) || code is null || code.ExpiresAt<=clock.GetUtcNow() || !Credentials.EqualHash(code.Hash,Credentials.Hash(r.Code)))throw new ApiException(403,"bootstrap_unavailable");
         var u=new User{Username=r.Username,NormalizedUsername=r.Username.ToUpperInvariant(),DisplayName=r.DisplayName,Role="administrator",CreatedAt=clock.GetUtcNow(),UpdatedAt=clock.GetUtcNow()};u.PasswordHash=hasher.HashPassword(u,r.Password);db.Users.Add(u);db.Settings.Remove(s!);audit.Add(u.Id,"bootstrap","user",u.Id.ToString(),trace);return await IssueAsync(u,"Initial setup",ct);
     }
     public async Task<AuthTokens> LoginAsync(LoginRequest r,string trace,CancellationToken ct)
     {
-        if(r.Username is null || r.Username.Length>128 || r.Password is null || r.Password.Length>128)throw new ApiException(401,"login_failed");IdentityInput.Text(r.DeviceName);
+        if(r.Username is null || r.Username.Length>128 || r.Password is null)throw new ApiException(401,"login_failed");IdentityInput.Text(r.DeviceName,field:"Device name");
         var u=await db.Users.SingleOrDefaultAsync(x=>x.NormalizedUsername==r.Username.ToUpperInvariant(),ct);
         // Dummy verification follows the same framework hash path for absent accounts.
         var dummy=new User();var hashed=u?.PasswordHash??DummyPassword.Hash;
@@ -62,7 +62,7 @@ public sealed class IdentityService(BrianiDb db,IPasswordHasher<User> hasher,Tim
     {var u=await db.Users.SingleOrDefaultAsync(x=>x.Id==a.UserId && x.Enabled,ct);if(u is null || !await db.AuthSessions.AnyAsync(x=>x.Id==a.SessionId && x.UserId==a.UserId && x.RevokedAt==null && x.RefreshExpiresAt>clock.GetUtcNow(),ct))throw new ApiException(401,"session_expired");return u;}
     public async Task<object> CreatePairAsync(string deviceName,CancellationToken ct)
     {
-        IdentityInput.Text(deviceName);if(await db.DevicePairings.CountAsync(x=>x.ExpiresAt>clock.GetUtcNow() && x.ConsumedAt==null,ct)>=128)throw new ApiException(429,"rate_limited");
+        IdentityInput.Text(deviceName,field:"Device name");if(await db.DevicePairings.CountAsync(x=>x.ExpiresAt>clock.GetUtcNow() && x.ConsumedAt==null,ct)>=128)throw new ApiException(429,"rate_limited");
         const string alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";var code=string.Concat(Enumerable.Range(0,8).Select(_=>alphabet[RandomNumberGenerator.GetInt32(alphabet.Length)]));var secret=Credentials.NewToken();var expires=clock.GetUtcNow().AddMinutes(5);
         db.DevicePairings.Add(new(){DeviceSecretHash=Credentials.Hash(secret),HumanCodeHash=Credentials.Hash(code),DeviceName=deviceName,ExpiresAt=expires});await db.SaveChangesAsync(ct);return new{deviceSecret=secret,userCode=code,expiresAt=expires,pollIntervalSeconds=5};
     }

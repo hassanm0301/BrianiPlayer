@@ -265,7 +265,7 @@ public sealed class QueryApiTests
         {
             var password = "Download-User-" + Briani.Api.Infrastructure.Security.Credentials.NewToken();
             using var created = await AdminClient.PostAsJsonAsync("/api/v1/admin/users", new
-            { username, displayName = username, password, role });
+            { username, displayName = username, password, confirmPassword = password, role });
             created.EnsureSuccessStatusCode();
             var user = await created.Content.ReadFromJsonAsync<UserReply>() ?? throw new InvalidOperationException("Missing created user.");
             using var login = await AdminClient.PostAsJsonAsync("/api/v1/auth/login", new { username, password, deviceName = "query-test" });

@@ -625,6 +625,35 @@
         "Administrator not claimed; no libraries, indexers or users created.",
         "No client, playback, download, backup/restore, benchmark or release certification run against this deployment."
       ]
+    },
+    {
+      "date": "2026-10-16",
+      "target": "hassan@192.168.100.186",
+      "state": "blocked_verification",
+      "deploymentStatus": "running_messages_image_admin_unclaimed",
+      "report": "docs/evidence/M09/pi-deployment-20261016/messages-update.md",
+      "package": "/home/hassan/briani/package-messages-20261016",
+      "image": "briani-server:messages-20261016-arm64",
+      "checks": {
+        "serverTestsPassed": 424,
+        "serverTestsExitCode": 0,
+        "clientTestsPassed": 116,
+        "clientTestsExitCode": 0,
+        "operationsTestsPassed": 32,
+        "contractDriftCheckExitCode": 0,
+        "planValidationExitCode": 0,
+        "archiveTransferHashMatched": true,
+        "piImageConfigDigestMatchesLock": true,
+        "healthzHttp": 200,
+        "readyzHttp": 200,
+        "livePasswordMismatchCode": "password_mismatch",
+        "stateBackup": "/mnt/hassan_drive/briani/backups/before-messages-20261016-034943"
+      },
+      "blockers": [],
+      "limitations": [
+        "Rolled out with docker compose via the claude account; the operations tool doctor/up were not run because hassan's sudo now requires a password.",
+        "Administrator not claimed; full-stack drills and desktop/Android E2E not rerun."
+      ]
     }
   ]
 }

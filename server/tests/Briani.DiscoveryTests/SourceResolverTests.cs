@@ -66,7 +66,7 @@ public sealed class SourceResolverTests : IAsyncLifetime
         await fixture.Host.InDb(async db => { db.Libraries.Add(library); await db.SaveChangesAsync(); return 0; });
         using var admin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         var password = Credentials.NewToken();
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "resolver-revoked", displayName = "Resolver Revoked", password, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "resolver-revoked", displayName = "Resolver Revoked", password, confirmPassword = password, role = "member" });
         created.EnsureSuccessStatusCode(); var user = await created.Content.ReadFromJsonAsync<UserReply>(); Assert.NotNull(user);
         await fixture.Host.InDb(async db => { db.LibraryGrants.Add(new LibraryGrant { UserId = user.Id, LibraryId = library.Id, CanRead = true, CanDownload = true }); await db.SaveChangesAsync(); return 0; });
         using var login = await fixture.Client.PostAsJsonAsync("/api/v1/auth/login", new { username = "resolver-revoked", password, deviceName = "resolver" });

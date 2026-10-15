@@ -56,7 +56,7 @@ public sealed class PreferenceApiTests:IAsyncLifetime
     }
     [Fact] public async Task Preferences_are_isolated_by_authenticated_user_and_do_not_grant_admin_access()
     {
-        var created=await Client.PostAsJsonAsync("/api/v1/admin/users",new{username="prefmember",displayName="Member",password=TestPasswords.Member,role="member"});created.EnsureSuccessStatusCode();
+        var created=await Client.PostAsJsonAsync("/api/v1/admin/users",new{username="prefmember",displayName="Member",password=TestPasswords.Member,confirmPassword=TestPasswords.Member,role="member"});created.EnsureSuccessStatusCode();
         var login=await Client.PostAsJsonAsync("/api/v1/auth/login",new{username="prefmember",password=TestPasswords.Member,deviceName="Test"});
         var tokens=(await login.Content.ReadFromJsonAsync<AuthReply>())!;
         (await Client.PutAsJsonAsync("/api/v1/me/preferences",new{version=1,theme="dark"})).EnsureSuccessStatusCode();

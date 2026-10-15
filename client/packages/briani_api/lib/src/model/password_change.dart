@@ -13,14 +13,20 @@ part 'password_change.g.dart';
 ///
 /// Properties:
 /// * [currentPassword] 
-/// * [newPassword] 
+/// * [newPassword] - Any value is accepted; there are no length or content rules.
+/// * [confirmNewPassword] - Must equal newPassword; the server rejects a mismatch with code password_mismatch.
 @BuiltValue()
 abstract class PasswordChange implements Built<PasswordChange, PasswordChangeBuilder> {
   @BuiltValueField(wireName: r'currentPassword')
   String get currentPassword;
 
+  /// Any value is accepted; there are no length or content rules.
   @BuiltValueField(wireName: r'newPassword')
   String get newPassword;
+
+  /// Must equal newPassword; the server rejects a mismatch with code password_mismatch.
+  @BuiltValueField(wireName: r'confirmNewPassword')
+  String get confirmNewPassword;
 
   PasswordChange._();
 
@@ -53,6 +59,11 @@ class _$PasswordChangeSerializer implements PrimitiveSerializer<PasswordChange> 
     yield r'newPassword';
     yield serializers.serialize(
       object.newPassword,
+      specifiedType: const FullType(String),
+    );
+    yield r'confirmNewPassword';
+    yield serializers.serialize(
+      object.confirmNewPassword,
       specifiedType: const FullType(String),
     );
   }
@@ -91,6 +102,13 @@ class _$PasswordChangeSerializer implements PrimitiveSerializer<PasswordChange> 
             specifiedType: const FullType(String),
           ) as String;
           result.newPassword = valueDes;
+          break;
+        case r'confirmNewPassword':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.confirmNewPassword = valueDes;
           break;
         default:
           unhandled.add(key);

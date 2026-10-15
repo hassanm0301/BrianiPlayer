@@ -438,7 +438,7 @@ public sealed class MutationApiTests : IAsyncLifetime
     {
         var admin = IdentityFixture.As(fixture.Host.CreateClient(), fixture.Admin.AccessToken);
         var password = Credentials.NewToken();
-        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "mutmember", displayName = "Mutation Member", password, role = "member" });
+        using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "mutmember", displayName = "Mutation Member", password, confirmPassword = password, role = "member" });
         created.EnsureSuccessStatusCode(); var user = (await created.Content.ReadFromJsonAsync<UserView>())!;
         await fixture.Host.InDb(async db =>
         {

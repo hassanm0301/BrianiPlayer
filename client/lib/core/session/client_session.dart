@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:briani_api/briani_api.dart' hide Provider;
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,30 +8,42 @@ import '../server_profiles/credential_vault.dart';
 import '../server_profiles/providers.dart';
 import '../server_profiles/server_profile.dart';
 
-/// Errors intentionally omit transport URLs, headers and credential values.
+/// Shows the server's own message. Client-written text is limited to cases where
+/// no server reply exists (unreachable server, certificate failure, or a reply
+/// without a message). Transport URLs, headers and credentials are never shown.
 String clientError(Object error) {
   if (error is DioException) {
     if (error.type == DioExceptionType.badCertificate) {
       return 'The server certificate could not be verified. Check its certificate and address.';
     }
-    if (error.type == DioExceptionType.connectionError ||
-        error.type == DioExceptionType.connectionTimeout ||
-        error.type == DioExceptionType.receiveTimeout) {
-      return 'The server is unavailable. Check your connection and retry.';
-    }
-    switch (error.response?.statusCode) {
-      case 401: return 'Sign in again to continue.';
-      case 403: return 'Your account does not have permission for this action.';
-      case 404: return 'This item is unavailable or no longer accessible.';
-      case 409: return 'This item changed or is in use. Refresh and try again.';
-      case 413: return 'This file is too large.';
-      case 429: return 'The server is busy. Wait briefly and retry.';
-      case 503: return 'A required service or media data is not ready. Retry shortly.';
-      case 400: return 'Check the values and try again.';
+    final message = serverMessage(error.response?.data);
+    if (message != null) return message;
+    if (error.response == null) {
+      return 'The server could not be reached. Check your connection and the server address.';
     }
   }
-  return 'The action could not be completed. Retry or check the server status.';
+  return 'The server did not explain this error. Retry or check the server status.';
 }
+
+/// Extracts the human-readable message from a server problem body.
+String? serverMessage(Object? data) {
+  if (data is Problem) return _text(data.detail) ?? _text(data.title);
+  if (data is Map) return _text(data['detail']) ?? _text(data['title']);
+  // Binary and plain-text endpoints still return JSON problems on failure.
+  if (data is List<int> && data.length <= 65536) {
+    return serverMessage(utf8.decode(data, allowMalformed: true));
+  }
+  if (data is String && data.trimLeft().startsWith('{')) {
+    try {
+      return serverMessage(jsonDecode(data));
+    } on FormatException {
+      return null;
+    }
+  }
+  return null;
+}
+
+String? _text(Object? value) => value is String && value.trim().isNotEmpty ? value : null;
 
 class SessionCredentials {
   SessionCredentials(this.vault);
@@ -182,7 +196,7 @@ class SessionController extends Notifier<ClientSession?> {
     } finally { _pending.remove(dio); dio.close(); }
   }
   Future<void> login(ServerProfile profile, String username, String password,
-      {String? bootstrapCode, String? displayName, CancelToken? cancelToken}) async {
+      {String? bootstrapCode, String? displayName, String? confirmPassword, CancelToken? cancelToken}) async {
     final epoch = _begin(profile);
     final dio = _transport(profile); _pending.add(dio);
     try {
@@ -191,7 +205,7 @@ class SessionController extends Notifier<ClientSession?> {
       if (bootstrapCode != null) {
         tokens = (await identity.bootstrapAdmin(bootstrapRequest: BootstrapRequest((b) => b
           ..code = bootstrapCode ..username = username ..displayName = displayName ?? username
-          ..password = password), cancelToken: cancelToken)).data!;
+          ..password = password ..confirmPassword = confirmPassword ?? ''), cancelToken: cancelToken)).data!;
       } else {
         tokens = (await identity.login(loginRequest: LoginRequest((b) => b
           ..username = username ..password = password ..deviceName = 'Briani native client'), cancelToken: cancelToken)).data!;

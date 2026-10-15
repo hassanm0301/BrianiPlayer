@@ -297,7 +297,7 @@ public static class DownloadQueries
         var nextOffset = offset + views.Length;
         var next = nextOffset < requests.Length ? cursors.Encode(scope, nextOffset) : null;
         return Results.Ok(new DownloadPageView(views, next, truncated ? null : count, truncated,
-            truncated ? ["results_truncated"] : []));
+            truncated ? [ErrorMessages.Warning("results_truncated")] : []));
     }
 
     private static async Task<IResult> ReadDownload(Guid id, HttpContext context, DownloadAccess access,
@@ -501,15 +501,7 @@ public static class DownloadViews
         _ => "download_failed"
     };
 
-    private static string? SafeErrorDetail(string? code) => code is null ? null : code switch
-    {
-        "source_expired" => "The source entry expired. Refresh discovery results and try again.",
-        "metadata_timeout" => "Torrent metadata was not received before the request expired.",
-        "disk_full" => "The destination volume has insufficient free space.",
-        "quota_exceeded" => "The selected files exceed the available quota.",
-        "permission_changed" => "Access to the destination library changed.",
-        _ => "The download operation failed."
-    };
+    private static string? SafeErrorDetail(string? code) => code is null ? null : ErrorMessages.For(SafeError(code));
 
     private static long SaturatingAdd(long left, long right)
     {

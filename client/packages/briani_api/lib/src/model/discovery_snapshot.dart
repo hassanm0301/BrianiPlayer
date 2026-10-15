@@ -22,7 +22,7 @@ part 'discovery_snapshot.g.dart';
 /// * [nextCursor] 
 /// * [totalKnown] 
 /// * [truncated] 
-/// * [warnings] 
+/// * [warnings] - Human-readable warnings written by the server for display as-is.
 @BuiltValue()
 abstract class DiscoverySnapshot implements Built<DiscoverySnapshot, DiscoverySnapshotBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -50,6 +50,7 @@ abstract class DiscoverySnapshot implements Built<DiscoverySnapshot, DiscoverySn
   @BuiltValueField(wireName: r'truncated')
   bool get truncated;
 
+  /// Human-readable warnings written by the server for display as-is.
   @BuiltValueField(wireName: r'warnings')
   BuiltList<String> get warnings;
 

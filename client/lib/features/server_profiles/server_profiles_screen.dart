@@ -276,14 +276,10 @@ class _ServerProfileTileState extends ConsumerState<_ServerProfileTile> {
           content: Text('Connected to server (API v${server.apiMajor}).'),
         ),
       );
-    } on ServerConnectionException {
+    } on ServerConnectionException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Could not connect. Check the address and server status.',
-          ),
-        ),
+        SnackBar(content: Text(error.toString())),
       );
     } catch (_) {
       if (!mounted) return;

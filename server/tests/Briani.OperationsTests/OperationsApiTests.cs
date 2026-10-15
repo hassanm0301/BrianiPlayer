@@ -50,7 +50,7 @@ public sealed class OperationsApiTests : IAsyncLifetime
         using var admin = IdentityFixture.As(fixture.Client, fixture.Admin.AccessToken);
         using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new
         {
-            username = "operationsmember", displayName = "Operations Member", password = TestPasswords.Member, role = "member"
+            username = "operationsmember", displayName = "Operations Member", password = TestPasswords.Member, confirmPassword = TestPasswords.Member, role = "member"
         });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         using var login = await fixture.Client.PostAsJsonAsync("/api/v1/auth/login", new

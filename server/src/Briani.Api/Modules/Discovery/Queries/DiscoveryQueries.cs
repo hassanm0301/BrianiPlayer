@@ -199,7 +199,7 @@ public static class DiscoveryQueries
             !warnings.Contains("stale_results", StringComparer.Ordinal)) warnings = [.. warnings, "stale_results"];
         long? total = snapshot.State is "queued" or "running" ? null : sorted.LongLength;
         return new DiscoverySnapshotView(snapshot.Id, snapshot.State, snapshot.CreatedAt, snapshot.ExpiresAt,
-            page, next, total, snapshot.Truncated, warnings);
+            page, next, total, snapshot.Truncated, [.. warnings.Select(ErrorMessages.Warning)]);
     }
 
     internal static NormalizedRelease ToNormalized(DiscoveryResult row)

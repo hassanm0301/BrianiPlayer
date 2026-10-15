@@ -694,7 +694,7 @@ def main() -> int:
         wait_for("Briani API readiness", lambda: _api_ready(api), 150)
         bootstrap = (state / "bootstrap.code").read_text().strip()
         admin_password = uuid.uuid4().hex + "Aa1!"
-        auth = api.json("/api/v1/bootstrap", {"code": bootstrap, "username": "m07-admin", "displayName": "M07 Desktop E2E", "password": admin_password})
+        auth = api.json("/api/v1/bootstrap", {"code": bootstrap, "username": "m07-admin", "displayName": "M07 Desktop E2E", "password": admin_password, "confirmPassword": admin_password})
         api.token = auth["accessToken"]
         root_id = api.json("/api/v1/admin/storage")[0]["id"]
         library_name = "M07 generated playback"

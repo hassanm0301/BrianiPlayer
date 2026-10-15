@@ -2277,6 +2277,9 @@ components:
   schemas:
     Problem:
       type: object
+      description: Error returned by the server. title and detail are human-readable
+        messages written by the server; clients display detail (falling back to title)
+        verbatim and never map code to their own text. code is a stable machine identifier.
       properties:
         type:
           type: string
@@ -2394,9 +2397,12 @@ components:
           maxLength: 200
         password:
           type: string
-          minLength: 12
-          maxLength: 128
           writeOnly: true
+          description: Any value is accepted; there are no length or content rules.
+        confirmPassword:
+          type: string
+          writeOnly: true
+          description: Must equal password; the server rejects a mismatch with code password_mismatch.
         role:
           type: string
           enum:
@@ -2406,6 +2412,7 @@ components:
       - username
       - displayName
       - password
+      - confirmPassword
       - role
       additionalProperties: false
     PatchUser:
@@ -2444,14 +2451,18 @@ components:
           maxLength: 200
         password:
           type: string
-          minLength: 12
-          maxLength: 128
           writeOnly: true
+          description: Any value is accepted; there are no length or content rules.
+        confirmPassword:
+          type: string
+          writeOnly: true
+          description: Must equal password; the server rejects a mismatch with code password_mismatch.
       required:
       - code
       - username
       - displayName
       - password
+      - confirmPassword
       additionalProperties: false
     LoginRequest:
       type: object
@@ -2511,27 +2522,35 @@ components:
           writeOnly: true
         newPassword:
           type: string
-          minLength: 12
-          maxLength: 128
           writeOnly: true
+          description: Any value is accepted; there are no length or content rules.
+        confirmNewPassword:
+          type: string
+          writeOnly: true
+          description: Must equal newPassword; the server rejects a mismatch with code password_mismatch.
       required:
       - currentPassword
       - newPassword
+      - confirmNewPassword
       additionalProperties: false
     PasswordReset:
       type: object
       properties:
         newPassword:
           type: string
-          minLength: 12
-          maxLength: 128
           writeOnly: true
+          description: Any value is accepted; there are no length or content rules.
+        confirmNewPassword:
+          type: string
+          writeOnly: true
+          description: Must equal newPassword; the server rejects a mismatch with code password_mismatch.
         version:
           type: integer
           format: int64
           minimum: 1
       required:
       - newPassword
+      - confirmNewPassword
       - version
       additionalProperties: false
     AuthSession:
@@ -3405,6 +3424,7 @@ components:
           type: boolean
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:
@@ -3571,6 +3591,7 @@ components:
           type: string
           nullable: true
         errorDetail:
+          description: Human-readable error message written by the server for display as-is.
           type: string
           nullable: true
         createdAt:
@@ -3848,6 +3869,7 @@ components:
             $ref: '#/components/schemas/TrackerSummary'
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:
@@ -4407,6 +4429,7 @@ components:
           type: boolean
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:
@@ -4434,6 +4457,7 @@ components:
           type: boolean
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:
@@ -4461,6 +4485,7 @@ components:
           type: boolean
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:
@@ -4488,6 +4513,7 @@ components:
           type: boolean
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:
@@ -4515,6 +4541,7 @@ components:
           type: boolean
         warnings:
           type: array
+          description: Human-readable warnings written by the server for display as-is.
           items:
             type: string
       required:

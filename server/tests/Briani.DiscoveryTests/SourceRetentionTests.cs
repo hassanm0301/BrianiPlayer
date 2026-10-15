@@ -63,7 +63,7 @@ public sealed class SourceRetentionTests : IAsyncLifetime
         for (var i = 0; i < 7; i++)
         {
             var password = Credentials.NewToken();
-            using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "cap-user-" + i + Guid.NewGuid().ToString("N")[..6], displayName = "Cap User", password, role = "member" });
+            using var created = await admin.PostAsJsonAsync("/api/v1/admin/users", new { username = "cap-user-" + i + Guid.NewGuid().ToString("N")[..6], displayName = "Cap User", password, confirmPassword = password, role = "member" });
             created.EnsureSuccessStatusCode();
             userIds.Add((await created.Content.ReadFromJsonAsync<UserReply>())!.Id);
         }
