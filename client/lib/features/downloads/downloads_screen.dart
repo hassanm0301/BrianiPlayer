@@ -6,11 +6,13 @@ import 'dart:async';
 import 'package:briani_api/briani_api.dart' hide Provider;
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/session/client_session.dart';
+import '../../core/input/route_activity.dart';
 import '../../core/preferences/preferences_providers.dart';
 import 'download_formatters.dart';
 
@@ -30,6 +32,9 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
   bool _loadingMore = false;
   bool _busy = false;
   bool _truncated = false;
+  int _capacity = 50, _loadEpoch = 0;
+  CancelToken? _loadCancel;
+  bool _visible = true;
 
   @override
   void initState() {
@@ -43,7 +48,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _startPolling();
-      _load(reset: true, quiet: true);
+      if (RouteActivity.isVisible(context)) _load(reset: true, quiet: true);
     } else {
       _poll?.cancel();
       _poll = null;
@@ -52,75 +57,109 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
 
   void _startPolling() {
     _poll?.cancel();
-    _poll = Timer.periodic(
-      const Duration(seconds: 5),
-      (_) => _load(reset: true, quiet: true),
-    );
+    _poll = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (RouteActivity.isVisible(context)) _load(reset: true, quiet: true);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visible = RouteActivity.isVisible(context);
+    if (visible && !_visible) {
+      Future.microtask(() {
+        if (mounted) _load(reset: true, quiet: true);
+      });
+    }
+    _visible = visible;
   }
 
   @override
   void dispose() {
+    _loadEpoch++;
+    _loadCancel?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _poll?.cancel();
     super.dispose();
   }
 
   Future<void> _load({required bool reset, bool quiet = false}) async {
-    if (_busy) return;
+    if (_busy && quiet) return;
+    if (!reset && (_cursor == null || _loadingMore)) return;
+    _loadCancel?.cancel();
+    final cancel = _loadCancel = CancelToken();
+    final epoch = ++_loadEpoch;
+    final api = ref.read(activeApiProvider);
+    if (api == null) return;
+    bool current() =>
+        mounted &&
+        epoch == _loadEpoch &&
+        !cancel.isCancelled &&
+        identical(ref.read(activeApiProvider), api);
     _busy = true;
-    if (reset) {
-      if (!quiet || _items.isEmpty) setState(() => _loading = true);
-    } else {
-      if (_cursor == null || _loadingMore) {
-        _busy = false;
-        return;
-      }
-      setState(() => _loadingMore = true);
-    }
+    final target = (reset ? _capacity : _capacity + 50).clamp(50, 10000);
+    setState(() {
+      _loading = _items.isEmpty;
+      _loadingMore = !reset;
+    });
     try {
-      final response = await requireActiveApi(ref)
-          .getDownloadsApi()
-          .listDownloads(cursor: reset ? null : _cursor, limit: 50);
-      if (!mounted || response.data == null) return;
-      final page = response.data!;
-      setState(() {
-        if (reset) {
-          if (quiet && _items.isNotEmpty) {
-            final byId = {for (final item in page.items) item.id: item};
-            for (var index = 0; index < _items.length; index++) {
-              _items[index] = byId.remove(_items[index].id) ?? _items[index];
-            }
-            _items.insertAll(0, byId.values);
-          } else {
-            _items
-              ..clear()
-              ..addAll(page.items);
-          }
-        } else {
-          for (final item in page.items) {
-            final index = _items.indexWhere((current) => current.id == item.id);
-            if (index == -1) {
-              _items.add(item);
-            } else {
-              _items[index] = item;
-            }
-          }
+      // Reconcile the whole loaded window atomically. A first-page response
+      // alone cannot establish deletion of an item from a later page.
+      final refreshed = <String, Download>{};
+      final warnings = <String>{};
+      String? cursor;
+      var truncated = false;
+      var received = 0;
+      do {
+        final page = (await api.getDownloadsApi().listDownloads(
+          cursor: cursor,
+          limit: (target - received).clamp(1, 200),
+          cancelToken: cancel,
+        )).data!;
+        if (!current()) return;
+        for (final item in page.items) {
+          refreshed[item.id] = item;
         }
-        _cursor = page.nextCursor;
-        _truncated = page.truncated;
-        _error = page.warnings.isEmpty ? null : page.warnings.join('\n');
+        received += page.items.length;
+        warnings.addAll(page.warnings);
+        truncated = truncated || page.truncated;
+        final next = page.nextCursor;
+        if (next == cursor && next != null) {
+          throw StateError('Repeated page cursor');
+        }
+        cursor = next;
+        if (page.items.isEmpty) break;
+      } while (cursor != null && received < target);
+      if (!current()) return;
+      setState(() {
+        if (warnings.isEmpty || refreshed.isNotEmpty) {
+          _items
+            ..clear()
+            ..addAll(refreshed.values);
+          _cursor = cursor;
+          _capacity = target;
+        }
+        _truncated = truncated;
+        _error = warnings.isEmpty ? null : warnings.join('\n');
         _loading = false;
         _loadingMore = false;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!current()) return;
       setState(() {
-        _error = clientError(error);
+        _error = error is DioException && error.response?.statusCode == 400
+            ? 'Downloads changed while refreshing. Refresh again to get the latest list.'
+            : clientError(error);
+        if (error is DioException &&
+            [401, 403, 404].contains(error.response?.statusCode)) {
+          _items.clear();
+          _cursor = null;
+        }
         _loading = false;
         _loadingMore = false;
       });
     } finally {
-      _busy = false;
+      if (epoch == _loadEpoch) _busy = false;
     }
   }
 
@@ -129,20 +168,19 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
     DownloadActionActionEnum action,
   ) async {
     try {
-      await requireActiveApi(ref)
-          .getDownloadsApi()
-          .actOnDownload(
-            id: download.id,
-            downloadAction: DownloadAction(
-              (b) => b
-                ..action = action
-                ..version = download.version,
-            ),
-            idempotencyKey: const Uuid().v4(),
-          );
+      await requireActiveApi(ref).getDownloadsApi().actOnDownload(
+        id: download.id,
+        downloadAction: DownloadAction(
+          (b) => b
+            ..action = action
+            ..version = download.version,
+        ),
+        idempotencyKey: const Uuid().v4(),
+      );
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('${action.name} queued.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${stateLabel(action.name)} requested.')),
+        );
         await _load(reset: true, quiet: true);
       }
     } catch (error) {
@@ -222,6 +260,14 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
                 : RefreshIndicator(
                     onRefresh: () => _load(reset: true),
                     child: ListView.builder(
+                      key: const PageStorageKey('downloads'),
+                      findChildIndexCallback: (key) {
+                        if (key is! ValueKey<String>) return null;
+                        final index = _items.indexWhere(
+                          (item) => item.id == key.value,
+                        );
+                        return index < 0 ? null : index;
+                      },
                       itemCount: _items.length,
                       itemBuilder: (context, index) =>
                           _downloadTile(_items[index], locale),
@@ -257,6 +303,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
         ? null
         : (download.downloadedSelectedBytes / total).clamp(0.0, 1.0).toDouble();
     return Card(
+      key: ValueKey(download.id),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       child: ListTile(
         title: Text(
@@ -269,7 +316,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
           children: [
             const SizedBox(height: 5),
             Text(
-              '${download.state.name} · ${formatBytes(download.downloadedSelectedBytes, locale: locale)} / ${formatBytes(total, locale: locale)}',
+              '${stateLabel(download.state.name)} · ${formatBytes(download.downloadedSelectedBytes, locale: locale)} / ${formatBytes(total, locale: locale)}',
             ),
             const SizedBox(height: 5),
             LinearProgressIndicator(value: progress),
@@ -361,6 +408,12 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
   bool _canManageLibrary = false;
   bool _canDownloadLibrary = false;
   bool _busy = false;
+  bool _visible = true;
+  int _loadEpoch = 0;
+  CancelToken? _loadCancel;
+  DateTime? _metadataLoadedAt;
+  bool _selectionInitialized = false;
+  int _firstSelectedVideo = -1;
 
   @override
   void initState() {
@@ -374,7 +427,7 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _startPolling();
-      _load(quiet: true);
+      if (RouteActivity.isVisible(context)) _load(quiet: true);
     } else {
       _poll?.cancel();
       _poll = null;
@@ -383,70 +436,124 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
 
   void _startPolling() {
     _poll?.cancel();
-    _poll = Timer.periodic(
-      const Duration(seconds: 5),
-      (_) => _load(quiet: true),
-    );
+    _poll = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (RouteActivity.isVisible(context)) _load(quiet: true);
+    });
   }
 
   @override
   void didUpdateWidget(covariant DownloadDetailsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.requestId != widget.requestId) _load();
+    if (oldWidget.requestId != widget.requestId) {
+      _loadCancel?.cancel();
+      _loadEpoch++;
+      _busy = false;
+      _download = null;
+      _files = [];
+      _settings = null;
+      _selected.clear();
+      _priority.clear();
+      _metadataLoadedAt = null;
+      _selectionInitialized = false;
+      _managing = false;
+      _canManageLibrary = false;
+      _canDownloadLibrary = false;
+      _load();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visible = RouteActivity.isVisible(context);
+    if (visible && !_visible) {
+      Future.microtask(() {
+        if (mounted) _load(quiet: true);
+      });
+    }
+    _visible = visible;
   }
 
   @override
   void dispose() {
+    _loadEpoch++;
+    _loadCancel?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _poll?.cancel();
     super.dispose();
   }
 
   Future<void> _load({bool quiet = false}) async {
-    if (_busy) return;
+    if (_busy && quiet) return;
+    _loadCancel?.cancel();
+    final cancel = _loadCancel = CancelToken();
+    final epoch = ++_loadEpoch;
+    final id = widget.requestId;
+    final api = ref.read(activeApiProvider);
+    if (api == null) return;
+    bool current() =>
+        mounted &&
+        epoch == _loadEpoch &&
+        id == widget.requestId &&
+        !cancel.isCancelled &&
+        identical(ref.read(activeApiProvider), api);
     _busy = true;
     if (!quiet && !_loading) setState(() => _loading = true);
     try {
-      final api = requireActiveApi(ref);
-      final downloadResponse = await api.getDownloadsApi().getDownload(
-        id: widget.requestId,
-      );
-      final filesResponse = await api.getDownloadsApi().listDownloadFiles(
-        id: widget.requestId,
-      );
-      DownloadSettings? settings;
-      try {
-        settings = (await api.getDownloadsApi().getDownloadSettings(
-          id: widget.requestId,
-        )).data;
-      } catch (_) {
-        // Read-only detail access remains useful when settings require management rights.
-      }
-      final libraryResponse = await api.getLibrariesApi().listLibraries();
-      if (!mounted) return;
-      final download = downloadResponse.data;
-      final files = filesResponse.data?.toList() ?? <DownloadFile>[];
-      final libraries = libraryResponse.data?.toList() ?? <ModelLibrary>[];
-      final library = libraries
-          .where((item) => item.id == download?.libraryId)
-          .firstOrNull;
+      final response = await Future.wait([
+        api.getDownloadsApi().getDownload(id: id, cancelToken: cancel),
+        api.getDownloadsApi().listDownloadFiles(id: id, cancelToken: cancel),
+      ]);
+      if (!current()) return;
+      final download = response[0].data as Download?;
+      final files =
+          (response[1].data as Iterable?)?.cast<DownloadFile>().toList() ??
+          <DownloadFile>[];
+      final refreshMetadata =
+          !quiet ||
+          _metadataLoadedAt == null ||
+          DateTime.now().difference(_metadataLoadedAt!) >=
+              const Duration(minutes: 1);
+      var settings = _settings;
+      var canManageLibrary = _canManageLibrary;
+      var canDownloadLibrary = _canDownloadLibrary;
       final user = ref.read(clientSessionProvider)?.tokens.user;
-      final canManage =
-          user?.role == UserRoleEnum.administrator ||
-          user?.id == download?.ownerId ||
-          library?.capabilities.manage == true;
-      final canDownload =
-          user?.id == download?.ownerId ||
-          library?.capabilities.download == true;
+      if (refreshMetadata) {
+        final libraryResponse = await api.getLibrariesApi().listLibraries(
+          cancelToken: cancel,
+        );
+        final library = libraryResponse.data
+            ?.where((x) => x.id == download?.libraryId)
+            .firstOrNull;
+        canManageLibrary =
+            library?.capabilities.manage == true ||
+            user?.role == UserRoleEnum.administrator;
+        canDownloadLibrary =
+            library?.capabilities.download == true ||
+            user?.id == download?.ownerId;
+        try {
+          settings = (await api.getDownloadsApi().getDownloadSettings(
+            id: id,
+            cancelToken: cancel,
+          )).data;
+        } on DioException catch (error) {
+          if (cancel.isCancelled) rethrow;
+          settings = null;
+          if (![403, 404].contains(error.response?.statusCode)) rethrow;
+        }
+      }
+      if (!current()) return;
       setState(() {
         _download = download;
         _files = files;
         _settings = settings;
-        _canManageLibrary =
-            library?.capabilities.manage == true ||
-            user?.role == UserRoleEnum.administrator;
-        _canDownloadLibrary = canDownload;
-        _managing = canManage;
+        _canManageLibrary = canManageLibrary;
+        _canDownloadLibrary = canDownloadLibrary;
+        _managing = canManageLibrary || user?.id == download?.ownerId;
+        if (refreshMetadata) _metadataLoadedAt = DateTime.now();
+        final ids = files.map((x) => x.id).toSet();
+        _selected.removeWhere((key, _) => !ids.contains(key));
+        _priority.removeWhere((key, _) => !ids.contains(key));
         for (final file in files) {
           _selected.putIfAbsent(file.id, () => file.selected);
           _priority.putIfAbsent(
@@ -454,24 +561,35 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
             () => FileChoicePriorityEnum.valueOf(file.priority.name),
           );
         }
-        if (files.isNotEmpty &&
-            files.every((f) => !(_selected[f.id] ?? f.selected))) {
-          final firstVideo = files.indexWhere(
-            (f) => f.kind == DownloadFileKindEnum.video,
-          );
-          if (firstVideo >= 0) _selected[files[firstVideo].id] = true;
+        if (!_selectionInitialized && files.isNotEmpty) {
+          if (files.every((f) => !(_selected[f.id] ?? f.selected))) {
+            final video = files
+                .where((f) => f.kind == DownloadFileKindEnum.video)
+                .firstOrNull;
+            if (video != null) _selected[video.id] = true;
+          }
+          _selectionInitialized = true;
         }
         _error = null;
         _loading = false;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!current()) return;
       setState(() {
+        if (error is DioException &&
+            [401, 403, 404].contains(error.response?.statusCode)) {
+          _download = null;
+          _files = [];
+          _settings = null;
+          _managing = false;
+          _canManageLibrary = false;
+          _canDownloadLibrary = false;
+        }
         _error = clientError(error);
         _loading = false;
       });
     } finally {
-      _busy = false;
+      if (epoch == _loadEpoch) _busy = false;
     }
   }
 
@@ -520,18 +638,16 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
             ),
           )
           .toList();
-      await requireActiveApi(ref)
-          .getDownloadsApi()
-          .selectDownloadFiles(
-            id: download.id,
-            downloadSelection: DownloadSelection(
-              (b) => b
-                ..files = ListBuilder(choices)
-                ..autoStart = true
-                ..version = download.version,
-            ),
-            idempotencyKey: const Uuid().v4(),
-          );
+      await requireActiveApi(ref).getDownloadsApi().selectDownloadFiles(
+        id: download.id,
+        downloadSelection: DownloadSelection(
+          (b) => b
+            ..files = ListBuilder(choices)
+            ..autoStart = true
+            ..version = download.version,
+        ),
+        idempotencyKey: const Uuid().v4(),
+      );
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -555,22 +671,21 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
     final download = _download;
     if (download == null) return;
     try {
-      await requireActiveApi(ref)
-          .getDownloadsApi()
-          .actOnDownload(
-            id: download.id,
-            downloadAction: DownloadAction(
-              (b) => b
-                ..action = action
-                ..version = download.version
-                ..deleteData = deleteData
-                ..confirmation = deleteData ? 'DELETE DATA' : null,
-            ),
-            idempotencyKey: const Uuid().v4(),
-          );
+      await requireActiveApi(ref).getDownloadsApi().actOnDownload(
+        id: download.id,
+        downloadAction: DownloadAction(
+          (b) => b
+            ..action = action
+            ..version = download.version
+            ..deleteData = deleteData
+            ..confirmation = deleteData ? 'DELETE DATA' : null,
+        ),
+        idempotencyKey: const Uuid().v4(),
+      );
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('${action.name} queued.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${stateLabel(action.name)} requested.')),
+        );
         await _load();
       }
     } catch (error) {
@@ -582,6 +697,8 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
   }
 
   Future<void> _deletePayload() async {
+    final requestId = widget.requestId;
+    final api = ref.read(activeApiProvider);
     final accepted = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -601,7 +718,10 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
         ],
       ),
     );
-    if (accepted == true) {
+    if (accepted == true &&
+        mounted &&
+        widget.requestId == requestId &&
+        identical(ref.read(activeApiProvider), api)) {
       await _action(DownloadActionActionEnum.remove, deleteData: true);
     }
   }
@@ -609,12 +729,18 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
   Future<void> _editSettings() async {
     final download = _download;
     final settings = _settings;
+    final api = ref.read(activeApiProvider);
+    final requestId = widget.requestId;
+    bool current() =>
+        mounted &&
+        widget.requestId == requestId &&
+        identical(ref.read(activeApiProvider), api);
     if (download == null || settings == null || !_managing) return;
     final draft = await showDialog<_DownloadSettingsDraft>(
       context: context,
       builder: (_) => _DownloadSettingsDialog(settings: settings),
     );
-    if (draft == null || !mounted) return;
+    if (draft == null || !mounted || !current() || api == null) return;
     int? readInt(String value) =>
         value.trim().isEmpty ? null : int.tryParse(value.trim());
     final dl = readInt(draft.downloadLimit),
@@ -624,43 +750,38 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
     final ratioValue = draft.ratio.trim().isEmpty
         ? null
         : double.tryParse(draft.ratio.trim());
-    if ([
-              draft.downloadLimit,
-              draft.uploadLimit,
-              draft.seedTime,
-              draft.queue,
-            ].any((value) => value.trim().isNotEmpty) &&
-            [dl, ul, minutes, position].contains(null) ||
-        draft.ratio.trim().isNotEmpty && ratioValue == null) {
+    if ((draft.downloadLimit.trim().isNotEmpty && dl == null) ||
+        (draft.uploadLimit.trim().isNotEmpty && ul == null) ||
+        (draft.seedTime.trim().isNotEmpty && minutes == null) ||
+        (draft.queue.trim().isNotEmpty && position == null) ||
+        (draft.ratio.trim().isNotEmpty && ratioValue == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Enter valid numeric limits.')),
       );
       return;
     }
     try {
-      final updated = await requireActiveApi(ref)
-          .getDownloadsApi()
-          .updateDownloadSettings(
-            id: download.id,
-            downloadSettings: DownloadSettings(
-              (b) => b
-                ..version = settings.version
-                ..downloadLimitBytesPerSecond = dl
-                ..uploadLimitBytesPerSecond = ul
-                ..ratioLimit = ratioValue
-                ..seedTimeMinutes = minutes
-                ..queuePosition = position
-                ..tags = ListBuilder(
-                  draft.tags
-                      .split(',')
-                      .map((x) => x.trim())
-                      .where((x) => x.isNotEmpty),
-                ),
+      final updated = await api.getDownloadsApi().updateDownloadSettings(
+        id: download.id,
+        downloadSettings: DownloadSettings(
+          (b) => b
+            ..version = settings.version
+            ..downloadLimitBytesPerSecond = dl
+            ..uploadLimitBytesPerSecond = ul
+            ..ratioLimit = ratioValue
+            ..seedTimeMinutes = minutes
+            ..queuePosition = position
+            ..tags = ListBuilder(
+              draft.tags
+                  .split(',')
+                  .map((x) => x.trim())
+                  .where((x) => x.isNotEmpty),
             ),
-          );
-      if (mounted) setState(() => _settings = updated.data ?? settings);
+        ),
+      );
+      if (current()) setState(() => _settings = updated.data ?? settings);
     } catch (error) {
-      if (mounted) {
+      if (mounted && current()) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(clientError(error))));
       }
@@ -694,6 +815,11 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
         ),
       );
     }
+    _firstSelectedVideo = _files.indexWhere(
+      (f) =>
+          f.kind == DownloadFileKindEnum.video &&
+          (_selected[f.id] ?? f.selected),
+    );
     final download = _download!;
     final locale = ref.watch(userPreferencesProvider).asData?.value.locale;
     final ownsRequest =
@@ -715,7 +841,7 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
           if (_managing)
             IconButton(
               tooltip: 'Transfer settings',
-              onPressed: _editSettings,
+              onPressed: _settings == null ? null : _editSettings,
               icon: const Icon(Icons.tune),
             ),
           if (_managing)
@@ -754,138 +880,169 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
       ),
       body: RefreshIndicator(
         onRefresh: _load,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            if (_error != null)
-              MaterialBanner(
-                content: Text(_error!),
-                actions: [
-                  TextButton(onPressed: _load, child: const Text('Retry')),
+        child: CustomScrollView(
+          key: PageStorageKey('download-${widget.requestId}'),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList.list(
+                children: [
+                  if (_error != null)
+                    MaterialBanner(
+                      content: Text(_error!),
+                      actions: [
+                        TextButton(
+                          onPressed: _load,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  Text(
+                    'State: ${stateLabel(download.state.name)} · Transfer: ${stateLabel(download.transferState.name)} · Import: ${stateLabel(download.importState.name)}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(value: fraction),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${formatBytes(download.downloadedSelectedBytes, locale: locale)} / ${formatBytes(total, locale: locale)} selected bytes · sequential ${download.sequential ? 'on' : 'off'}',
+                  ),
+                  Text(
+                    '↓ ${formatRate(download.downloadBps, locale: locale)} · ↑ ${formatRate(download.uploadBps, locale: locale)} · Connected seeders ${formatCount(download.seedersConnected, locale: locale)} · peers ${formatCount(download.peersConnected, locale: locale)} · ETA ${formatEta(download.etaSeconds, locale: locale)}',
+                  ),
+                  if (download.errorCode != null)
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.error_outline),
+                        title: Text(download.errorCode!),
+                        subtitle: Text(
+                          download.errorDetail ?? 'The server reported an error without additional detail.',
+                        ),
+                      ),
+                    ),
+                  if (download.tags.isNotEmpty)
+                    Wrap(
+                      spacing: 6,
+                      children: download.tags
+                          .map((tag) => Chip(label: Text(tag)))
+                          .toList(),
+                    ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      if (_managing &&
+                          (download.transferState ==
+                                  DownloadTransferStateEnum.downloading ||
+                              download.transferState ==
+                                  DownloadTransferStateEnum.seeding))
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              _action(DownloadActionActionEnum.pause),
+                          icon: const Icon(Icons.pause),
+                          label: const Text('Pause'),
+                        ),
+                      if (_managing &&
+                          download.transferState ==
+                              DownloadTransferStateEnum.paused)
+                        FilledButton.icon(
+                          onPressed: () =>
+                              _action(DownloadActionActionEnum.resume),
+                          icon: const Icon(Icons.play_arrow),
+                          label: const Text('Resume'),
+                        ),
+                      if (_managing &&
+                          (download.state == DownloadStateEnum.failed ||
+                              download.state == DownloadStateEnum.stalled))
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              _action(DownloadActionActionEnum.retry),
+                          icon: const Icon(Icons.restart_alt),
+                          label: const Text('Retry'),
+                        ),
+                      if (ownsRequest)
+                        OutlinedButton.icon(
+                          onPressed: () => _removeRequest(download),
+                          icon: const Icon(Icons.remove_circle_outline),
+                          label: const Text('Remove request'),
+                        ),
+                    ],
+                  ),
+                  const Divider(height: 28),
+                  Text(
+                    _needsSelection
+                        ? 'Choose files before payload transfer'
+                        : 'Files',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  if (_download?.state == DownloadStateEnum.metadataPending)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        'Waiting for torrent metadata. Payload transfer will not start until file selection is confirmed.',
+                      ),
+                    ),
+                  if (_files.isEmpty &&
+                      download.state != DownloadStateEnum.metadataPending)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        'No files are available in the server snapshot. Refresh to check for updates.',
+                      ),
+                    ),
                 ],
               ),
-            Text(
-              'State: ${download.state.name} · Transfer: ${download.transferState.name} · Import: ${download.importState.name}',
-              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 10),
-            LinearProgressIndicator(value: fraction),
-            const SizedBox(height: 6),
-            Text(
-              '${formatBytes(download.downloadedSelectedBytes, locale: locale)} / ${formatBytes(total, locale: locale)} selected bytes · sequential ${download.sequential ? 'on' : 'off'}',
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList.builder(
+                itemCount: _files.length,
+                itemBuilder: (context, index) =>
+                    _fileRow(_files[index], index, locale),
+              ),
             ),
-            Text(
-              '↓ ${formatRate(download.downloadBps, locale: locale)} · ↑ ${formatRate(download.uploadBps, locale: locale)} · Connected seeders ${formatCount(download.seedersConnected, locale: locale)} · peers ${formatCount(download.peersConnected, locale: locale)} · ETA ${download.etaSeconds == null ? '—' : '${formatCount(download.etaSeconds, locale: locale)}s'}',
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList.list(
+                children: [
+                  if (_needsSelection &&
+                      _canDownloadLibrary &&
+                      _files.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: FilledButton.icon(
+                        onPressed: _savingSelection ? null : _submitSelection,
+                        icon: _savingSelection
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.check),
+                        label: const Text('Save selection and start'),
+                      ),
+                    ),
+                  if (download.sequential &&
+                      _files
+                              .where(
+                                (f) =>
+                                    f.kind == DownloadFileKindEnum.video &&
+                                    (_selected[f.id] ?? f.selected),
+                              )
+                              .length >
+                          1)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Text(
+                        'Sequential order applies to selected files. A later video may wait for earlier selected videos.',
+                      ),
+                    ),
+                ],
+              ),
             ),
-            if (download.errorCode != null)
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.error_outline),
-                  title: Text(download.errorCode!),
-                  subtitle: Text(
-                    download.errorDetail ?? 'The server reported an error without additional detail.',
-                  ),
-                ),
-              ),
-            if (download.tags.isNotEmpty)
-              Wrap(
-                spacing: 6,
-                children: download.tags
-                    .map((tag) => Chip(label: Text(tag)))
-                    .toList(),
-              ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (_managing &&
-                    (download.transferState ==
-                            DownloadTransferStateEnum.downloading ||
-                        download.transferState ==
-                            DownloadTransferStateEnum.seeding))
-                  OutlinedButton.icon(
-                    onPressed: () => _action(DownloadActionActionEnum.pause),
-                    icon: const Icon(Icons.pause),
-                    label: const Text('Pause'),
-                  ),
-                if (_managing &&
-                    download.transferState == DownloadTransferStateEnum.paused)
-                  FilledButton.icon(
-                    onPressed: () => _action(DownloadActionActionEnum.resume),
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Resume'),
-                  ),
-                if (_managing &&
-                    (download.state == DownloadStateEnum.failed ||
-                        download.state == DownloadStateEnum.stalled))
-                  OutlinedButton.icon(
-                    onPressed: () => _action(DownloadActionActionEnum.retry),
-                    icon: const Icon(Icons.restart_alt),
-                    label: const Text('Retry'),
-                  ),
-                if (ownsRequest)
-                  OutlinedButton.icon(
-                    onPressed: () => _removeRequest(download),
-                    icon: const Icon(Icons.remove_circle_outline),
-                    label: const Text('Remove request'),
-                  ),
-              ],
-            ),
-            const Divider(height: 28),
-            Text(
-              _needsSelection
-                  ? 'Choose files before payload transfer'
-                  : 'Files',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            if (_download?.state == DownloadStateEnum.metadataPending)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'Waiting for torrent metadata. Payload transfer will not start until file selection is confirmed.',
-                ),
-              ),
-            if (_files.isEmpty &&
-                download.state != DownloadStateEnum.metadataPending)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'No files are available in the server snapshot. Refresh to check for updates.',
-                ),
-              ),
-            for (var index = 0; index < _files.length; index++)
-              _fileRow(_files[index], index, locale),
-            if (_needsSelection && _canDownloadLibrary && _files.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: FilledButton.icon(
-                  onPressed: _savingSelection ? null : _submitSelection,
-                  icon: _savingSelection
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.check),
-                  label: const Text('Save selection and start'),
-                ),
-              ),
-            if (download.sequential &&
-                _files
-                        .where(
-                          (f) =>
-                              f.kind == DownloadFileKindEnum.video &&
-                              (_selected[f.id] ?? f.selected),
-                        )
-                        .length >
-                    1)
-              const Padding(
-                padding: EdgeInsets.only(top: 10),
-                child: Text(
-                  'Sequential order applies to selected files. A later video may wait for earlier selected videos.',
-                ),
-              ),
           ],
         ),
       ),
@@ -901,79 +1058,87 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
         : (file.downloadedBytes / file.sizeBytes).clamp(0.0, 1.0).toDouble();
     final laterVideo =
         file.kind == DownloadFileKindEnum.video &&
-        index > 0 &&
-        _files
-            .take(index)
-            .any(
-              (x) =>
-                  x.kind == DownloadFileKindEnum.video &&
-                  (_selected[x.id] ?? x.selected),
-            );
+        _firstSelectedVideo >= 0 &&
+        index > _firstSelectedVideo;
     final leading = canToggle
-                ? Checkbox(
-                    value: checked,
-                    onChanged: (value) =>
-                        setState(() => _selected[file.id] = value ?? false),
-                  )
-                : Icon(_kindIcon(file.kind));
-    final title = Text(
-              file.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            );
+        ? Checkbox(
+            value: checked,
+            onChanged: (value) =>
+                setState(() => _selected[file.id] = value ?? false),
+          )
+        : Icon(_kindIcon(file.kind));
+    final title = Text(file.name, maxLines: 1, overflow: TextOverflow.ellipsis);
     final subtitle = Text(
-              '${file.kind.name} · ${formatBytes(file.sizeBytes, locale: locale)} · ${file.playbackState.name}${laterVideo && checked ? ' · may wait behind earlier video' : ''}',
-            );
+      '${file.kind.name} · ${formatBytes(file.sizeBytes, locale: locale)} · ${stateLabel(file.playbackState.name)}${laterVideo && checked ? ' · may wait behind earlier video' : ''}',
+    );
     final trailing = Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (canToggle && checked)
-                  DropdownButton<FileChoicePriorityEnum>(
-                    value:
-                        _priority[file.id] ??
-                        FileChoicePriorityEnum.valueOf(file.priority.name),
-                    underline: const SizedBox.shrink(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _priority[file.id] = value);
-                      }
-                    },
-                    items: FileChoicePriorityEnum.values
-                        .whereType<FileChoicePriorityEnum>()
-                        .map(
-                          (value) => DropdownMenuItem<FileChoicePriorityEnum>(
-                            value: value,
-                            child: Text(value.name),
-                          ),
-                        )
-                        .toList(),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (canToggle && checked)
+          DropdownButton<FileChoicePriorityEnum>(
+            value:
+                _priority[file.id] ??
+                FileChoicePriorityEnum.valueOf(file.priority.name),
+            underline: const SizedBox.shrink(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() => _priority[file.id] = value);
+              }
+            },
+            items: FileChoicePriorityEnum.values
+                .whereType<FileChoicePriorityEnum>()
+                .map(
+                  (value) => DropdownMenuItem<FileChoicePriorityEnum>(
+                    value: value,
+                    child: Text(value.name),
                   ),
-                if (file.kind == DownloadFileKindEnum.video &&
-                    file.selected &&
-                    (file.playbackState ==
-                            DownloadFilePlaybackStateEnum.eligible ||
-                        file.playbackState ==
-                            DownloadFilePlaybackStateEnum.complete))
-                  IconButton(
-                    tooltip: 'Play',
-                    onPressed: () => context.push(
-                      '/play/downloadFile/${Uri.encodeComponent(file.id)}',
-                    ),
-                    icon: const Icon(Icons.play_arrow),
-                  ),
-              ],
-            );
-    final television = MediaQuery.of(context).navigationMode == NavigationMode.directional;
+                )
+                .toList(),
+          ),
+        if (file.kind == DownloadFileKindEnum.video &&
+            file.selected &&
+            (file.playbackState == DownloadFilePlaybackStateEnum.eligible ||
+                file.playbackState == DownloadFilePlaybackStateEnum.complete))
+          IconButton(
+            tooltip: 'Play',
+            onPressed: () => context.push(
+              '/play/downloadFile/${Uri.encodeComponent(file.id)}',
+            ),
+            icon: const Icon(Icons.play_arrow),
+          ),
+      ],
+    );
+    final television =
+        MediaQuery.of(context).navigationMode == NavigationMode.directional;
     return Card(
+      key: ValueKey(file.id),
       child: Column(
         children: [
           if (television)
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(children: [leading, const SizedBox(width: 12),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [title, const SizedBox(height: 4), subtitle])),
-                const SizedBox(width: 12), trailing]))
-          else ListTile(leading: leading, title: title, subtitle: subtitle, trailing: trailing),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  leading,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [title, const SizedBox(height: 4), subtitle],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  trailing,
+                ],
+              ),
+            )
+          else
+            ListTile(
+              leading: leading,
+              title: title,
+              subtitle: subtitle,
+              trailing: trailing,
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
             child: Column(
@@ -1048,6 +1213,7 @@ class _DownloadSettingsDialog extends StatefulWidget {
 }
 
 class _DownloadSettingsDialogState extends State<_DownloadSettingsDialog> {
+  final _errors = <String, String>{};
   late final TextEditingController _downloadLimit;
   late final TextEditingController _uploadLimit;
   late final TextEditingController _ratio;
@@ -1086,16 +1252,41 @@ class _DownloadSettingsDialogState extends State<_DownloadSettingsDialog> {
     super.dispose();
   }
 
-  void _save() => Navigator.of(context).pop(
-    _DownloadSettingsDraft(
-      downloadLimit: _downloadLimit.text,
-      uploadLimit: _uploadLimit.text,
-      ratio: _ratio.text,
-      seedTime: _seedTime.text,
-      queue: _queue.text,
-      tags: _tags.text,
-    ),
-  );
+  void _save() {
+    _errors.clear();
+    void integer(String field, String text, int max) {
+      if (text.trim().isEmpty) return;
+      final value = int.tryParse(text.trim());
+      if (value == null || value < 0 || value > max) {
+        _errors[field] = 'Enter a whole number from 0 to $max, or leave blank.';
+      }
+    }
+
+    integer('download', _downloadLimit.text, 1073741824);
+    integer('upload', _uploadLimit.text, 1073741824);
+    integer('time', _seedTime.text, 525600);
+    integer('queue', _queue.text, 500);
+    if (_ratio.text.trim().isNotEmpty) {
+      final ratio = double.tryParse(_ratio.text.trim());
+      if (ratio == null || !ratio.isFinite || ratio < 0 || ratio > 10000) {
+        _errors['ratio'] = 'Enter a number from 0 to 10000, or leave blank.';
+      }
+    }
+    if (_errors.isNotEmpty) {
+      setState(() {});
+      return;
+    }
+    Navigator.of(context).pop(
+      _DownloadSettingsDraft(
+        downloadLimit: _downloadLimit.text,
+        uploadLimit: _uploadLimit.text,
+        ratio: _ratio.text,
+        seedTime: _seedTime.text,
+        queue: _queue.text,
+        tags: _tags.text,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => AlertDialog(
@@ -1107,33 +1298,42 @@ class _DownloadSettingsDialogState extends State<_DownloadSettingsDialog> {
           TextField(
             controller: _downloadLimit,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              errorText: _errors['download'],
               labelText: 'Download limit (bytes/sec)',
             ),
           ),
           TextField(
             controller: _uploadLimit,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              errorText: _errors['upload'],
               labelText: 'Upload limit (bytes/sec)',
             ),
           ),
           TextField(
             controller: _ratio,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Seeding ratio limit'),
+            decoration: InputDecoration(
+              labelText: 'Seeding ratio limit',
+              errorText: _errors['ratio'],
+            ),
           ),
           TextField(
             controller: _seedTime,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              errorText: _errors['time'],
               labelText: 'Seed time limit (minutes)',
             ),
           ),
           TextField(
             controller: _queue,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Queue position'),
+            decoration: InputDecoration(
+              labelText: 'Queue position',
+              errorText: _errors['queue'],
+            ),
           ),
           TextField(
             controller: _tags,

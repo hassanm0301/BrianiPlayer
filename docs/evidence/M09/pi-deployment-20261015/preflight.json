@@ -1,0 +1,46 @@
+{
+  "architecture": "aarch64",
+  "kernel": "6.18.50+rpt-rpi-2712",
+  "landlock": {
+    "abi": -1,
+    "abiErrno": 38,
+    "errata": -1,
+    "errataErrno": 38
+  },
+  "cgroupControllers": "cpuset cpu io pids",
+  "kernelConfig": [
+    "CONFIG_CGROUPS=y",
+    "CONFIG_MEMCG=y",
+    "# CONFIG_SECURITY_LANDLOCK is not set",
+    "CONFIG_LSM=\"\""
+  ],
+  "memoryLimit": false,
+  "containers": [
+    "filestash_wopi\tUp 5 minutes",
+    "filestash\tUp 5 minutes"
+  ],
+  "images": [
+    "[briani-server:m10-arm64] sha256:da78c5623715d988f36ff058fd6edb28bde59fbf638528f5a9174d0848437c24 arm64",
+    "[briani-egress:m10-arm64] sha256:3a9a3ba8b1be0a51a1dfde7e35235eff8a501f45081f8e680708523f8ad56caf arm64"
+  ],
+  "storage": [
+    {
+      "path": "/mnt/hassan_drive/briani/state",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0o700"
+    },
+    {
+      "path": "/mnt/hassan_drive/briani/media/Hassan",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0o700"
+    },
+    {
+      "path": "/mnt/family_drive/briani/media",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0o700"
+    }
+  ]
+}

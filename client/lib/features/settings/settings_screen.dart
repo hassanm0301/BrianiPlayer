@@ -679,23 +679,96 @@ Widget _numberSetting(
   required double max,
   required double step,
   required ValueChanged<double> onChanged,
-}) => Padding(
-  padding: const EdgeInsets.symmetric(vertical: 6),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text('$label: ${value.toStringAsFixed(step < 1 ? 2 : 0)}'),
-      Slider(
-        value: value.clamp(min, max),
-        min: min,
-        max: max,
-        divisions: ((max - min) / step).round(),
-        label: value.toStringAsFixed(2),
-        onChanged: onChanged,
-      ),
-    ],
-  ),
+}) => _NumberSetting(
+  label: label,
+  value: value,
+  min: min,
+  max: max,
+  step: step,
+  onChanged: onChanged,
 );
+
+class _NumberSetting extends StatefulWidget {
+  const _NumberSetting({
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.step,
+    required this.onChanged,
+  });
+  final String label;
+  final double value, min, max, step;
+  final ValueChanged<double> onChanged;
+  @override
+  State<_NumberSetting> createState() => _NumberSettingState();
+}
+
+class _NumberSettingState extends State<_NumberSetting> {
+  late double _draft = widget.value.clamp(widget.min, widget.max);
+  @override
+  void didUpdateWidget(covariant _NumberSetting oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) {
+      _draft = widget.value.clamp(widget.min, widget.max);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if ((widget.max - widget.min) / widget.step > 100) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: TextFormField(
+          key: ValueKey('${widget.label}:${widget.value}'),
+          initialValue: widget.value.round().toString(),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            labelText: widget.label,
+            border: const OutlineInputBorder(),
+          ),
+          onFieldSubmitted: (raw) {
+            final parsed = double.tryParse(raw.trim());
+            if (parsed == null ||
+                !parsed.isFinite ||
+                parsed < widget.min ||
+                parsed > widget.max) {
+              _message(
+                context,
+                'Enter a value from ${widget.min.round()} to ${widget.max.round()}.',
+              );
+              return;
+            }
+            widget.onChanged(parsed);
+          },
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${widget.label}: ${_draft.toStringAsFixed(widget.step < 1 ? 2 : 0)}',
+          ),
+          Slider(
+            value: _draft,
+            min: widget.min,
+            max: widget.max,
+            divisions: ((widget.max - widget.min) / widget.step).round(),
+            label: _draft.toStringAsFixed(2),
+            onChanged: (next) => setState(() => _draft = next),
+            onChangeEnd: (next) {
+              _draft = next;
+              widget.onChanged(next);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 String _enumLabel(Object value) => value
     .toString()

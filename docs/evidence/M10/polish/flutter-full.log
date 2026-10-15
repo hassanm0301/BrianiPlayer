@@ -1,0 +1,139 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +1: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: Most seeded sorts seeders descending and stores its mode view
+00:00 +2: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:03 +3: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:04 +4: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: magnet cancel dismisses cleanly without creating a download
+00:04 +5: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: saved download settings survive dialog exit and preserve values
+00:10 +6: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +7: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +8: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +9: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +10: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +11: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +12: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:10 +13: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:11 +14: /home/hassan/projects/BrianiPlayer/client/test/tv_text_traversal_test.dart: TV vertical arrows leave single-line fields and reach controls
+00:11 +15: /home/hassan/projects/BrianiPlayer/client/test/tv_text_traversal_test.dart: TV vertical arrows leave single-line fields and reach controls
+00:11 +16: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: valid partial transfer settings are submitted
+00:11 +17: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:16 +18: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +19: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +20: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +21: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +22: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +23: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +24: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +25: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +26: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +27: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +28: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +29: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +30: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +31: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +32: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +33: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +34: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +35: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +36: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +37: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +38: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +39: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +40: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:16 +41: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:16 +42: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:16 +43: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:16 +44: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:16 +45: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:17 +46: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:17 +47: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:17 +48: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:17 +49: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:17 +50: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:17 +51: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:17 +52: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:17 +53: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:17 +54: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:17 +54: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: <2>
+  Actual: <1>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart:368:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart line 368
+The test description was:
+  Continue Watching refreshes after Libraries becomes visible again
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:17 +54 -1: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:17 +54 -1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again [E]
+  Test failed. See exception logs above.
+  The test description was: Continue Watching refreshes after Libraries becomes visible again
+  
+00:17 +55 -1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: library grid uses responsive lazy slivers at large text scale
+00:17 +56 -1: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:17 +57 -1: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:17 +58 -1: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:17 +59 -1: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:18 +60 -1: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: provider lookup failure is visible while query results still load
+00:18 +61 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +62 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +63 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +64 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +65 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +66 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +67 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +68 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +69 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +70 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +71 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +72 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +73 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +74 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +75 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +76 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +77 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +78 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +79 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +80 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +81 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:18 +82 -1: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:18 +83 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:18 +84 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:19 +85 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:19 +86 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: invalid create-member fields stay open with inline feedback
+00:19 +87 -1: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: invalid create-member fields stay open with inline feedback
+00:19 +88 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: folder shows its empty state after a successful page response
+00:19 +89 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: folder shows the supplied full breadcrumb ancestry
+00:19 +90 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: read-only library entries do not offer mutation controls
+00:19 +91 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:19 +92 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: selecting library root explicitly moves to a null folder id
+00:19 +93 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:19 +94 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: photo viewer reports an unavailable authorized image and offers retry
+00:19 +95 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: Flutter decodes the generated EXIF-oriented JPEG upright
+00:23 +96 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: device preferences validate locally and cap cache at 64 MiB
+00:23 +97 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: queued writes from the old session never target the replacement account
+00:23 +98 -1: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:23 +99 -1: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:23 +100 -1: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:23 +101 -1: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:23 +102 -1: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:23 +103 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:23 +104 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:23 +105 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:23 +106 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:23 +107 -1: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:23 +108 -1: Some tests failed.
+
+Failing tests:
+  /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again

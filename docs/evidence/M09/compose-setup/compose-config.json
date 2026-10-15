@@ -1,0 +1,17 @@
+[
+  {
+    "case": "configured paths",
+    "exitCode": 0,
+    "expected": "pass"
+  },
+  {
+    "case": "missing BRIANI_DATA",
+    "exitCode": 1,
+    "expected": "reject"
+  },
+  {
+    "case": "missing BRIANI_STATE",
+    "exitCode": 1,
+    "expected": "reject"
+  }
+]

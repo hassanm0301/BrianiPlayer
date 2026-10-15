@@ -1,0 +1,16 @@
+{
+  "kernel": "6.18.50+rpt-rpi-2712",
+  "architecture": "aarch64",
+  "landlock": {
+    "abi": -1,
+    "errno": 38
+  },
+  "openat2": {
+    "supported": true,
+    "errno": null
+  },
+  "dockerMemoryLimit": "false",
+  "cgroupControllers": "cpuset cpu io pids",
+  "activeContainers": "filestash_wopi Up 28 minutes\nfilestash Up 28 minutes",
+  "temporaryContainers": ""
+}

@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-14",
+  "scope": "Existing-feature bugs, UI consistency, accessibility and measured optimization",
+  "ownership": {
+    "browse_fixes": [
+      "client/lib/features/libraries",
+      "client/lib/features/discover",
+      "browse tests"
+    ],
+    "ui_audit": [
+      "settings",
+      "administration",
+      "account",
+      "server profiles",
+      "settings_polish_test.dart"
+    ],
+    "parent": [
+      "app/core",
+      "downloads",
+      "playback/photos",
+      "server optimization",
+      "integration tests",
+      "evidence/status"
+    ],
+    "performance_audit": [
+      "read-only server measurement/reconnect investigation"
+    ]
+  },
+  "acceptance": [
+    "sorting/search/refresh regressions",
+    "download reconciliation and transfer validation",
+    "OS text scaling and responsive UI",
+    "settings/seek interaction request counts",
+    "TV navigation regression",
+    "server media/streaming/security regressions",
+    "local before/after optimization measurements"
+  ],
+  "hardware": "Pi and physical Android remain user-deferred; no access attempted",
+  "acceptanceResults": {
+    "flutterUnitWidget": {
+      "passed": 112,
+      "exitCode": 0
+    },
+    "flutterAnalyze": {
+      "issues": 0,
+      "exitCode": 0
+    },
+    "linuxBuild": {
+      "exitCode": 0
+    },
+    "serverApplication": {
+      "passed": 415,
+      "solutionExitCode": 1,
+      "note": "Two engine cases require harness; both subsequently passed there."
+    },
+    "engineIntegration": {
+      "passed": 2,
+      "exitCodes": [
+        0,
+        0
+      ]
+    },
+    "nativeConnectedDesktop": {
+      "exitCode": 0,
+      "nativeTestsPassed": 2,
+      "mediaCasesPassed": 3,
+      "runId": "87e48899e5f64e55bd22fee11244f09b",
+      "cleanup": "verified_empty"
+    },
+    "independentReview": "two_findings_fixed_and_regression_tested; final_review_clear",
+    "secretScan": {
+      "exitCode": 0
+    },
+    "planStructural": {
+      "checks": 1062,
+      "exitCode": 0
+    }
+  },
+  "review": {
+    "reviewer": "/root/plan_review",
+    "findings": [
+      "late download A settings result assigned to B",
+      "nullable API polling on mounted disconnect frame"
+    ],
+    "resolution": "request/API identity guards; nullable API acquisition; both covered by tests",
+    "additionalGuard": "delete-payload confirmation checks request/API identity"
+  },
+  "state": "complete_local",
+  "limitations": [
+    "Existing intermittent reconnect reliability blocker remains",
+    "No Pi/physical Android/TV/Windows/macOS/signing verification",
+    "Synthetic local optimization measurements are not API or Pi benchmarks",
+    "No distribution archives or server images rebuilt/published"
+  ]
+}

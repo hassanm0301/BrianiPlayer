@@ -1,0 +1,5 @@
+Plan structural checks: 1062
+Specifications: 14; milestones: 12; operations: 73; schemas: 68
+Optional OpenAPI standards validation: not installed; structural checks only
+This does not execute implementation tests T01–T32.
+PASS: package structural consistency.

@@ -1,0 +1,21 @@
+{
+  "composeConfig": "passed",
+  "mediaMounts": {
+    "briani": {
+      "/data": "/mnt/hassan_drive/briani/media",
+      "/data/Family": "/mnt/family_drive/briani/media"
+    },
+    "qbittorrent": {
+      "/data": "/mnt/hassan_drive/briani/media",
+      "/data/Family": "/mnt/family_drive/briani/media"
+    }
+  },
+  "productionBrianiContainers": "",
+  "activeContainers": "filestash_wopi Up 36 minutes\nfilestash Up 36 minutes",
+  "payloadHashesVerified": 9,
+  "environmentAndBackupMode": "0600",
+  "duplicateTransferArchivesRemoved": 2,
+  "packageArchiveRetained": "/home/hassan/briani/package-landlock-free-20261015/dist/images/briani-server-linux-arm64.tar",
+  "kernel": "6.18.50+rpt-rpi-2712",
+  "memoryLimit": "false"
+}

@@ -42,13 +42,26 @@ class ServerProfilesScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(children: [
-                              Expanded(child: Text('Servers', style: Theme.of(context).textTheme.headlineMedium)),
-                              if (tv) FilledButton.icon(
-                                autofocus: profiles.asData?.value.isEmpty ?? true,
-                                onPressed: () => _addServer(context, ref),
-                                icon: const Icon(Icons.add), label: const Text('Add server')),
-                            ]),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Servers',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium,
+                                  ),
+                                ),
+                                if (tv)
+                                  FilledButton.icon(
+                                    autofocus:
+                                        profiles.asData?.value.isEmpty ?? true,
+                                    onPressed: () => _addServer(context, ref),
+                                    icon: const Icon(Icons.add),
+                                    label: const Text('Add server'),
+                                  ),
+                              ],
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               'Connect to a Briani server or manage saved addresses.',
@@ -60,8 +73,20 @@ class ServerProfilesScreen extends ConsumerWidget {
                                   child: CircularProgressIndicator(),
                                 ),
                                 error: (error, stack) => Center(
-                                  child: Text(
-                                    'Could not load saved servers: $error',
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Text(
+                                        'Could not load saved servers.',
+                                      ),
+                                      const SizedBox(height: 8),
+                                      FilledButton(
+                                        onPressed: () => ref.invalidate(
+                                          serverProfilesProvider,
+                                        ),
+                                        child: const Text('Retry'),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 data: (items) => items.isEmpty
@@ -77,7 +102,8 @@ class ServerProfilesScreen extends ConsumerWidget {
                                         itemBuilder: (context, index) {
                                           final profile = items[index];
                                           return _ServerProfileTile(
-                                            profile: profile, autofocus: tv && index == 0,
+                                            profile: profile,
+                                            autofocus: tv && index == 0,
                                           );
                                         },
                                       ),
@@ -102,11 +128,13 @@ class ServerProfilesScreen extends ConsumerWidget {
               ),
             ],
           ),
-          floatingActionButton: tv ? null : FloatingActionButton.extended(
-            onPressed: () => _addServer(context, ref),
-            icon: const Icon(Icons.add),
-            label: const Text('Add server'),
-          ),
+          floatingActionButton: tv
+              ? null
+              : FloatingActionButton.extended(
+                  onPressed: () => _addServer(context, ref),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add server'),
+                ),
         );
       },
     );
@@ -114,7 +142,9 @@ class ServerProfilesScreen extends ConsumerWidget {
 
   Future<void> _addServer(BuildContext context, WidgetRef ref) async {
     final profile = await showDialog<ServerProfile>(
-      context: context, builder: (_) => const _AddServerDialog());
+      context: context,
+      builder: (_) => const _AddServerDialog(),
+    );
     if (profile == null || !context.mounted) return;
     await ref.read(serverProfileRepositoryProvider).save(profile);
     if (context.mounted) ref.invalidate(serverProfilesProvider);
@@ -123,95 +153,103 @@ class ServerProfilesScreen extends ConsumerWidget {
 
 class _AddServerDialog extends StatefulWidget {
   const _AddServerDialog();
-  @override State<_AddServerDialog> createState() => _AddServerDialogState();
+  @override
+  State<_AddServerDialog> createState() => _AddServerDialogState();
 }
+
 class _AddServerDialogState extends State<_AddServerDialog> {
   final label = TextEditingController();
   final origin = TextEditingController();
   final formKey = GlobalKey<FormState>();
   bool allowInsecureHttp = false;
-  @override void dispose() { label.dispose(); origin.dispose(); super.dispose(); }
-  @override Widget build(BuildContext dialogContext) => AlertDialog(
-          title: const Text('Add server'),
-          content: Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: label,
-                    autofocus: true,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Enter a name.'
-                        : null,
-                  ),
-                  TextFormField(
-                    controller: origin,
-                    decoration: const InputDecoration(
-                      labelText: 'Server address',
-                      hintText: 'https://server.example',
-                    ),
-                    keyboardType: TextInputType.url,
-                    validator: (value) {
-                      try {
-                        ServerProfile.parseOrigin(
-                          value ?? '',
-                          allowInsecureHttp: allowInsecureHttp,
-                        );
-                        return null;
-                      } on FormatException catch (error) {
-                        return error.message;
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    value: allowInsecureHttp,
-                    onChanged: (value) => setState(
-                      () => allowInsecureHttp = value ?? false,
-                    ),
-                    title: const Text(
-                      'Allow unencrypted HTTP for a trusted LAN/VPN server',
-                    ),
-                    subtitle: const Text(
-                      'Only enable this when the address is reachable through a network you trust. Login credentials travel without encryption.',
-                    ),
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                ],
+  @override
+  void dispose() {
+    label.dispose();
+    origin.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext dialogContext) => AlertDialog(
+    title: const Text('Add server'),
+    content: Form(
+      key: formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: label,
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'Name'),
+              validator: (value) => value == null || value.trim().isEmpty
+                  ? 'Enter a name.'
+                  : null,
+            ),
+            TextFormField(
+              controller: origin,
+              decoration: const InputDecoration(
+                labelText: 'Server address',
+                hintText: 'https://server.example',
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (!formKey.currentState!.validate()) return;
-                final parsedOrigin = ServerProfile.parseOrigin(
-                  origin.text,
-                  allowInsecureHttp: allowInsecureHttp,
-                );
-                Navigator.pop(
-                  dialogContext,
-                  ServerProfile(
-                    id: const Uuid().v4(),
-                    label: label.text.trim(),
-                    origin: parsedOrigin,
-                    allowInsecureHttp:
-                        allowInsecureHttp && parsedOrigin.scheme == 'http',
-                  ),
-                );
+              keyboardType: TextInputType.url,
+              validator: (value) {
+                try {
+                  ServerProfile.parseOrigin(
+                    value ?? '',
+                    allowInsecureHttp: allowInsecureHttp,
+                  );
+                  return null;
+                } on FormatException catch (error) {
+                  return error.message;
+                }
               },
-              child: const Text('Save'),
+            ),
+            const SizedBox(height: 12),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              value: allowInsecureHttp,
+              onChanged: (value) =>
+                  setState(() => allowInsecureHttp = value ?? false),
+              title: const Text(
+                'Allow unencrypted HTTP for a trusted LAN/VPN server',
+              ),
+              subtitle: const Text(
+                'Only enable this when the address is reachable through a network you trust. Login credentials travel without encryption.',
+              ),
+              controlAffinity: ListTileControlAffinity.leading,
             ),
           ],
-        );
+        ),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(dialogContext),
+        child: const Text('Cancel'),
+      ),
+      FilledButton(
+        onPressed: () {
+          if (!formKey.currentState!.validate()) return;
+          final parsedOrigin = ServerProfile.parseOrigin(
+            origin.text,
+            allowInsecureHttp: allowInsecureHttp,
+          );
+          Navigator.pop(
+            dialogContext,
+            ServerProfile(
+              id: const Uuid().v4(),
+              label: label.text.trim(),
+              origin: parsedOrigin,
+              allowInsecureHttp:
+                  allowInsecureHttp && parsedOrigin.scheme == 'http',
+            ),
+          );
+        },
+        child: const Text('Save'),
+      ),
+    ],
+  );
 }
 
 class _ServerProfileTile extends ConsumerStatefulWidget {
@@ -271,60 +309,101 @@ class _ServerProfileTileState extends ConsumerState<_ServerProfileTile> {
     if (MediaQuery.of(context).navigationMode == NavigationMode.directional) {
       // A disabled ListTile tap surface can still capture directional focus.
       // The TV row exposes its actions directly, with advanced actions in a menu.
-      return Card(child: Padding(padding: const EdgeInsets.all(16), child: Row(children: [
-        const Icon(Icons.dns_outlined), const SizedBox(width: 16),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(widget.profile.label, style: Theme.of(context).textTheme.titleLarge),
-          Text(widget.profile.origin.toString()),
-        ])),
-        TextButton.icon(autofocus: widget.autofocus,
-          onPressed: () => context.go('/signin/${Uri.encodeComponent(widget.profile.id)}'),
-          icon: const Icon(Icons.login), label: const Text('Connect')),
-        PopupMenuButton<String>(tooltip: 'Server options',
-          onSelected: (action) { if (action == 'check') { _checkConnection(); } else if (action == 'remove') { _remove(); } },
-          itemBuilder: (_) => [
-            PopupMenuItem(value: 'check', enabled: !_checking, child: const Text('Check connection')),
-            const PopupMenuItem(value: 'remove', child: Text('Remove server')),
-          ]),
-      ])));
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const Icon(Icons.dns_outlined),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.profile.label,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    Text(widget.profile.origin.toString()),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                autofocus: widget.autofocus,
+                onPressed: () => context.go(
+                  '/signin/${Uri.encodeComponent(widget.profile.id)}',
+                ),
+                icon: const Icon(Icons.login),
+                label: const Text('Connect'),
+              ),
+              PopupMenuButton<String>(
+                tooltip: 'Server options',
+                onSelected: (action) {
+                  if (action == 'check') {
+                    _checkConnection();
+                  } else if (action == 'remove') {
+                    _remove();
+                  }
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'check',
+                    enabled: !_checking,
+                    child: const Text('Check connection'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'remove',
+                    child: Text('Remove server'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
     }
     return ListTile(
-    leading: const Icon(Icons.dns_outlined),
-    title: Text(widget.profile.label),
-    subtitle: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.profile.origin.toString()),
-        if (widget.profile.origin.scheme == 'http' &&
-            !widget.profile.allowInsecureHttp)
-          Text(
-            'Blocked: this remote HTTP address has no trusted-network opt-in.',
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
+      leading: const Icon(Icons.dns_outlined),
+      title: Text(widget.profile.label),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.profile.origin.toString()),
+          if (widget.profile.origin.scheme == 'http' &&
+              !widget.profile.allowInsecureHttp)
+            Text(
+              'Blocked: this remote HTTP address has no trusted-network opt-in.',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+        ],
+      ),
+      trailing: Wrap(
+        spacing: 4,
+        children: [
+          TextButton.icon(
+            autofocus: widget.autofocus,
+            onPressed: () =>
+                context.go('/signin/${Uri.encodeComponent(widget.profile.id)}'),
+            icon: const Icon(Icons.login),
+            label: const Text('Connect'),
           ),
-      ],
-    ),
-    trailing: Wrap(
-      spacing: 4,
-      children: [
-        TextButton.icon(
-          autofocus: widget.autofocus,
-          onPressed: () => context.go('/signin/${Uri.encodeComponent(widget.profile.id)}'),
-          icon: const Icon(Icons.login), label: const Text('Connect'),
-        ),
-        TextButton.icon(
-          onPressed: _checking ? null : _checkConnection,
-          icon: _checking
-              ? const SizedBox.square(
-                  dimension: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.link),
-          label: const Text('Check connection'),
-        ),
-        IconButton(tooltip: 'Remove ${widget.profile.label}',
-          icon: const Icon(Icons.delete_outline), onPressed: _remove),
-      ],
-    ),
-  );
+          TextButton.icon(
+            onPressed: _checking ? null : _checkConnection,
+            icon: _checking
+                ? const SizedBox.square(
+                    dimension: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.link),
+            label: const Text('Check connection'),
+          ),
+          IconButton(
+            tooltip: 'Remove ${widget.profile.label}',
+            icon: const Icon(Icons.delete_outline),
+            onPressed: _remove,
+          ),
+        ],
+      ),
+    );
   }
 }

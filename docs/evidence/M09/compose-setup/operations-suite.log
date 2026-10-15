@@ -1,0 +1,26 @@
+........./usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 500: 'error'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+/usr/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 401: 'error'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+.....................
+----------------------------------------------------------------------
+Ran 30 tests in 0.012s
+
+OK
+[0] /usr/bin/dotnet test /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/OperationsTests.csproj --nologo
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  OperationsTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 4 s - OperationsTests.dll (net10.0)
+[0] /usr/bin/python3 -m unittest discover -s tests/operations
+Prowlarr API readiness: authenticated system/status returned version
+Consistent configuration/state backup created at /tmp/tmp2b1b_i16/backup; media payload excluded.
+Created protected deployment configuration: /tmp/tmp9zrjz9ye/project/.env (0600)
+Start Briani to let the server generate its one-time 30-minute bootstrap code, then display it with show-bootstrap-token.
+Prowlarr API key and qBittorrent first-run password must be obtained from the actual private upstream setup; no credential was generated for those services.
+Evidence: artifacts/dev/20261014T111406.193221Z
+Task exit status: 0

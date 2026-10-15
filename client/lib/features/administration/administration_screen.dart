@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:briani_api/briani_api.dart';
 import 'package:briani_api/briani_api.dart' as api_models;
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,35 +17,86 @@ final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
   final api = session.api;
   final admin = api.getAdministrationApi();
   final libraries = api.getLibrariesApi();
-  final results = await Future.wait([
-    admin.getAdminSettings(),
-    admin.listUsers(),
-    admin.getAdminHealth(),
-    admin.listStorageRoots(),
-    admin.listIntegrations(),
-    admin.listAudit(limit: 30),
-    libraries.listLibraries(),
-    api.getDiscoveryApi().listProviders(),
+  final results = await Future.wait<dynamic>([
+    _adminRead<AdminSettings>(
+      'settings',
+      () async => (await admin.getAdminSettings()).data!,
+    ),
+    _adminRead<List<User>>(
+      'users',
+      () async => (await admin.listUsers()).data!.toList().cast<User>(),
+    ),
+    _adminRead<List<ServiceHealth>>(
+      'health',
+      () async =>
+          (await admin.getAdminHealth()).data!.toList().cast<ServiceHealth>(),
+    ),
+    _adminRead<List<StorageRoot>>(
+      'roots',
+      () async =>
+          (await admin.listStorageRoots()).data!.toList().cast<StorageRoot>(),
+    ),
+    _adminRead<List<Integration>>(
+      'integrations',
+      () async =>
+          (await admin.listIntegrations()).data!.toList().cast<Integration>(),
+    ),
+    _adminRead<AuditPage>(
+      'audit',
+      () async => (await admin.listAudit(limit: 30)).data!,
+    ),
+    _adminRead<List<ModelLibrary>>(
+      'libraries',
+      () async =>
+          (await libraries.listLibraries()).data!.toList().cast<ModelLibrary>(),
+    ),
+    _adminRead<List<api_models.Provider>>(
+      'providers',
+      () async => (await api.getDiscoveryApi().listProviders()).data!
+          .toList()
+          .cast<api_models.Provider>(),
+    ),
   ]);
+  final settings = results[0] as _AdminRead<AdminSettings>;
+  final users = results[1] as _AdminRead<List<User>>;
+  final health = results[2] as _AdminRead<List<ServiceHealth>>;
+  final roots = results[3] as _AdminRead<List<StorageRoot>>;
+  final integrations = results[4] as _AdminRead<List<Integration>>;
+  final audit = results[5] as _AdminRead<AuditPage>;
+  final libraryRows = results[6] as _AdminRead<List<ModelLibrary>>;
+  final providers = results[7] as _AdminRead<List<api_models.Provider>>;
   return _AdminSnapshot(
-    settings: (results[0] as Response<AdminSettings>).data!,
-    users: (results[1] as Response<dynamic>).data!.toList().cast<User>(),
-    health: (results[2] as Response<dynamic>).data!
-        .toList()
-        .cast<ServiceHealth>(),
-    roots: (results[3] as Response<dynamic>).data!.toList().cast<StorageRoot>(),
-    integrations: (results[4] as Response<dynamic>).data!
-        .toList()
-        .cast<Integration>(),
-    audit: (results[5] as Response<AuditPage>).data!,
-    libraries: (results[6] as Response<dynamic>).data!
-        .toList()
-        .cast<ModelLibrary>(),
-    providers: (results[7] as Response<dynamic>).data!
-        .toList()
-        .cast<api_models.Provider>(),
+    settings: settings.value,
+    users: users.value ?? const [],
+    health: health.value ?? const [],
+    roots: roots.value ?? const [],
+    integrations: integrations.value ?? const [],
+    audit: audit.value,
+    libraries: libraryRows.value ?? const [],
+    providers: providers.value ?? const [],
+    failures: {
+      for (final row in results.cast<_AdminRead<dynamic>>())
+        if (row.value == null) row.key,
+    },
   );
 });
+
+Future<_AdminRead<T>> _adminRead<T>(
+  String key,
+  Future<T> Function() load,
+) async {
+  try {
+    return _AdminRead<T>(key, await load());
+  } catch (_) {
+    return _AdminRead<T>(key, null);
+  }
+}
+
+class _AdminRead<T> {
+  const _AdminRead(this.key, this.value);
+  final String key;
+  final T? value;
+}
 
 class _AdminSnapshot {
   const _AdminSnapshot({
@@ -58,15 +108,17 @@ class _AdminSnapshot {
     required this.audit,
     required this.libraries,
     required this.providers,
+    required this.failures,
   });
-  final AdminSettings settings;
+  final AdminSettings? settings;
   final List<User> users;
   final List<ServiceHealth> health;
   final List<StorageRoot> roots;
   final List<Integration> integrations;
-  final AuditPage audit;
+  final AuditPage? audit;
   final List<ModelLibrary> libraries;
   final List<api_models.Provider> providers;
+  final Set<String> failures;
 }
 
 class AdministrationScreen extends ConsumerWidget {
@@ -99,15 +151,19 @@ class AdministrationScreen extends ConsumerWidget {
             ],
           ),
         ),
-        data: (snapshot) => _AdminContent(snapshot: snapshot),
+        data: (snapshot) => _AdminContent(
+          snapshot: snapshot,
+          retry: () => ref.invalidate(_adminSnapshotProvider),
+        ),
       ),
     );
   }
 }
 
 class _AdminContent extends ConsumerWidget {
-  const _AdminContent({required this.snapshot});
+  const _AdminContent({required this.snapshot, required this.retry});
   final _AdminSnapshot snapshot;
+  final VoidCallback retry;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -115,12 +171,28 @@ class _AdminContent extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _ServerSettings(snapshot.settings),
-        _DiscoveryScope(snapshot.settings, snapshot.providers),
-        _UserManagement(snapshot.users),
-        _LibraryManagement(snapshot, locale: locale),
-        _HealthAndIntegrations(snapshot),
-        _Operations(snapshot, locale: locale),
+        if (snapshot.settings == null)
+          _UnavailableSection(
+            title: 'Server and transfer settings',
+            retry: retry,
+          )
+        else
+          _ServerSettings(snapshot.settings!),
+        if (snapshot.settings == null)
+          _UnavailableSection(title: 'Discovery scope', retry: retry)
+        else
+          _DiscoveryScope(
+            snapshot.settings!,
+            snapshot.providers,
+            unavailable: snapshot.failures.contains('providers'),
+          ),
+        if (snapshot.failures.contains('users'))
+          _UnavailableSection(title: 'Users and access', retry: retry)
+        else
+          _UserManagement(snapshot.users),
+        _LibraryManagement(snapshot, locale: locale, retry: retry),
+        _HealthAndIntegrations(snapshot, retry: retry),
+        _Operations(snapshot, locale: locale, retry: retry),
       ],
     );
   }
@@ -216,20 +288,22 @@ class _ServerSettings extends StatelessWidget {
           settings.rebuild((b) => b.connectionsPerTorrent = v),
         ),
       ),
-      _saveNullableIntBounded(
+      _saveOptionalUnit(
         context,
-        'Download limit (bytes/second; rounded down to KiB/s; blank = unlimited)',
+        'Download limit (MiB/s; blank = unlimited)',
         settings.downloadLimitBytesPerSecond,
+        1048576,
         1073741824,
         (v) => _putSettings(
           context,
           settings.rebuild((b) => b.downloadLimitBytesPerSecond = v),
         ),
       ),
-      _saveNullableIntBounded(
+      _saveOptionalUnit(
         context,
-        'Upload limit (bytes/second; rounded down to KiB/s; blank = unlimited)',
+        'Upload limit (MiB/s; blank = unlimited)',
         settings.uploadLimitBytesPerSecond,
+        1048576,
         1073741824,
         (v) => _putSettings(
           context,
@@ -254,20 +328,22 @@ class _ServerSettings extends StatelessWidget {
           settings.rebuild((b) => b.defaultSeedTimeMinutes = v),
         ),
       ),
-      _saveNullableInt(
+      _saveOptionalUnit(
         context,
-        'Default user quota (bytes; blank = unlimited)',
+        'Default user quota (GiB; blank = unlimited)',
         settings.defaultUserQuotaBytes,
+        1073741824,
+        9007199254740991,
         (v) => _putSettings(
           context,
           settings.rebuild((b) => b.defaultUserQuotaBytes = v),
         ),
       ),
-      _saveInt(
+      _saveUnit(
         context,
-        'Low disk floor (bytes)',
+        'Low disk floor (GiB)',
         settings.lowDiskFloorBytes ?? 5368709120,
-        0,
+        1073741824,
         9007199254740991,
         (v) => _putSettings(
           context,
@@ -285,11 +361,11 @@ class _ServerSettings extends StatelessWidget {
           settings.rebuild((b) => b.lowDiskFloorFraction = v),
         ),
       ),
-      _saveInt(
+      _saveUnit(
         context,
-        'Thumbnail cache limit (bytes)',
+        'Thumbnail cache limit (MiB)',
         settings.thumbnailCacheMaxBytes ?? 536870912,
-        0,
+        1048576,
         8589934592,
         (v) => _putSettings(
           context,
@@ -345,9 +421,14 @@ class _ServerSettings extends StatelessWidget {
 }
 
 class _DiscoveryScope extends ConsumerStatefulWidget {
-  const _DiscoveryScope(this.settings, this.providers);
+  const _DiscoveryScope(
+    this.settings,
+    this.providers, {
+    this.unavailable = false,
+  });
   final AdminSettings settings;
   final List<api_models.Provider> providers;
+  final bool unavailable;
 
   @override
   ConsumerState<_DiscoveryScope> createState() => _DiscoveryScopeState();
@@ -391,6 +472,10 @@ class _DiscoveryScopeState extends ConsumerState<_DiscoveryScope> {
       const Text(
         'Choose which configured providers and category IDs can appear in discovery. The server enforces this scope for every user.',
       ),
+      if (widget.unavailable)
+        const Text(
+          'Configured provider names are unavailable; provider IDs can still be entered manually.',
+        ),
       const SizedBox(height: 8),
       _scopeMode(
         'Providers',
@@ -592,9 +677,10 @@ class _UserManagement extends ConsumerWidget {
 }
 
 class _LibraryManagement extends ConsumerStatefulWidget {
-  const _LibraryManagement(this.snapshot, {this.locale});
+  const _LibraryManagement(this.snapshot, {this.locale, required this.retry});
   final _AdminSnapshot snapshot;
   final String? locale;
+  final VoidCallback retry;
   @override
   ConsumerState<_LibraryManagement> createState() => _LibraryManagementState();
 }
@@ -648,13 +734,22 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
     return _AdminSection(
       title: 'Libraries, grants and storage',
       trailing: FilledButton.icon(
-        onPressed: snapshot.roots.isEmpty
+        onPressed: snapshot.roots.isEmpty || snapshot.failures.contains('roots')
             ? null
             : () => _createLibrary(context, ref, snapshot.roots),
         icon: const Icon(Icons.create_new_folder_outlined),
         label: const Text('Add library'),
       ),
       children: [
+        if (snapshot.failures.contains('roots'))
+          _retryNotice('Storage roots are unavailable.', widget.retry),
+        if (snapshot.failures.contains('libraries'))
+          _retryNotice('Libraries are unavailable.', widget.retry),
+        if (snapshot.failures.contains('users'))
+          _retryNotice(
+            'User list is unavailable; access changes are disabled.',
+            widget.retry,
+          ),
         for (final root in snapshot.roots)
           ListTile(
             leading: Icon(
@@ -679,7 +774,9 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
                 IconButton(
                   tooltip: 'Manage ${library.name} access',
                   icon: const Icon(Icons.group_outlined),
-                  onPressed: () => _loadGrants(library.id),
+                  onPressed: snapshot.failures.contains('users')
+                      ? null
+                      : () => _loadGrants(library.id),
                 ),
                 IconButton(
                   tooltip: 'Scan ${library.name}',
@@ -799,12 +896,17 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
 }
 
 class _HealthAndIntegrations extends ConsumerWidget {
-  const _HealthAndIntegrations(this.snapshot);
+  const _HealthAndIntegrations(this.snapshot, {required this.retry});
   final _AdminSnapshot snapshot;
+  final VoidCallback retry;
   @override
   Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
     title: 'Service health and integrations',
     children: [
+      if (snapshot.failures.contains('health'))
+        _retryNotice('Service health is unavailable.', retry),
+      if (snapshot.failures.contains('integrations'))
+        _retryNotice('Integrations are unavailable.', retry),
       for (final health in snapshot.health)
         ListTile(
           leading: Icon(
@@ -845,9 +947,10 @@ class _HealthAndIntegrations extends ConsumerWidget {
 }
 
 class _Operations extends ConsumerWidget {
-  const _Operations(this.snapshot, {this.locale});
+  const _Operations(this.snapshot, {this.locale, required this.retry});
   final _AdminSnapshot snapshot;
   final String? locale;
+  final VoidCallback retry;
   @override
   Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
     title: 'Maintenance and audit',
@@ -887,16 +990,48 @@ class _Operations extends ConsumerWidget {
       ),
       const SizedBox(height: 12),
       const Text('Recent audit activity (server-redacted)'),
-      for (final item in snapshot.audit.items)
-        ListTile(
-          dense: true,
-          title: Text(item.action),
-          subtitle: Text(
-            '${formatDateTime(item.occurredAt, locale: locale)} · ${item.actorId ?? 'System'}',
+      if (snapshot.failures.contains('audit'))
+        _retryNotice('Audit activity is unavailable.', retry),
+      if (snapshot.audit != null)
+        for (final item in snapshot.audit!.items)
+          ListTile(
+            dense: true,
+            title: Text(item.action),
+            subtitle: Text(
+              '${formatDateTime(item.occurredAt, locale: locale)} · ${item.actorId ?? 'System'}',
+            ),
           ),
-        ),
-      if (snapshot.audit.truncated)
+      if (snapshot.audit?.truncated == true)
         const Text('More audit records are available.'),
+    ],
+  );
+}
+
+Widget _retryNotice(String text, VoidCallback retry) => Padding(
+  padding: const EdgeInsets.symmetric(vertical: 8),
+  child: Row(
+    children: [
+      Expanded(child: Text(text)),
+      TextButton(onPressed: retry, child: const Text('Retry')),
+    ],
+  ),
+);
+
+class _UnavailableSection extends StatelessWidget {
+  const _UnavailableSection({required this.title, required this.retry});
+  final String title;
+  final VoidCallback retry;
+  @override
+  Widget build(BuildContext context) => _AdminSection(
+    title: title,
+    children: [
+      const Text(
+        "This information could not be loaded. Other administration sections remain available.",
+      ),
+      Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(onPressed: retry, child: const Text("Retry")),
+      ),
     ],
   );
 }
@@ -956,6 +1091,54 @@ Widget _saveText(
   ),
 );
 
+Widget _saveOptionalUnit(
+  BuildContext context,
+  String label,
+  int? value,
+  int multiplier,
+  int max,
+  ValueChanged<int?> save,
+) => _saveText(
+  context,
+  label,
+  value == null ? '' : (value / multiplier).toStringAsFixed(9),
+  (raw) {
+    final text = raw.trim();
+    final parsed = text.isEmpty ? null : double.tryParse(text);
+    if (text.isNotEmpty &&
+        (parsed == null ||
+            !parsed.isFinite ||
+            parsed < 0 ||
+            parsed * multiplier > max)) {
+      _toast(
+        context,
+        '$label must be zero or greater within the supported range, or blank for unlimited.',
+      );
+      return;
+    }
+    save(parsed == null ? null : (parsed * multiplier).round());
+  },
+);
+
+Widget _saveUnit(
+  BuildContext context,
+  String label,
+  int value,
+  int multiplier,
+  int max,
+  ValueChanged<int> save,
+) => _saveText(context, label, (value / multiplier).toStringAsFixed(9), (raw) {
+  final parsed = double.tryParse(raw.trim());
+  if (parsed == null ||
+      !parsed.isFinite ||
+      parsed < 0 ||
+      parsed * multiplier > max) {
+    _toast(context, '$label is outside its allowed range.');
+    return;
+  }
+  save((parsed * multiplier).round());
+});
+
 Widget _saveInt(
   BuildContext context,
   String label,
@@ -1003,25 +1186,6 @@ Widget _saveNullableInt(
   save(parsed);
 });
 
-Widget _saveNullableIntBounded(
-  BuildContext context,
-  String label,
-  int? value,
-  int max,
-  ValueChanged<int?> save,
-) => _saveText(context, label, value?.toString() ?? '', (raw) {
-  final text = raw.trim();
-  final parsed = text.isEmpty ? null : int.tryParse(text);
-  if (text.isNotEmpty && (parsed == null || parsed < 0 || parsed > max)) {
-    _toast(
-      context,
-      '$label must be between 0 and $max, or blank for unlimited.',
-    );
-    return;
-  }
-  save(parsed);
-});
-
 Widget _saveNullableDouble(
   BuildContext context,
   String label,
@@ -1063,73 +1227,141 @@ Future<void> _putSettings(BuildContext context, AdminSettings settings) async {
 Future<void> _createUser(BuildContext context, WidgetRef ref) async {
   final session = _captureAdminSession(ref);
   if (session == null) return;
-  var username = '';
-  var name = '';
-  var password = '';
-  final value = await showDialog<(String, String, String)>(
+  await showDialog<void>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Create member account'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Username'),
-            onChanged: (v) => username = v,
-          ),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Display name'),
-            onChanged: (v) => name = v,
-          ),
-          TextFormField(
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Initial password'),
-            onChanged: (v) => password = v,
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, (username, name, password)),
-          child: const Text('Create'),
-        ),
-      ],
-    ),
+    builder: (_) => _CreateUserDialog(session: session),
   );
-  if (!context.mounted) return;
-  if (!_sameAdminSession(ref, session)) return;
-  if (value == null) return;
-  if (value.$1.trim().isEmpty ||
-      value.$2.trim().isEmpty ||
-      value.$3.length < 12 ||
-      value.$3.length > 128) {
-    _toast(
-      context,
-      'Enter a username, display name, and password of 12–128 characters.',
-    );
-    return;
+}
+
+class _CreateUserDialog extends ConsumerStatefulWidget {
+  const _CreateUserDialog({required this.session});
+  final ClientSession session;
+  @override
+  ConsumerState<_CreateUserDialog> createState() => _CreateUserDialogState();
+}
+
+class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
+  final _form = GlobalKey<FormState>();
+  final _username = TextEditingController(),
+      _name = TextEditingController(),
+      _password = TextEditingController();
+  bool _busy = false;
+  String? _error;
+  @override
+  void dispose() {
+    _username.dispose();
+    _name.dispose();
+    _password.dispose();
+    super.dispose();
   }
-  try {
-    await session.api.getAdministrationApi().createUser(
-      createUser: CreateUser(
-        (b) => b
-          ..username = value.$1.trim()
-          ..displayName = value.$2.trim()
-          ..password = value.$3
-          ..role = CreateUserRoleEnum.member,
-      ),
-      idempotencyKey: 'create-user-${DateTime.now().microsecondsSinceEpoch}',
-    );
-    if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
-  } catch (_) {
-    if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(context, 'The account could not be created.');
+
+  Future<void> _create() async {
+    if (_busy || !_form.currentState!.validate()) return;
+    if (!_sameAdminSession(ref, widget.session)) {
+      setState(
+        () => _error = 'Your administrator session changed. Close this dialog and try again.',
+      );
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.session.api.getAdministrationApi().createUser(
+        createUser: CreateUser(
+          (b) => b
+            ..username = _username.text.trim()
+            ..displayName = _name.text.trim()
+            ..password = _password.text
+            ..role = CreateUserRoleEnum.member,
+        ),
+        idempotencyKey: 'create-user-${DateTime.now().microsecondsSinceEpoch}',
+      );
+      if (!mounted) return;
+      ref.invalidate(_adminSnapshotProvider);
+      Navigator.pop(context);
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _error =
+              'The account could not be created. Check the server and retry.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Create member account'),
+    content: SizedBox(
+      width: 480,
+      child: Form(
+        key: _form,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _username,
+                enabled: !_busy,
+                decoration: const InputDecoration(labelText: 'Username'),
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Enter a username.' : null,
+              ),
+              TextFormField(
+                controller: _name,
+                enabled: !_busy,
+                decoration: const InputDecoration(labelText: 'Display name'),
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? 'Enter a display name.'
+                    : null,
+              ),
+              TextFormField(
+                controller: _password,
+                enabled: !_busy,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Initial password',
+                  helperText: 'Use 12–128 characters.',
+                ),
+                validator: (v) => v == null || v.length < 12 || v.length > 128
+                    ? 'Use 12–128 characters.'
+                    : null,
+              ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    _error!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: _busy ? null : () => Navigator.pop(context),
+        child: const Text('Cancel'),
+      ),
+      FilledButton(
+        onPressed: _busy ? null : _create,
+        child: _busy
+            ? const SizedBox.square(
+                dimension: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Text('Create'),
+      ),
+    ],
+  );
 }
 
 Future<void> _editUser(

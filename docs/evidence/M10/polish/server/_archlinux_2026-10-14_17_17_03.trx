@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="fe7ea302-37d5-406f-8ecb-ec3a7c0fd83f" name="@archlinux 2026-10-14 17:17:03" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-14T17:17:03.4641788+04:00" queuing="2026-10-14T17:17:03.4641789+04:00" start="2026-10-14T17:16:59.7856568+04:00" finish="2026-10-14T17:17:08.5865642+04:00" />
+  <TestSettings name="default" id="c09e9e0a-d2ec-4c38-9f08-e53f1839b4e1">
+    <Deployment runDeploymentRoot="_archlinux_2026-10-14_17_17_03" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="bbd4ef9c-5a22-4b85-ac74-c5f41a12190a" testId="ccbc12fc-af07-37cf-aad1-a916ea83e07a" testName="Briani.OperationsTests.OperationsApiTests.Health_is_admin_only_and_does_not_trigger_upstream_probes" computerName="archlinux" duration="00:00:00.1846678" startTime="2026-10-14T17:17:03.4258845+04:00" endTime="2026-10-14T17:17:04.5568498+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bbd4ef9c-5a22-4b85-ac74-c5f41a12190a" />
+    <UnitTestResult executionId="6193c0bc-1bf9-4b72-9f3e-fb9fd5d3fd08" testId="5020ffce-2f8e-911d-a793-d2267e8afc2b" testName="Briani.OperationsTests.OperationsApiTests.Rescan_rejects_unknown_library_and_deduplicates_active_library_scan" computerName="archlinux" duration="00:00:00.0932053" startTime="2026-10-14T17:17:05.8883301+04:00" endTime="2026-10-14T17:17:06.5338851+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6193c0bc-1bf9-4b72-9f3e-fb9fd5d3fd08" />
+    <UnitTestResult executionId="08180d15-3199-482b-9f39-2d4814b5cc35" testId="02a491f2-36b5-b480-88a8-894f06c6c99f" testName="Briani.OperationsTests.OperationsApiTests.Settings_changed_during_engine_apply_are_requeued_without_losing_the_latest_version" computerName="archlinux" duration="00:00:00.4734440" startTime="2026-10-14T17:17:07.5979781+04:00" endTime="2026-10-14T17:17:08.5080631+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="08180d15-3199-482b-9f39-2d4814b5cc35" />
+    <UnitTestResult executionId="4f589573-4895-4cb3-b089-54b1a93d87e2" testId="968ff760-5a35-3b5e-ad4d-e3f622e8768f" testName="Briani.OperationsTests.OperationsApiTests.Maintenance_validates_action_and_reuses_idempotency_key" computerName="archlinux" duration="00:00:00.1775245" startTime="2026-10-14T17:17:04.5574348+04:00" endTime="2026-10-14T17:17:05.2756851+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4f589573-4895-4cb3-b089-54b1a93d87e2" />
+    <UnitTestResult executionId="e0e9926b-18e7-4b08-9ecc-fec6ca6c9c04" testId="42334307-d509-da51-0346-d1c0e26e2582" testName="Briani.OperationsTests.OperationsApiTests.Thumbnail_prune_deletes_only_owned_inactive_cache_files" computerName="archlinux" duration="00:00:00.1394104" startTime="2026-10-14T17:17:06.5340715+04:00" endTime="2026-10-14T17:17:07.0792110+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0e9926b-18e7-4b08-9ecc-fec6ca6c9c04" />
+    <UnitTestResult executionId="97181d41-cafa-46eb-a14c-a2f96b3e1da7" testId="0c71d2bf-aff6-e5ac-cfc8-d678c0118d4f" testName="Briani.OperationsTests.OperationsApiTests.Health_reports_a_missing_mounted_data_root_as_unavailable" computerName="archlinux" duration="00:00:00.0478657" startTime="2026-10-14T17:17:05.2758412+04:00" endTime="2026-10-14T17:17:05.8880780+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="97181d41-cafa-46eb-a14c-a2f96b3e1da7" />
+    <UnitTestResult executionId="85f88c78-cd84-408c-94b5-d99ea62ec832" testId="251da190-94e0-5b99-c6ca-7fa84f90d6f7" testName="Briani.OperationsTests.OperationsApiTests.Configure_engine_job_retries_and_runs_without_holding_write_gate" computerName="archlinux" duration="00:00:00.5711361" startTime="2026-10-14T17:17:00.8320514+04:00" endTime="2026-10-14T17:17:03.3981315+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85f88c78-cd84-408c-94b5-d99ea62ec832" />
+    <UnitTestResult executionId="4aa03602-97cf-414c-b456-dc493163f320" testId="f1dc5ae0-aff3-c99b-24e1-963bd030738d" testName="Briani.OperationsTests.OperationsApiTests.Member_cannot_read_administrator_health" computerName="archlinux" duration="00:00:00.0779293" startTime="2026-10-14T17:17:07.0793810+04:00" endTime="2026-10-14T17:17:07.5978356+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4aa03602-97cf-414c-b456-dc493163f320" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Settings_changed_during_engine_apply_are_requeued_without_losing_the_latest_version" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="02a491f2-36b5-b480-88a8-894f06c6c99f">
+      <Execution id="08180d15-3199-482b-9f39-2d4814b5cc35" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Settings_changed_during_engine_apply_are_requeued_without_losing_the_latest_version" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Maintenance_validates_action_and_reuses_idempotency_key" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="968ff760-5a35-3b5e-ad4d-e3f622e8768f">
+      <Execution id="4f589573-4895-4cb3-b089-54b1a93d87e2" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Maintenance_validates_action_and_reuses_idempotency_key" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Member_cannot_read_administrator_health" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="f1dc5ae0-aff3-c99b-24e1-963bd030738d">
+      <Execution id="4aa03602-97cf-414c-b456-dc493163f320" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Member_cannot_read_administrator_health" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Health_reports_a_missing_mounted_data_root_as_unavailable" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="0c71d2bf-aff6-e5ac-cfc8-d678c0118d4f">
+      <Execution id="97181d41-cafa-46eb-a14c-a2f96b3e1da7" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Health_reports_a_missing_mounted_data_root_as_unavailable" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Thumbnail_prune_deletes_only_owned_inactive_cache_files" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="42334307-d509-da51-0346-d1c0e26e2582">
+      <Execution id="e0e9926b-18e7-4b08-9ecc-fec6ca6c9c04" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Thumbnail_prune_deletes_only_owned_inactive_cache_files" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Rescan_rejects_unknown_library_and_deduplicates_active_library_scan" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="5020ffce-2f8e-911d-a793-d2267e8afc2b">
+      <Execution id="6193c0bc-1bf9-4b72-9f3e-fb9fd5d3fd08" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Rescan_rejects_unknown_library_and_deduplicates_active_library_scan" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Health_is_admin_only_and_does_not_trigger_upstream_probes" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="ccbc12fc-af07-37cf-aad1-a916ea83e07a">
+      <Execution id="bbd4ef9c-5a22-4b85-ac74-c5f41a12190a" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Health_is_admin_only_and_does_not_trigger_upstream_probes" />
+    </UnitTest>
+    <UnitTest name="Briani.OperationsTests.OperationsApiTests.Configure_engine_job_retries_and_runs_without_holding_write_gate" storage="/home/hassan/projects/brianiplayer/server/tests/briani.operationstests/bin/debug/net10.0/operationstests.dll" id="251da190-94e0-5b99-c6ca-7fa84f90d6f7">
+      <Execution id="85f88c78-cd84-408c-94b5-d99ea62ec832" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.OperationsTests/bin/Debug/net10.0/OperationsTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.OperationsTests.OperationsApiTests" name="Configure_engine_job_retries_and_runs_without_holding_write_gate" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="ccbc12fc-af07-37cf-aad1-a916ea83e07a" executionId="bbd4ef9c-5a22-4b85-ac74-c5f41a12190a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5020ffce-2f8e-911d-a793-d2267e8afc2b" executionId="6193c0bc-1bf9-4b72-9f3e-fb9fd5d3fd08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="02a491f2-36b5-b480-88a8-894f06c6c99f" executionId="08180d15-3199-482b-9f39-2d4814b5cc35" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="968ff760-5a35-3b5e-ad4d-e3f622e8768f" executionId="4f589573-4895-4cb3-b089-54b1a93d87e2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="42334307-d509-da51-0346-d1c0e26e2582" executionId="e0e9926b-18e7-4b08-9ecc-fec6ca6c9c04" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0c71d2bf-aff6-e5ac-cfc8-d678c0118d4f" executionId="97181d41-cafa-46eb-a14c-a2f96b3e1da7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="251da190-94e0-5b99-c6ca-7fa84f90d6f7" executionId="85f88c78-cd84-408c-94b5-d99ea62ec832" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f1dc5ae0-aff3-c99b-24e1-963bd030738d" executionId="4aa03602-97cf-414c-b456-dc493163f320" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="8" executed="8" passed="8" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v4.0.1+0f7d528729 (64-bit .NET 10.0.12)
+[xUnit.net 00:00:00.15]   Discovering: OperationsTests
+[xUnit.net 00:00:00.21]   Discovered:  OperationsTests
+[xUnit.net 00:00:00.29]   Starting:    OperationsTests
+{"EventId":12,"LogLevel":"Information","Category":"Briani.Api.Infrastructure.Security.OpaqueAuthentication","Message":"AuthenticationScheme: opaque was challenged.","State":{"AuthenticationScheme":"opaque","{OriginalFormat}":"AuthenticationScheme: {AuthenticationScheme} was challenged."}}
+{"EventId":10102,"LogLevel":"Warning","Category":"Microsoft.EntityFrameworkCore.Query","Message":"The query uses a row limiting operator (\u0027Skip\u0027/\u0027Take\u0027) without an \u0027OrderBy\u0027 operator. This may lead to unpredictable results. If the \u0027Distinct\u0027 operator is used after \u0027OrderBy\u0027, then make sure to use the \u0027OrderBy\u0027 operator after \u0027Distinct\u0027 as the ordering would otherwise get erased.","State":{"{OriginalFormat}":"The query uses a row limiting operator (\u0027Skip\u0027/\u0027Take\u0027) without an \u0027OrderBy\u0027 operator. This may lead to unpredictable results. If the \u0027Distinct\u0027 operator is used after \u0027OrderBy\u0027, then make sure to use the \u0027OrderBy\u0027 operator after \u0027Distinct\u0027 as the ordering would otherwise get erased."}}
+{"EventId":10102,"LogLevel":"Warning","Category":"Microsoft.EntityFrameworkCore.Query","Message":"The query uses a row limiting operator (\u0027Skip\u0027/\u0027Take\u0027) without an \u0027OrderBy\u0027 operator. This may lead to unpredictable results. If the \u0027Distinct\u0027 operator is used after \u0027OrderBy\u0027, then make sure to use the \u0027OrderBy\u0027 operator after \u0027Distinct\u0027 as the ordering would otherwise get erased.","State":{"{OriginalFormat}":"The query uses a row limiting operator (\u0027Skip\u0027/\u0027Take\u0027) without an \u0027OrderBy\u0027 operator. This may lead to unpredictable results. If the \u0027Distinct\u0027 operator is used after \u0027OrderBy\u0027, then make sure to use the \u0027OrderBy\u0027 operator after \u0027Distinct\u0027 as the ordering would otherwise get erased."}}
+{"EventId":13,"LogLevel":"Information","Category":"Briani.Api.Infrastructure.Security.OpaqueAuthentication","Message":"AuthenticationScheme: opaque was forbidden.","State":{"AuthenticationScheme":"opaque","{OriginalFormat}":"AuthenticationScheme: {AuthenticationScheme} was forbidden."}}
+[xUnit.net 00:00:08.00]   Finished:    OperationsTests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

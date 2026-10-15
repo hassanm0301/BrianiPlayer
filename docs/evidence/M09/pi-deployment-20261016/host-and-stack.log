@@ -1,0 +1,32 @@
+## host
+6.18.50+rpt-rpi-2712
+reboot=w coherent_pool=1M 8250.nr_uarts=1 pci=pcie_bus_safe cgroup_disable=memory numa_policy=interleave nvme.max_host_mem_size_mb=32  numa=fake=8 system_heap.max_order=0 smsc95xx.macaddr=2C:CF:67:36:26:89 vc_mem.mem_base=0x3fc00000 vc_mem.mem_size=0x40000000  console=ttyAMA10,115200 console=tty1 root=PARTUUID=4ff2c4dc-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=GB cgroup_enable=memory
+
+## cmdline.txt (backup: /boot/firmware/cmdline.txt.before-briani-20261016)
+console=serial0,115200 console=tty1 root=PARTUUID=4ff2c4dc-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=GB cgroup_enable=memory
+## controllers
+cpuset cpu io memory pids
+MemoryLimit=true
+## doctor
+Docker Compose version v5.5.1
+29.8.1
+NAME                                           IMAGE                                                                                                     COMMAND                  SERVICE                CREATED              STATUS                    PORTS
+briani-ops-ae2b50f79f-briani-1                 briani-server:landlock-free-20261015-arm64                                                                "dotnet Briani.Api.d…"   briani                 2 minutes ago        Up 55 seconds             192.168.100.186:8088->8088/tcp
+briani-ops-ae2b50f79f-prowlarr-1               lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902      "/init"                  prowlarr               2 minutes ago        Up 56 seconds             9696/tcp
+briani-ops-ae2b50f79f-qbittorrent-1            lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed   "/init"                  qbittorrent            About a minute ago   Up 50 seconds             
+briani-ops-ae2b50f79f-torrent-egress-guard-1   briani-egress:m10-arm64                                                                                   "/guard.sh"              torrent-egress-guard   2 minutes ago        Up 55 seconds (healthy)   
+Linux architecture: aarch64; state and data mounts writable with 5368709120 free bytes minimum.
+Compose rendering passed. The service table above reports current container state; run qbit-bootstrap and capture-prowlarr-key after first startup.
+doctor_exit=0
+## containers
+briani-ops-ae2b50f79f-qbittorrent-1	lscr.io/linuxserver/qbittorrent	Up 50 seconds	
+briani-ops-ae2b50f79f-briani-1	briani-server:landlock-free-20261015-arm64	Up 55 seconds	192.168.100.186:8088->8088/tcp
+briani-ops-ae2b50f79f-prowlarr-1	lscr.io/linuxserver/prowlarr	Up 56 seconds	9696/tcp
+briani-ops-ae2b50f79f-torrent-egress-guard-1	briani-egress:m10-arm64	Up 55 seconds (healthy)	
+filestash_wopi	collabora/code:24.04.10.2.1	Up 4 minutes	0.0.0.0:9980->9980/tcp, [::]:9980->9980/tcp
+filestash	machines/filestash:latest	Up 4 minutes	0.0.0.0:8334->8334/tcp, [::]:8334->8334/tcp
+## memory limits (bytes)
+/briani-ops-ae2b50f79f-qbittorrent-1 0
+/briani-ops-ae2b50f79f-briani-1 1073741824
+/briani-ops-ae2b50f79f-prowlarr-1 0
+/briani-ops-ae2b50f79f-torrent-egress-guard-1 33554432

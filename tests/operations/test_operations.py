@@ -43,11 +43,39 @@ class OperationSafetyTests(unittest.TestCase):
             with self.assertRaises(ops.OpsError):ops.command_up(type('A',(),{'project':self.root})())
             compose.assert_not_called()
     def test_host_preflight_reports_missing_containment_and_memory_without_mutation(self):
-        with patch.object(ops,'run',return_value=type('R',(),{'stdout':'false'})()),patch.object(ops,'kernel_containment_query',return_value={'abi':-1,'errata':-1,'abiErrno':38,'errataErrno':38}):
+        with patch.object(ops,'run',return_value=type('R',(),{'stdout':'false'})()),patch.object(ops,'kernel_containment_query',return_value={'supported':False,'errno':38}):
             with self.assertRaises(ops.OpsError) as failure:ops.require_host_capabilities(self.root)
-            self.assertIn('memory',str(failure.exception));self.assertIn('Landlock',str(failure.exception))
-        with patch.object(ops,'run',return_value=type('R',(),{'stdout':'true'})()),patch.object(ops,'kernel_containment_query',return_value={'abi':8,'errata':7}):
+            self.assertIn('memory',str(failure.exception));self.assertIn('openat2 BENEATH|NO_SYMLINKS',str(failure.exception))
+        with patch.object(ops,'run',return_value=type('R',(),{'stdout':'true'})()),patch.object(ops,'kernel_containment_query',return_value={'supported':True,'errno':None}):
             ops.require_host_capabilities(self.root)
+    def test_openat2_probe_uses_read_only_directory_and_containment_flags(self):
+        calls=[]
+        class FakeSyscall:
+            restype=None
+            def __call__(self,*args):
+                calls.append(args)
+                how=args[3]._obj
+                self.valid=(how.flags & os.O_ACCMODE == os.O_RDONLY, how.resolve == 0x0c)
+                return 99
+        class FakeLibc:
+            syscall=FakeSyscall()
+        with patch.object(ops.platform,'system',return_value='Linux'),patch.object(ops.platform,'machine',return_value='x86_64'),patch.object(ops.os,'open',return_value=12) as opened,patch.object(ops.os,'close') as closed,patch.object(ops.ctypes,'CDLL',return_value=FakeLibc()):
+            self.assertEqual(ops.kernel_containment_query(self.root),{'supported':True,'errno':None})
+        opened.assert_called_once_with(self.root,os.O_RDONLY|os.O_DIRECTORY|os.O_CLOEXEC)
+        self.assertEqual(closed.call_args_list,[unittest.mock.call(99),unittest.mock.call(12)])
+        self.assertTrue(calls)
+        self.assertEqual(FakeLibc.syscall.valid,(True,True))
+    def test_openat2_probe_fails_closed_when_syscall_is_missing_or_flags_unsupported(self):
+        for error_number in (38,22):
+            class FakeSyscall:
+                restype=None
+                def __call__(self,*_args):
+                    ops.ctypes.set_errno(error_number)
+                    return -1
+            class FakeLibc:
+                syscall=FakeSyscall()
+            with self.subTest(errno=error_number),patch.object(ops.platform,'system',return_value='Linux'),patch.object(ops.platform,'machine',return_value='aarch64'),patch.object(ops.os,'open',return_value=12),patch.object(ops.os,'close'),patch.object(ops.ctypes,'CDLL',return_value=FakeLibc()):
+                self.assertEqual(ops.kernel_containment_query(self.root),{'supported':False,'errno':error_number})
     def test_image_lock_checks_upstream_pins_and_local_briani_image_id(self):
         lockroot=self.root/'locks'; lockroot.mkdir()
         local_id='sha256:'+'b'*64; qb='lscr.io/linuxserver/qbittorrent@sha256:'+'c'*64; pr='lscr.io/linuxserver/prowlarr@sha256:'+'d'*64

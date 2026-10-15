@@ -1,0 +1,11 @@
+{
+  "playbackTimeSeconds": 0.083333,
+  "firstFrameSeconds": 6.3082565420008905,
+  "engineProgressAtFirstFrame": 1,
+  "completedBeforeFirstFrame": true,
+  "decodedVideo": {
+    "w": 640,
+    "h": 360,
+    "pixelformat": "yuv420p"
+  }
+}

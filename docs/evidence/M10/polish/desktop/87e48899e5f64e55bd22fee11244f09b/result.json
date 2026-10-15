@@ -1,0 +1,210 @@
+{
+  "result": "passed",
+  "milestone": "M07",
+  "runId": "87e48899e5f64e55bd22fee11244f09b",
+  "artifacts": "/home/hassan/projects/BrianiPlayer/docs/evidence/M10/polish/desktop/87e48899e5f64e55bd22fee11244f09b",
+  "desktopE2E": {
+    "command": "xvfb-run -a flutter test integration_test/desktop_e2e_test.dart -d linux",
+    "exitCode": 0,
+    "audio": "disabled for headless test",
+    "display": "Xvfb"
+  },
+  "apiImageId": "sha256:1df27e12987bc5e3881d56e964d64a57de9837a13aef7eed8182921ba44f2ac8",
+  "qBittorrentImage": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+  "qBittorrentVersion": "v5.2.4",
+  "mpvVersion": "mpv v0.41.0 Copyright © 2000-2025 mpv/MPlayer/mplayer2 projects",
+  "ffmpegVersion": "ffmpeg version n9.0.2 Copyright (c) 2000-2026 the FFmpeg developers",
+  "isolatedInternalNetwork": true,
+  "externalTrackerOrPeer": false,
+  "publishedPorts": [],
+  "media": [
+    {
+      "label": "desktop-ui-faststart-mp4",
+      "sizeBytes": 21065227,
+      "sourceSha256": "750049144e7619cbdf1abac22980f9c440c1117bc74d8e010d49792a28eb0083",
+      "torrentHash": "3c9bc907aae8850abc3162e91ce7c740d9a611b8",
+      "firstFrame": {
+        "positionMs": 958,
+        "videoCodec": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "engineProgressAtFirstFrame": 0.832218897997159
+      },
+      "incompleteAtFirstFrame": true,
+      "progressAtFirstFrame": 0.832218897997159,
+      "uiSelectedAndStarted": true,
+      "embeddedNativePlayer": true,
+      "externalHandoff": true,
+      "nativeBufferPauseAndResume": {
+        "resumed": true,
+        "positionAfterResumeMs": 100583
+      },
+      "nativeRenderProof": {
+        "capture": "/home/hassan/projects/BrianiPlayer/docs/evidence/M10/polish/desktop/87e48899e5f64e55bd22fee11244f09b/ui-native-render.png",
+        "width": 640,
+        "height": 480,
+        "uniqueColorsInVideoViewport": 17397,
+        "viewportCrop": "510x365+130+50"
+      },
+      "completedImport": {
+        "fileName": "Faststart café [test].mp4",
+        "playbackState": "complete",
+        "importedMediaId": "85c35ba0-3cfe-475a-9517-08d01f618c05"
+      },
+      "completedImportBrowsedInUi": true,
+      "externalProcessesTerminated": 1
+    },
+    {
+      "label": "tracks-mkv",
+      "sourceSha256": "56ceec85995d139b1dc4cc7fc61a6e4ab3bfb33760366c2e57df816f3aa01415",
+      "sizeBytes": 22551464,
+      "torrentHash": "33a0f21540ef39c35892c2f6c6a91e2445dc63cd",
+      "firstFrame": {
+        "playbackTimeSeconds": 0.125,
+        "firstFrameSeconds": 0.15137855200009653,
+        "engineProgressAtFirstFrame": 0.797714596267453,
+        "completedBeforeFirstFrame": false,
+        "decodedVideo": {
+          "w": 640,
+          "h": 360,
+          "pixelformat": "yuv420p"
+        }
+      },
+      "incompleteAtFirstFrame": true,
+      "progressAtFirstFrame": 0.797714596267453,
+      "contiguousPrefixBytes": 17301504,
+      "headRangeBeforeCompletion": true,
+      "bufferingObserved": true,
+      "bufferResume": {
+        "pausedForCache": true,
+        "stableSeconds": 1.0016990610020002,
+        "positionAtPause": 100.042,
+        "resumed": true,
+        "positionAfterResume": 100.75
+      },
+      "vlc": null,
+      "vlcCompletedComparison": null,
+      "missingPiece": 72,
+      "missingDataWait": {
+        "status": 206,
+        "bytesBeforeGap": 262144,
+        "waited": true
+      },
+      "resumeSameTicketBytes": 16,
+      "prioritiesUnchanged": true,
+      "httpMatrix": [
+        {
+          "case": "head-range",
+          "status": 200,
+          "contentLength": 22551464,
+          "bodyBytes": 0
+        },
+        {
+          "case": "closed-range",
+          "status": 206,
+          "bytesCompared": 8069,
+          "sha256": "bed8c08ab71fdd561d0385212e32c6f6810287555936018bfb15efeefa685e72"
+        },
+        {
+          "case": "open-range",
+          "status": 206,
+          "bytesCompared": 22543272,
+          "sha256": "d92a8a346d6b4dc3a61b6a59d964635b7298d731e16758f157c96b324bb3c9f2"
+        },
+        {
+          "case": "suffix-range",
+          "status": 206,
+          "bytesCompared": 4096,
+          "sha256": "fa21f1c29d052b419780b1e511ecb086492f7583465b1f92ed7d0751871b2c83"
+        },
+        {
+          "case": "multi-range-fallback",
+          "status": 200,
+          "bytesCompared": 22551464,
+          "sha256": "56ceec85995d139b1dc4cc7fc61a6e4ab3bfb33760366c2e57df816f3aa01415"
+        },
+        {
+          "case": "full-get",
+          "status": 200,
+          "bytesCompared": 22551464,
+          "sha256": "56ceec85995d139b1dc4cc7fc61a6e4ab3bfb33760366c2e57df816f3aa01415"
+        },
+        {
+          "case": "unsatisfiable",
+          "status": 416,
+          "contentRange": "bytes */22551464"
+        },
+        {
+          "case": "if-range-fallback",
+          "status": 200,
+          "bytesCompared": 22551464
+        }
+      ]
+    },
+    {
+      "label": "tail-metadata-mp4",
+      "sourceSha256": "3002eb06fefb31d9c36973b3b064bf8247709a219706feaf70c543b8db4d4111",
+      "sizeBytes": 21065227,
+      "torrentHash": "06b842249b7fbda6f80f3f5fd793ea29aa8fbfbf",
+      "firstFrame": {
+        "playbackTimeSeconds": 0.083333,
+        "firstFrameSeconds": 6.3082565420008905,
+        "engineProgressAtFirstFrame": 1,
+        "completedBeforeFirstFrame": true,
+        "decodedVideo": {
+          "w": 640,
+          "h": 360,
+          "pixelformat": "yuv420p"
+        }
+      },
+      "incompleteAtFirstFrame": false,
+      "tailMetadataOutcome": "waited_until_complete",
+      "httpMatrix": [
+        {
+          "case": "head-range",
+          "status": 200,
+          "contentLength": 21065227,
+          "bodyBytes": 0
+        },
+        {
+          "case": "closed-range",
+          "status": 206,
+          "bytesCompared": 8069,
+          "sha256": "24a82dabcf707956f85c30c5c1921832aabd8e3f2f0b9e592204e61c7b1e7f8e"
+        },
+        {
+          "case": "open-range",
+          "status": 206,
+          "bytesCompared": 21057035,
+          "sha256": "918f8796c2e0cb0cc5c3ecb18593e1d767a62d022e064b1ccb62bf1077f7f2c1"
+        },
+        {
+          "case": "suffix-range",
+          "status": 206,
+          "bytesCompared": 4096,
+          "sha256": "75e9d51273cfc433bbe7b65898cc7fcad2e3559a417b04973358272f4d74fdb0"
+        },
+        {
+          "case": "multi-range-fallback",
+          "status": 200,
+          "bytesCompared": 21065227,
+          "sha256": "3002eb06fefb31d9c36973b3b064bf8247709a219706feaf70c543b8db4d4111"
+        },
+        {
+          "case": "full-get",
+          "status": 200,
+          "bytesCompared": 21065227,
+          "sha256": "3002eb06fefb31d9c36973b3b064bf8247709a219706feaf70c543b8db4d4111"
+        },
+        {
+          "case": "unsatisfiable",
+          "status": 416,
+          "contentRange": "bytes */21065227"
+        },
+        {
+          "case": "if-range-fallback",
+          "status": 200,
+          "bytesCompared": 21065227
+        }
+      ]
+    }
+  ]
+}

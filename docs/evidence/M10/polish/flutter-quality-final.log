@@ -1,0 +1,35 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart
+00:00 +0: system accessibility scaling remains effective
+00:00 +1: quiet refresh removes requests absent from the reconciled window
+00:00 +2: valid partial transfer settings are submitted
+00:00 +3: tabs preserve folder search and Back; hidden downloads stop polling
+00:00 +4: download detail polls live data without repeatedly loading metadata
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+pumpAndSettle timed out
+
+When the exception was thrown, this was the stack:
+#0      WidgetTester.pumpAndSettle.<anonymous closure> (package:flutter_test/src/widget_tester.dart:717:11)
+<asynchronous suspension>
+#1      TestAsyncUtils.guard.<anonymous closure> (package:flutter_test/src/test_async_utils.dart:130:27)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart:370:7)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  download detail polls live data without repeatedly loading metadata
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:02 +4 -1: download detail polls live data without repeatedly loading metadata [E]
+  Test failed. See exception logs above.
+  The test description was: download detail polls live data without repeatedly loading metadata
+  
+00:02 +4 -1: Some tests failed.
+
+Failing tests:
+  /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: download detail polls live data without repeatedly loading metadata

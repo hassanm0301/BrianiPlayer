@@ -1,0 +1,3 @@
+Created protected deployment configuration: /home/hassan/briani/ops/.env (0600)
+Start Briani to let the server generate its one-time 30-minute bootstrap code, then display it with show-bootstrap-token.
+Prowlarr API key and qBittorrent first-run password must be obtained from the actual private upstream setup; no credential was generated for those services.

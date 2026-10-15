@@ -11,9 +11,19 @@ services:
       AllowedHosts: "${BRIANI_HOSTS:-localhost;127.0.0.1;briani}"
     ports: ["${BRIANI_BIND:-127.0.0.1}:8088:8088"]
     volumes:
-      - "${BRIANI_STATE:-./state}/briani:/config"
-      - "${BRIANI_DATA:-/srv/briani/data}:/data"
-      - "${BRIANI_STATE:-./state}/secrets:/run/briani-secrets:ro"
+      - type: bind
+        source: ${BRIANI_STATE:?set BRIANI_STATE to your host state directory}/briani
+        target: /config
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${BRIANI_DATA:?set BRIANI_DATA to your host media directory}
+        target: /data
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${BRIANI_STATE:?set BRIANI_STATE to your host state directory}/secrets
+        target: /run/briani-secrets
+        read_only: true
+        bind: {create_host_path: false}
     networks: [control, client-access]
     restart: unless-stopped
     read_only: true
@@ -29,8 +39,14 @@ services:
       WEBUI_PORT: "8080"
       TORRENTING_PORT: "6881"
     volumes:
-      - "${BRIANI_STATE:-./state}/qbittorrent:/config"
-      - "${BRIANI_DATA:-/srv/briani/data}:/data"
+      - type: bind
+        source: ${BRIANI_STATE:?set BRIANI_STATE to your host state directory}/qbittorrent
+        target: /config
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${BRIANI_DATA:?set BRIANI_DATA to your host media directory}
+        target: /data
+        bind: {create_host_path: false}
     network_mode: service:torrent-egress-guard
     depends_on:
       torrent-egress-guard:
@@ -57,7 +73,11 @@ services:
     environment:
       PUID: "${BRIANI_UID:-1000}"
       PGID: "${BRIANI_GID:-1000}"
-    volumes: ["${BRIANI_STATE:-./state}/prowlarr:/config"]
+    volumes:
+      - type: bind
+        source: ${BRIANI_STATE:?set BRIANI_STATE to your host state directory}/prowlarr
+        target: /config
+        bind: {create_host_path: false}
     networks: [control, indexer-egress]
     restart: unless-stopped
     stop_grace_period: 60s

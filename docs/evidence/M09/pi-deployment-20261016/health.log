@@ -1,0 +1,2 @@
+GET http://192.168.100.186:8088/healthz -> {"status":"alive"} http=200
+GET http://192.168.100.186:8088/readyz -> {"status":"ready"} http=200

@@ -1,0 +1,7 @@
+{
+  "result": "preflight_passed",
+  "executables": "present",
+  "apiImage": "briani-server:m10",
+  "qBittorrentImage": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+  "flutter": "Flutter 3.47.7 \u2022 channel stable \u2022 https://github.com/flutter/flutter.git"
+}

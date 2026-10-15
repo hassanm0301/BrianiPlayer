@@ -10,7 +10,7 @@ You need:
 
 - Docker Engine and the Docker Compose plugin, working for the non-root Linux account that will manage Briani.
 - Python 3.10 or newer for the supplied operations tool. The tool uses Python's standard library; you do not need .NET or Flutter on the server.
-- A kernel with the Landlock containment features required by Briani, and Docker memory-limit enforcement. The `doctor` check below verifies both and stops if either is missing.
+- A Linux amd64/ARM64 kernel supporting `openat2` with `RESOLVE_BENEATH` and `RESOLVE_NO_SYMLINKS`, and Docker memory-limit enforcement. The `doctor` check probes both and stops if either is missing. The path probe opens the existing deployment directory read-only; it creates or changes no host files and does not alter kernel or boot settings.
 - Already mounted, local storage for application state and media. SSD/NVMe storage is preferable for databases and downloads. Keep the database off SMB/NFS.
 - At least 5 GiB free on the state and media filesystems to pass the initial check, plus space for your actual collection and downloads.
 - A stable server address that your client devices can reach. A DHCP reservation on your existing network can keep that address consistent.
@@ -41,9 +41,11 @@ Keep these three directories separate:
 | State | Briani database, accounts, keys, thumbnails, qBittorrent/Prowlarr configuration | `/mnt/briani-ssd/state` |
 | Media/data | Your library folders and managed downloads | `/mnt/briani-ssd/media` |
 
-State and media may be sibling directories on the same mounted disk, but cannot contain each other or overlap the deployment directory. The operations tool requires them to be under an **already mounted non-root filesystem**. An ordinary folder on `/` is refused, even if it has plenty of space, to avoid writing to the OS disk when a media disk is missing. The backup target must also be on a mounted non-root filesystem.
+State and media may be sibling directories on the same mounted disk, but cannot contain each other or overlap the deployment directory. Give Briani dedicated writable directories for state and media; do not point it at a broad shared host directory. The operations tool requires them to be under an **already mounted non-root filesystem**. An ordinary folder on `/` is refused, even if it has plenty of space, to avoid writing to the OS disk when a media disk is missing. The backup target must also be on a mounted non-root filesystem.
 
-Mount and prepare your disk using your operating system's storage tools first. The selected account must be able to create and write the directories. Briani will not change the ownership of your media disk for you. Paths must be absolute, must not be symlinks, and must not contain `:`, `#`, or newlines. Keep state private to the selected account; `init` creates its service directories with owner-only access.
+Mount and prepare your disk using your operating system's storage tools first. The selected account must be able to create and write the directories. Briani will not change the ownership of your media disk for you. Paths must be absolute, must not be symlinks, and must not contain `:`, `#`, or newlines. Keep state private to the selected account; `init` creates its service directories with owner-only access. Briani resolves authorized paths through descriptor-based `openat2` containment. This protects requests from escaping those directories through symlinks or `..` traversal; it does not provide an atomic guarantee against an arbitrary local process moving or replacing directories concurrently. Treat the host and its local administrators as trusted.
+
+Stop the Briani Compose stack before reorganizing, renaming, or moving the selected state or media directories on the host. After the change, update the deployment configuration through a reviewed migration procedure; do not move active paths while services are running.
 
 Existing media belongs **inside the selected media directory**, for example `media/Videos/` and `media/Photos/`. In the containers, that directory appears as `/data` for both Briani and qBittorrent. Choosing `/mnt/briani-ssd/media` does not also expose other folders elsewhere on the host.
 
@@ -125,7 +127,7 @@ python3 "$BRIANI_PACKAGE/tools/operations/briani.py" doctor \
   --project "$BRIANI_PROJECT"
 ```
 
-Before startup, an empty service table is normal. Resolve any architecture, disk, permissions, memory-controller, or Landlock error before continuing. The tool does not alter your kernel or weaken these requirements.
+Before startup, an empty service table is normal. Resolve any architecture, disk, permissions, memory-controller, or `openat2` error before continuing. The tool does not alter your kernel or weaken these requirements.
 
 ## 5. Start the services and capture their credentials
 
@@ -369,7 +371,7 @@ Do not forward qBittorrent/Prowlarr administration ports to the internet. Public
 |---|---|
 | `doctor` reports a missing mount | Confirm the actual disk is mounted. Do not create a substitute folder on the OS disk. |
 | Permission or UID/GID error | Use the account recorded during `init`; ensure it owns or can write the selected directories. Avoid `sudo` and world-writable permissions. |
-| Landlock or memory-limit failure | Use a host/kernel providing the reported capability. Do not bypass the check. |
+| `openat2` or memory-limit failure | Use a host/kernel providing the reported capability. Do not bypass the check. |
 | Local image identity mismatch | Load the correct architecture's archives and use their matching locks/tools. Do not retag an unrelated image. |
 | Phone/TV cannot connect | Check server IP, port 8088, LAN binding, allowed host list, firewall access, and the HTTP opt-in. `localhost` on the phone/TV refers to that device. |
 | HTTP 400 when connecting | Check that the address's hostname/IP is in `BRIANI_HOSTS`; entries have no scheme or port. |

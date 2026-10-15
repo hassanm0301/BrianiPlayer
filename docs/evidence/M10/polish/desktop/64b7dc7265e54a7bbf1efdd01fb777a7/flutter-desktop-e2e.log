@@ -1,0 +1,61 @@
+Resolving dependencies...
+Downloading packages...
+  archive 4.5.1 (4.5.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+! media_kit 1.2.6 from path vendor/media_kit (overridden)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  screen_retriever 0.2.2 (0.3.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.3 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+14 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/integration_test/desktop_e2e_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/briani_player
+00:00 +0: fixture markers never expose unfinished JSON reports
+00:00 +1: Linux desktop connects to the isolated Briani API
+media_kit: NativeReferenceHolder: Allocated 94562105218768
+VideoOutput.Resize
+{handle: 94562103679104, id: 94562095818960, rect: {left: 0, top: 0, width: 1, height: 1}}
+NativeVideoController: Texture ID: 94562095818960
+VideoOutput.Resize
+{handle: 94562103679104, id: 94562095818960, rect: {left: 0, top: 0, width: 640, height: 360}}
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Timed out waiting for refreshed imported folder; visible text: M07 isolated server | Libraries |
+Discover | Downloads | M07 generated playback | Search this folder | Downloads | M07 generated
+playback
+
+When the exception was thrown, this was the stack:
+#0      _until (file:///home/hassan/projects/BrianiPlayer/client/integration_test/desktop_e2e_test.dart:30:3)
+<asynchronous suspension>
+#1      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/integration_test/desktop_e2e_test.dart:279:5)
+<asynchronous suspension>
+#2      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#3      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  Linux desktop connects to the isolated Briani API
+════════════════════════════════════════════════════════════════════════════════════════════════════
+03:37 +1 -1: Linux desktop connects to the isolated Briani API [E]
+  Test failed. See exception logs above.
+  The test description was: Linux desktop connects to the isolated Briani API
+  
+03:37 +1 -1: (tearDownAll)
+03:37 +1 -1: Some tests failed.
+
+Failing tests:
+  /home/hassan/projects/BrianiPlayer/client/integration_test/desktop_e2e_test.dart: Linux desktop connects to the isolated Briani API

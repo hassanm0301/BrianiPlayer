@@ -1,0 +1,17 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:00 +1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Largest first sends a supported wire value and keeps content
+00:00 +2: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: late folder search cannot overwrite newer results
+00:00 +3: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: old discovery page cannot contaminate a new query
+00:00 +4: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: failed folder refresh retains loaded entries and offers retry
+00:01 +5: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: failed initial folder load never reports an empty folder
+00:01 +6: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: switching to Search cancels a pending discovery page
+00:01 +7: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: late preferences preserve the discovery mode chosen by the user
+00:01 +8: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: late preferences do not reset a folder sort chosen by the user
+00:01 +9: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again
+00:01 +10: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: library grid uses responsive lazy slivers at large text scale
+00:02 +11: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:02 +12: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: quiet refresh removes requests absent from the reconciled window
+00:03 +13: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: valid partial transfer settings are submitted
+00:03 +14: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:03 +15: All tests passed!

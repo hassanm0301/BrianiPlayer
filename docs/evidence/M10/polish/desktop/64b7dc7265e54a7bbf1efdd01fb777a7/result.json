@@ -1,0 +1,9 @@
+{
+  "result": "failed",
+  "milestone": "M07",
+  "runId": "64b7dc7265e54a7bbf1efdd01fb777a7",
+  "failure": "RuntimeError",
+  "detail": "Flutter Linux desktop E2E failed; see /home/hassan/projects/BrianiPlayer/docs/evidence/M10/polish/desktop/64b7dc7265e54a7bbf1efdd01fb777a7/flutter-desktop-e2e.log",
+  "artifacts": "/home/hassan/projects/BrianiPlayer/docs/evidence/M10/polish/desktop/64b7dc7265e54a7bbf1efdd01fb777a7",
+  "flutterStage": "external-handoff"
+}

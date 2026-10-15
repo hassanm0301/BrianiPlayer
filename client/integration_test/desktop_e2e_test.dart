@@ -14,6 +14,8 @@ import 'package:briani_player/app/app.dart';
 import 'package:briani_player/core/server_profiles/providers.dart';
 import 'package:briani_player/core/playback/playback_adapter.dart';
 import 'package:briani_player/features/playback/player_screen.dart';
+import 'package:briani_player/features/libraries/folder_screen.dart';
+import 'package:window_manager/window_manager.dart';
 
 Future<void> _until(WidgetTester tester, Finder finder, String label,
     {Duration timeout = const Duration(seconds: 35)}) async {
@@ -92,6 +94,8 @@ void main() {
     final adapters = <MediaKitPlaybackAdapter>[];
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
+    await windowManager.ensureInitialized();
+    await windowManager.setSize(const Size(1280, 800));
     await tester.binding.setSurfaceSize(const Size(1280, 800));
     await tester.pumpWidget(ProviderScope(
       overrides: [
@@ -268,11 +272,15 @@ void main() {
     await tester.tap(back);
     await _until(tester, find.byType(NavigationRail), 'main app navigation after playback');
     await tester.tap(find.descendant(of: find.byType(NavigationRail), matching: find.text('Libraries')));
-    await _until(tester, find.text(libraryName), 'library after completed download import');
-    await tester.tap(find.text(libraryName));
-    await _until(tester, find.text('Downloads'), 'completed download folder in library',
+    // Switching tabs retains the previously opened library folder. Refresh it
+    // to discover the import completed while playback was on another route.
+    await _until(tester, find.byType(FolderScreen), 'retained library folder');
+    await tester.tap(find.byTooltip('Refresh folder'));
+    final downloadsFolder = find.descendant(
+      of: find.byType(FolderScreen), matching: find.text('Downloads'));
+    await _until(tester, downloadsFolder, 'completed download folder in library',
         timeout: const Duration(seconds: 45));
-    await tester.tap(find.text('Downloads').last);
+    await tester.tap(downloadsFolder);
     final importedFolder = find.textContaining(config['downloadName'] as String);
     await _until(tester, importedFolder, 'imported download folder');
     await tester.tap(importedFolder.last);

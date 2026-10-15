@@ -19,24 +19,37 @@ def require_memory_limits(project: Path):
     if result.stdout.strip() != 'true':
         raise OpsError('Docker cannot enforce container memory limits on this host; enable the kernel/cgroup memory controller before deploying. No host configuration was changed.')
 
-def kernel_containment_query():
+class OpenHow(ctypes.Structure):
+    _fields_ = [('flags', ctypes.c_uint64), ('mode', ctypes.c_uint64), ('resolve', ctypes.c_uint64)]
+
+def kernel_containment_query(directory: Path):
+    """Probe openat2 containment without creating or changing host files."""
     if platform.system()!='Linux' or platform.machine().lower() not in ('x86_64','amd64','aarch64','arm64'):
         raise OpsError('64-bit Linux amd64/arm64 is required')
-    libc=ctypes.CDLL(None,use_errno=True);libc.syscall.restype=ctypes.c_long
-    values={}
-    for label,flag in (('abi',1),('errata',2)):
+    dirfd = resultfd = None
+    try:
+        dirfd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
+        how = OpenHow(os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC, 0, 0x08 | 0x04)  # BENEATH | NO_SYMLINKS
+        libc=ctypes.CDLL(None,use_errno=True);libc.syscall.restype=ctypes.c_long
         ctypes.set_errno(0)
-        values[label]=libc.syscall(ctypes.c_long(444),ctypes.c_void_p(),ctypes.c_size_t(0),ctypes.c_uint(flag))
-        values[label+'Errno']=ctypes.get_errno()
-    return values
+        resultfd=libc.syscall(ctypes.c_long(437),ctypes.c_int(dirfd),ctypes.c_char_p(b'.'),ctypes.byref(how),ctypes.c_size_t(ctypes.sizeof(how)))
+        if resultfd < 0:
+            error=ctypes.get_errno()
+            return {'supported':False,'errno':error}
+        return {'supported':True,'errno':None}
+    except OSError as error:
+        return {'supported':False,'errno':error.errno}
+    finally:
+        if resultfd is not None and resultfd >= 0: os.close(resultfd)
+        if dirfd is not None: os.close(dirfd)
 
 def require_host_capabilities(project: Path):
     failures=[]
     try:require_memory_limits(project)
     except OpsError as error:failures.append(str(error))
-    capabilities=kernel_containment_query()
-    if capabilities['abi']<2 or capabilities['errata']<0 or capabilities['errata']&4==0:
-        failures.append('The kernel lacks the Landlock ABI/erratum required for filesystem containment. Use a compatible kernel with Landlock enabled; this tool never changes kernel or boot settings.')
+    capabilities=kernel_containment_query(project)
+    if not capabilities['supported']:
+        failures.append(f"The kernel or filesystem does not support openat2 BENEATH|NO_SYMLINKS containment (errno {capabilities['errno']}); use a compatible Linux amd64/arm64 host. No host files, kernel settings, or boot settings were changed.")
     if failures:raise OpsError(' '.join(failures))
 
 def run(argv: Sequence[str], *, cwd: Path, env: dict[str,str] | None = None, capture: bool = False):
@@ -93,14 +106,32 @@ def require_mounted_parent(p:Path,label:str):
         probe=probe.parent
     raise OpsError(f'{label} must be on an already mounted non-root filesystem; refusing to create a directory on a missing mount')
 
-def compose(project: Path, args: Sequence[str], env: dict[str,str] | None=None, *, admin=False, capture=False):
-    # The repository Compose file has a default top-level project name. Always
-    # override it from the private project directory so restore/rollback drills
-    # cannot recreate or stop an unrelated deployment with the same default.
+def compose_project_name(project: Path) -> str:
     resolved=project.resolve()
     slug=re.sub(r'[^a-z0-9_-]+','-',resolved.name.lower()).strip('-') or 'deployment'
     identity=hashlib.sha256(str(resolved).encode()).hexdigest()[:10]
-    cmd=['docker','compose','--project-name',f'briani-{slug[:24]}-{identity}','-f',str(COMPOSE)]
+    return f'briani-{slug[:24]}-{identity}'
+
+def write_compose_files(project: Path):
+    """Give ordinary Compose commands the same deployment identity as this tool."""
+    identity=compose_project_name(project)
+    for name,source in (('compose.yaml',COMPOSE),('compose.admin.yaml',ADMIN)):
+        target=project/name
+        if target.is_symlink() or target.exists() and not target.is_file():
+            raise OpsError(f'deployment manifest must be a regular file: {name}')
+        if target.exists():
+            names=re.findall(r'(?m)^name[ \t]*:[ \t]*([^\r\n]+)$',target.read_text())
+            expected=re.escape(identity)
+            if (name=='compose.yaml' or names) and (len(names)!=1 or not re.fullmatch(rf'(?:{expected}|"{expected}"|\'{expected}\')[ \t]*(?:#.*)?',names[0].strip())):
+                raise OpsError(f'{name} must retain the deployment name {identity}; no existing manifest was changed')
+        else:
+            content=source.read_text()
+            if name=='compose.yaml': content=content.replace('name: briani\n','name: '+identity+'\n',1)
+            target.write_text(content)
+
+def compose(project: Path, args: Sequence[str], env: dict[str,str] | None=None, *, admin=False, capture=False):
+    # Override the repository default name, matching generated deployment files.
+    cmd=['docker','compose','--project-name',compose_project_name(project),'-f',str(COMPOSE)]
     if admin: cmd += ['-f',str(ADMIN)]
     cmd += ['--project-directory',str(project),'--env-file',str(project/'.env')]
     cmd += list(args)
@@ -233,6 +264,7 @@ def command_init(a):
     if secret_dir.is_symlink(): raise OpsError(f'secrets path cannot be a symlink: {secret_dir}')
     secret_dir.mkdir(mode=0o700,exist_ok=True); os.chmod(secret_dir,0o700)
     write_env(env_path,{'BRIANI_EGRESS_IMAGE':egress_image,'BRIANI_IMAGE':a.image,'BRIANI_LOCAL_IMAGE':str(a.local_image).lower(),'BRIANI_STATE':str(state),'BRIANI_DATA':str(data),'BRIANI_BIND':bind,'BRIANI_UID':str(a.uid),'BRIANI_GID':str(a.gid),'BRIANI_HOSTS':a.hosts})
+    write_compose_files(project)
     print(f'Created protected deployment configuration: {env_path} (0600)')
     print('Start Briani to let the server generate its one-time 30-minute bootstrap code, then display it with show-bootstrap-token.')
     print('Prowlarr API key and qBittorrent first-run password must be obtained from the actual private upstream setup; no credential was generated for those services.')
@@ -248,7 +280,7 @@ def command_doctor(a):
     print('Compose rendering passed. The service table above reports current container state; run qbit-bootstrap and capture-prowlarr-key after first startup.')
 
 def command_up(a):
-    project=project_directory(a.project); context(project); require_host_capabilities(project); compose(project,['up','-d'])
+    project=project_directory(a.project); context(project); require_host_capabilities(project); write_compose_files(project); compose(project,['up','-d'])
     print('Started the pinned Compose stack. qBittorrent and Prowlarr credentials remain private upstream setup steps.')
 
 def command_capture_prowlarr(a):
@@ -465,6 +497,7 @@ def command_restore(a):
     restore_state(backup,dest)
     project.mkdir(parents=True,exist_ok=True,mode=0o700)
     vals['BRIANI_DATA']=str(data); write_env(project/'.env',vals)
+    write_compose_files(project)
     print(f'Restored service configuration to isolated state {dest} and project {project}. Media payload was not restored.')
 
 def command_upgrade(a):

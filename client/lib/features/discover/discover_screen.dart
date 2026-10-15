@@ -51,6 +51,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   bool _truncated = false;
   bool _preferencesApplied = false;
   bool _initialQueryStarted = false;
+  bool _viewEdited = false;
+  bool _failedPage = false;
+  int _queryGeneration = 0;
 
   @override
   void initState() {
@@ -59,9 +62,27 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       final preferences = next.asData?.value;
       if (preferences == null || _preferencesApplied || !mounted) return;
       _preferencesApplied = true;
-      setState(() => _applySavedView('latest', preferences));
+      if (_viewEdited) return;
+      setState(() => _applySavedView(_mode, preferences));
       if (_initialQueryStarted) unawaited(_runQuery());
     }, fireImmediately: true);
+    ref.listenManual(activeApiProvider, (previous, next) {
+      if (!mounted || identical(previous, next)) return;
+      _cancelQuery();
+      setState(() {
+        _items.clear();
+        _snapshot = null;
+        _providers = [];
+        _libraries = [];
+        _error = null;
+        _providerError = null;
+        _loading = next != null;
+        _viewEdited = false;
+        _preferencesApplied = false;
+        _initialQueryStarted = false;
+      });
+      if (next != null) unawaited(_loadInitial());
+    });
     unawaited(_loadInitial());
   }
 
@@ -77,15 +98,30 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 
   Future<void> _loadInitial() async {
+    final api = ref.read(activeApiProvider);
     await Future.wait([_loadProviders(), _loadLibraries()]);
-    if (!mounted) return;
-    _initialQueryStarted = true;
+    if (!mounted ||
+        _initialQueryStarted ||
+        api == null ||
+        !identical(ref.read(activeApiProvider), api)) {
+      return;
+    }
     await _runQuery();
   }
 
   void _changeMode(String mode, {bool runQuery = false}) {
+    _viewEdited = true;
+    _initialQueryStarted = true;
+    _cancelQuery();
     final preferences = ref.read(userPreferencesProvider).asData?.value;
     setState(() {
+      _error = null;
+      if (!runQuery) {
+        _loading = false;
+        _snapshot = null;
+        _items.clear();
+        _truncated = false;
+      }
       if (preferences != null) {
         _applySavedView(mode, preferences);
       } else {
@@ -107,18 +143,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 
   Future<void> _loadLibraries() async {
+    final api = ref.read(activeApiProvider);
+    if (api == null) return;
     try {
-      final response = await requireActiveApi(ref)
-          .getLibrariesApi()
-          .listLibraries();
-      if (!mounted) return;
+      final response = await api.getLibrariesApi().listLibraries();
+      if (!mounted || !identical(ref.read(activeApiProvider), api)) return;
       setState(
         () => _libraries =
             response.data?.whereType<ModelLibrary>().toList() ??
             <ModelLibrary>[],
       );
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || !identical(ref.read(activeApiProvider), api)) return;
       setState(
         () => _error = 'Libraries could not be loaded: ${clientError(error)}',
       );
@@ -126,23 +162,32 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 
   Future<void> _loadProviders() async {
+    final api = ref.read(activeApiProvider);
+    if (api == null) return;
     try {
-      final response = await requireActiveApi(ref)
-          .getDiscoveryApi()
-          .listProviders();
-      if (!mounted) return;
+      final response = await api.getDiscoveryApi().listProviders();
+      if (!mounted || !identical(ref.read(activeApiProvider), api)) return;
       setState(() {
         _providers =
             response.data?.whereType<Provider>().toList() ?? <Provider>[];
         _providerError = null;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || !identical(ref.read(activeApiProvider), api)) return;
       setState(() => _providerError = clientError(error));
     }
   }
 
+  void _cancelQuery() {
+    _queryCancel?.cancel('Discovery view changed');
+    _queryCancel = null;
+    ++_queryGeneration;
+    _loadingMore = false;
+  }
+
   Future<void> _runQuery() async {
+    _initialQueryStarted = true;
+    _cancelQuery();
     final categories = _parseCategories(_categoryController.text);
     final minSize = _parseGib(_minSizeController.text);
     final maxSize = _parseGib(_maxSizeController.text);
@@ -177,15 +222,25 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       return;
     }
 
-    _queryCancel?.cancel('A newer discovery query started');
+    final generation = _queryGeneration;
+    final api = ref.read(activeApiProvider);
+    if (api == null) {
+      setState(() => _loading = false);
+      return;
+    }
     final cancel = CancelToken();
+    bool current() =>
+        mounted &&
+        !cancel.isCancelled &&
+        generation == _queryGeneration &&
+        identical(ref.read(activeApiProvider), api);
     _queryCancel = cancel;
     setState(() {
       _loading = true;
       _loadingMore = false;
       _error = null;
+      _failedPage = false;
       _snapshot = null;
-      _items.clear();
       _truncated = false;
     });
     try {
@@ -207,13 +262,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           ..maxSizeBytes = maxSize
           ..minSeeders = minSeeders,
       );
-      final first = await requireActiveApi(ref)
-          .getDiscoveryApi()
-          .createDiscoveryQuery(
-            discoveryQuery: query,
-            idempotencyKey: _uuid.v4(),
-            cancelToken: cancel,
-          );
+      final first = await api.getDiscoveryApi().createDiscoveryQuery(
+        discoveryQuery: query,
+        idempotencyKey: _uuid.v4(),
+        cancelToken: cancel,
+      );
       var snapshot =
           first.data ??
           (throw StateError('The discovery query returned no snapshot.'));
@@ -222,20 +275,23 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               snapshot.state == DiscoverySnapshotStateEnum.running) &&
           DateTime.now().isBefore(deadline)) {
         await Future<void>.delayed(const Duration(milliseconds: 500));
-        if (cancel.isCancelled) return;
-        final response = await requireActiveApi(ref)
-            .getDiscoveryApi()
-            .getDiscoverySnapshot(
-              id: snapshot.id,
-              limit: _pageSize,
-              cancelToken: cancel,
-            );
+        if (!current()) return;
+        final response = await api.getDiscoveryApi().getDiscoverySnapshot(
+          id: snapshot.id,
+          limit: _pageSize,
+          cancelToken: cancel,
+        );
         snapshot = response.data ?? snapshot;
       }
-      if (!mounted || cancel.isCancelled) return;
+      if (!current()) return;
       setState(() {
         _snapshot = snapshot;
-        _items.addAll(snapshot.items);
+        if (snapshot.state != DiscoverySnapshotStateEnum.failed ||
+            snapshot.items.isNotEmpty) {
+          _items
+            ..clear()
+            ..addAll(snapshot.items);
+        }
         _truncated = snapshot.truncated;
         _loading = false;
         if (snapshot.state == DiscoverySnapshotStateEnum.failed) {
@@ -248,7 +304,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         }
       });
     } catch (error) {
-      if (!mounted || cancel.isCancelled) return;
+      if (!current()) return;
       setState(() {
         _loading = false;
         _error = clientError(error);
@@ -321,27 +377,52 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   Future<void> _loadMore() async {
     final snapshot = _snapshot;
-    if (snapshot == null || snapshot.nextCursor == null || _loadingMore) return;
-    setState(() => _loadingMore = true);
+    if (snapshot == null ||
+        snapshot.nextCursor == null ||
+        _loadingMore ||
+        _loading) {
+      return;
+    }
+    final generation = _queryGeneration;
+    final api = requireActiveApi(ref);
+    final cancel = _queryCancel ??= CancelToken();
+    bool current() =>
+        mounted &&
+        !cancel.isCancelled &&
+        generation == _queryGeneration &&
+        _snapshot?.id == snapshot.id &&
+        identical(ref.read(activeApiProvider), api);
+    setState(() {
+      _loadingMore = true;
+      _error = null;
+      _failedPage = false;
+    });
     try {
-      final response = await requireActiveApi(ref)
-          .getDiscoveryApi()
-          .getDiscoverySnapshot(
-            id: snapshot.id,
-            cursor: snapshot.nextCursor,
-            limit: _pageSize,
-          );
-      if (!mounted || response.data == null) return;
+      final response = await api.getDiscoveryApi().getDiscoverySnapshot(
+        id: snapshot.id,
+        cursor: snapshot.nextCursor,
+        limit: _pageSize,
+        cancelToken: cancel,
+      );
+      if (!current()) return;
+      final page =
+          response.data ??
+          (throw StateError('The discovery page returned no snapshot.'));
+      if (page.id != snapshot.id) {
+        throw StateError('The discovery snapshot changed. Retry the query.');
+      }
       setState(() {
-        _snapshot = response.data;
-        _items.addAll(response.data!.items);
-        _truncated = response.data!.truncated;
+        _snapshot = page;
+        final existing = _items.map((result) => result.id).toSet();
+        _items.addAll(page.items.where((result) => existing.add(result.id)));
+        _truncated = page.truncated;
         _loadingMore = false;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!current()) return;
       setState(() {
         _loadingMore = false;
+        _failedPage = true;
         _error = clientError(error);
       });
     }
@@ -572,6 +653,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (ref.watch(activeApiProvider) == null) return const SizedBox.shrink();
     final preferences = ref.watch(userPreferencesProvider).asData?.value;
     final locale = preferences?.locale;
     final configuredColumns =
@@ -592,6 +674,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       appBar: AppBar(
         title: const Text('Discover'),
         actions: [
+          IconButton(
+            tooltip: 'Refresh discovery',
+            onPressed: _loading ? null : _runQuery,
+            icon: const Icon(Icons.refresh),
+          ),
           IconButton(
             tooltip: 'Upload .torrent file',
             onPressed: _submitting ? null : _uploadTorrent,
@@ -615,20 +702,29 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ),
               ],
             ),
-          if (_snapshot?.state == DiscoverySnapshotStateEnum.partial)
+          if (_snapshot?.state == DiscoverySnapshotStateEnum.partial ||
+              (_snapshot?.warnings.isNotEmpty ?? false))
             MaterialBanner(
               content: Text(
                 _snapshot!.warnings.isEmpty
                     ? 'Some sources did not respond.'
                     : _snapshot!.warnings.join('\n'),
               ),
-              actions: const [],
+              actions: [
+                TextButton(
+                  onPressed: _loading ? null : _runQuery,
+                  child: const Text('Retry sources'),
+                ),
+              ],
             ),
           if (_error != null && !_loading)
             MaterialBanner(
               content: Text(_error!),
               actions: [
-                TextButton(onPressed: _runQuery, child: const Text('Retry')),
+                TextButton(
+                  onPressed: _failedPage ? _loadMore : _runQuery,
+                  child: Text(_failedPage ? 'Retry page' : 'Retry'),
+                ),
               ],
             ),
           if (_truncated)
@@ -650,8 +746,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ),
               ),
             ),
+          if (_loading && _items.isNotEmpty) const LinearProgressIndicator(),
           Expanded(
-            child: _loading
+            child: _loading && _items.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null && _items.isEmpty
                 ? Center(child: Text(_error!, textAlign: TextAlign.center))
@@ -659,11 +756,20 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ? Center(
                     child: Text(
                       _mode == 'search'
-                          ? 'No results in this fetched snapshot.'
+                          ? (_searchController.text.trim().isEmpty
+                                ? 'Enter a torrent name to search.'
+                                : 'No results in this fetched snapshot.')
                           : 'No results are available for this view.',
                     ),
                   )
                 : ListView.builder(
+                    key: PageStorageKey('discovery-$_mode'),
+                    findChildIndexCallback: (key) {
+                      final index = _items.indexWhere(
+                        (result) => ValueKey('result-${result.id}') == key,
+                      );
+                      return index < 0 ? null : index;
+                    },
                     itemCount: _items.length,
                     itemBuilder: (context, index) =>
                         _resultTile(_items[index], configuredColumns, locale),
@@ -673,7 +779,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             Padding(
               padding: const EdgeInsets.all(12),
               child: OutlinedButton.icon(
-                onPressed: _loadingMore ? null : _loadMore,
+                onPressed: _loadingMore || _loading ? null : _loadMore,
                 icon: _loadingMore
                     ? const SizedBox(
                         width: 16,
@@ -744,12 +850,21 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     labelText: 'Search torrent names',
                     prefixIcon: Icon(Icons.search),
                   ),
-                  onSubmitted: (_) => _runQuery(),
+                  onChanged: (_) => _viewEdited = true,
+                  onSubmitted: (_) {
+                    _viewEdited = true;
+                    _runQuery();
+                  },
                 ),
               ),
               const SizedBox(width: 8),
               FilledButton(
-                onPressed: _loading ? null : _runQuery,
+                onPressed: _loading
+                    ? null
+                    : () {
+                        _viewEdited = true;
+                        _runQuery();
+                      },
                 child: const Text('Search'),
               ),
             ],
@@ -766,6 +881,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   width: 180,
                   child: TextField(
                     controller: _categoryController,
+                    onChanged: (_) => _viewEdited = true,
                     decoration: const InputDecoration(
                       labelText: 'Category IDs',
                       hintText: 'Comma-separated',
@@ -776,6 +892,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   width: 150,
                   child: TextField(
                     controller: _minSizeController,
+                    onChanged: (_) => _viewEdited = true,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Minimum GiB'),
                   ),
@@ -784,6 +901,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   width: 150,
                   child: TextField(
                     controller: _maxSizeController,
+                    onChanged: (_) => _viewEdited = true,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Maximum GiB'),
                   ),
@@ -792,6 +910,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   width: 150,
                   child: TextField(
                     controller: _minSeedersController,
+                    onChanged: (_) => _viewEdited = true,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       labelText: 'Minimum seeders',
@@ -801,7 +920,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 DropdownButton<String>(
                   value: _sort,
                   onChanged: (value) {
-                    if (value != null) setState(() => _sort = value);
+                    if (value != null) {
+                      setState(() {
+                        _viewEdited = true;
+                        _sort = value;
+                      });
+                    }
                   },
                   items: const [
                     DropdownMenuItem(
@@ -824,7 +948,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 DropdownButton<String>(
                   value: _order,
                   onChanged: (value) {
-                    if (value != null) setState(() => _order = value);
+                    if (value != null) {
+                      setState(() {
+                        _viewEdited = true;
+                        _order = value;
+                      });
+                    }
                   },
                   items: const [
                     DropdownMenuItem(value: 'desc', child: Text('Descending')),
@@ -845,6 +974,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                           label: Text(provider.name),
                           selected: _providerIds.contains(provider.id),
                           onSelected: (selected) => setState(() {
+                            _viewEdited = true;
                             selected
                                 ? _providerIds.add(provider.id)
                                 : _providerIds.remove(provider.id);
@@ -873,6 +1003,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     Set<String> visibleColumns,
     String? locale,
   ) => Card(
+    key: ValueKey('result-${result.id}'),
     margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
     child: ListTile(
       title: Text(result.title, maxLines: 2, overflow: TextOverflow.ellipsis),

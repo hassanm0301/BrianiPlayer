@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:briani_api/briani_api.dart' hide Provider;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/session/client_session.dart';
@@ -20,17 +21,21 @@ class PhotoViewerScreen extends ConsumerStatefulWidget {
   ConsumerState<PhotoViewerScreen> createState() => _PhotoViewerScreenState();
 }
 
-class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
+class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
+    with WidgetsBindingObserver {
   late String _mediaId;
   Future<Media>? _mediaFuture;
   Future<Uint8List>? _imageFuture;
   Timer? _slideshow;
   bool _playing = false;
   int _index = 0;
+  CancelToken? _loadCancel;
+  String? _loadedId;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _mediaId = widget.mediaId;
     _index = widget.adjacentMediaIds
         .indexOf(_mediaId)
@@ -47,23 +52,43 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
   @override
   void didUpdateWidget(covariant PhotoViewerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.mediaId != widget.mediaId) {
+    if (oldWidget.mediaId != widget.mediaId ||
+        !listEquals(oldWidget.adjacentMediaIds, widget.adjacentMediaIds)) {
       _stop();
       _mediaId = widget.mediaId;
+      _index = widget.adjacentMediaIds
+          .indexOf(_mediaId)
+          .clamp(0, widget.adjacentMediaIds.length);
       _load();
     }
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) _stop();
+  }
+
+  @override
   void dispose() {
-    _stop();
+    WidgetsBinding.instance.removeObserver(this);
+    _loadCancel?.cancel();
+    _slideshow?.cancel();
     super.dispose();
   }
 
   void _load() {
     final api = requireActiveApi(ref).getMediaApi();
-    _mediaFuture = api.getMedia(id: _mediaId).then((r) => r.data!);
-    _imageFuture = api.getImage(id: _mediaId).then((r) => r.data!);
+    _loadCancel?.cancel();
+    final cancel = _loadCancel = CancelToken();
+    final id = _mediaId;
+    _loadedId = null;
+    _mediaFuture = api
+        .getMedia(id: id, cancelToken: cancel)
+        .then((r) => r.data!);
+    _imageFuture = api.getImage(id: id, cancelToken: cancel).then((r) {
+      if (!cancel.isCancelled && mounted && _mediaId == id) _loadedId = id;
+      return r.data!;
+    });
     if (mounted) setState(() {});
   }
 
@@ -94,7 +119,9 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
     setState(() => _playing = true);
     _slideshow = Timer.periodic(
       Duration(seconds: intervalSeconds.clamp(1, 3600).toInt()),
-      (_) => _step(1),
+      (_) {
+        if (_loadedId == _mediaId) _step(1);
+      },
     );
   }
 
@@ -163,6 +190,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
             children: [
               Positioned.fill(
                 child: InteractiveViewer(
+                  key: ValueKey(_mediaId),
                   minScale: .5,
                   maxScale: 8,
                   child: Center(

@@ -6,7 +6,7 @@ Run Briani on a 64-bit Linux computer or Raspberry Pi 5 with Docker Compose. The
 
 - Install [Docker Engine](https://docs.docker.com/engine/install/) and the [Compose plugin](https://docs.docker.com/compose/install/linux/), plus Python 3.10 or newer.
 - Use a non-root account that can run Docker and write to your media disk.
-- Have a local disk already mounted, such as `/mnt/briani`. State and media must be separate folders on mounted storage, with at least 5 GiB free for the initial check. Allow more space for your collection.
+- Have a local disk already mounted, such as `/mnt/briani`. State and media must be separate, dedicated folders on mounted storage, with at least 5 GiB free for the initial check. Allow more space for your collection. The host and its local administrators must be trusted; stop the stack before moving or reorganizing either folder.
 - Have the supplied Briani candidate files on the server. First startup also needs internet access to pull the pinned qBittorrent and Prowlarr images. These are private Briani test packages; there is no public Briani image to pull yet. [Platform status](../compatibility/support-matrix.md) lists remaining verification.
 
 The examples use `192.168.1.50` for your server. Replace it with your actual LAN IP.
@@ -56,7 +56,7 @@ python3 "$BRIANI_PACKAGE/tools/operations/briani.py" doctor \
   --project "$BRIANI_PROJECT"
 ```
 
-Your configuration and accounts go in the state folder; your files go in the media folder. The tool checks storage, permissions, and required host capabilities. If it reports a problem, use [troubleshooting](advanced.md#troubleshooting) before continuing.
+Your configuration and accounts go in the state folder; your files go in the media folder. The tool checks storage, permissions, Docker memory-limit enforcement, and Linux `openat2` path-containment support. Briani uses descriptor-based containment to keep authorized paths beneath their configured directories; it cannot guarantee safety against an arbitrary local process moving directories concurrently. If the tool reports a problem, use [troubleshooting](advanced.md#troubleshooting) before continuing.
 
 ## 3. Start the server
 
@@ -72,6 +72,18 @@ python3 "$BRIANI_PACKAGE/tools/operations/briani.py" capture-prowlarr-key \
 ```
 
 `qbit-bootstrap` sets and saves qBittorrent's password; `up` starts the full stack; `capture-prowlarr-key` saves Prowlarr's API key. If Prowlarr has not finished starting, wait briefly and rerun only `capture-prowlarr-key`.
+
+### Use Docker Compose directly
+
+`init` creates **compose.yaml**, **compose.admin.yaml**, and a protected **.env** in your deployment folder. The state and media paths above are required; Compose also rejects missing paths. After completing the first-start credential steps, you can manage the server with standard Compose commands:
+
+```bash
+cd "$BRIANI_PROJECT"
+docker compose up -d
+docker compose ps
+```
+
+The generated Compose files use the same deployment name as the operations tool. Keep your mounted disk available; Compose refuses to silently create replacement directories for missing storage. For backups and recovery, continue using the operations tool as described in [advanced maintenance](advanced.md).
 
 ## 4. Connect the app and create your administrator
 

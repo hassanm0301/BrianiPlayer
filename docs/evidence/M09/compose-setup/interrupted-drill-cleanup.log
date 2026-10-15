@@ -1,0 +1,6 @@
+cleanup stop source before restore: stopped 4 exact project-owned container(s)
+cleanup stop restore before next project: stopped 4 exact project-owned container(s)
+cleanup drill-owned state/data/backup/project files: removed
+Owned container/network/volume cleanup verified
+remove-private-overlay-image: exit 0
+Owned temporary files removed

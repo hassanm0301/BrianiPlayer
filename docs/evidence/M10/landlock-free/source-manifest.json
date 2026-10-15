@@ -1,0 +1,30 @@
+{
+  "head": "4c74ed345b1d4acd8857908c347785e6a8040172",
+  "workingTree": "Includes pre-existing uncommitted user changes; no commit/push/publication",
+  "files": [
+    {
+      "path": "server/src/Briani.Api/Infrastructure/Storage/ContainedStorage.cs",
+      "sha256": "dcf8f33f9104f163e41a99a6b7baadd515332aeae9d9f12f7e2ba67bf8859728"
+    },
+    {
+      "path": "server/src/Briani.Api/Infrastructure/Storage/DirectorySafety.cs",
+      "sha256": "d50661fb0ca2fb8ff9ef2b328b186479c0175c0d021372251b84da8cce8cea64"
+    },
+    {
+      "path": "tools/operations/briani.py",
+      "sha256": "5f64cce2c60fdef6fce65225881f1008f5fac7f53da4364aa010cd0f7d77cf69"
+    },
+    {
+      "path": "server/tests/Briani.IdentityTests/DescriptorContainmentTests.cs",
+      "sha256": "33a7dfd10e20b12b0f86801206dfd47333ef909d2ebdd3f7ad9111144c0106a4"
+    },
+    {
+      "path": "prototypes/security/no_landlock/deny_landlock.c",
+      "sha256": "a2390a6096dd9f3aec05099d296fe2e4d30c920f4ba5fa03de7ec7a72de76bd5"
+    },
+    {
+      "path": "prototypes/security/no_landlock/pi_probe/Program.cs",
+      "sha256": "92be255991f646daf7a20316e3ad2bdaa3104001b84f35aad8aedf6825ebebde"
+    }
+  ]
+}

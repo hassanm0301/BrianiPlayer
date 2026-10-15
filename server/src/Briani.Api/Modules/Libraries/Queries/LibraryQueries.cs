@@ -59,8 +59,11 @@ public static class LibraryQueries
             !x.RelativePath.Contains("/.briani/") && !x.RelativePath.EndsWith("/.briani"))));
         if (folderId is not null && !await baseQuery.AnyAsync(x => x.Id == folderId && x.Kind == "folder", ct))
             throw new ApiException(404, "not_found");
-        var catalogCount = await db.MediaItems.AsNoTracking().Where(x => x.LibraryId == id).CountAsync(ct);
-        var catalogVersionSum = await db.MediaItems.AsNoTracking().Where(x => x.LibraryId == id).SumAsync(x => (long?)x.Version, ct) ?? 0;
+        var catalogStamp = await db.MediaItems.AsNoTracking().Where(x => x.LibraryId == id)
+            .GroupBy(_ => 1).Select(items => new { Count = items.Count(), VersionSum = items.Sum(x => (long)x.Version) })
+            .SingleOrDefaultAsync(ct);
+        var catalogCount = catalogStamp?.Count ?? 0;
+        var catalogVersionSum = catalogStamp?.VersionSum ?? 0;
         var catalog = $"{library.Version}:{catalogCount}:{catalogVersionSum}";
         var offset = 0;
         if (cursor is not null)

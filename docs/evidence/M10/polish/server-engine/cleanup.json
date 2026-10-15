@@ -1,0 +1,20 @@
+{
+  "readOnlyExactRunLabelQueries": true,
+  "runs": [
+    {
+      "harness": "adapter",
+      "runId": "f719c9bccf334dbf8f2f121258dc2b84",
+      "remainingContainerIds": [],
+      "remainingNetworkIds": [],
+      "remainingScratchPaths": []
+    },
+    {
+      "harness": "metadata",
+      "runId": "35690af262d344fd88ea04e5ff8a02ac",
+      "remainingContainerIds": [],
+      "remainingNetworkIds": [],
+      "remainingScratchPaths": []
+    }
+  ],
+  "passed": true
+}

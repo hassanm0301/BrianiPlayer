@@ -1,0 +1,94 @@
+{
+  "image": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+  "runId": "35690af262d344fd88ea04e5ff8a02ac",
+  "networkIsolation": "internal Docker bridge",
+  "result": "passed",
+  "command": "dotnet test Briani.DownloadTests --no-build --filter LocalSeedMetadataMagnetsMapV1V2HybridAndZeroLengthWithoutPayload",
+  "exitCode": 0,
+  "hashObservations": [
+    {
+      "fixture": "fixture-v1.torrent",
+      "seed": {
+        "Hash": "ab7271081517e22d94102c1128ca16f5aabedab7",
+        "InfoHashV1": "ab7271081517e22d94102c1128ca16f5aabedab7",
+        "InfoHashV2": null
+      },
+      "downloadBeforeMetadata": {
+        "Hash": "ab7271081517e22d94102c1128ca16f5aabedab7",
+        "InfoHashV1": "ab7271081517e22d94102c1128ca16f5aabedab7",
+        "InfoHashV2": null,
+        "filteredCount": 1
+      },
+      "downloadAfterMetadata": {
+        "Hash": "ab7271081517e22d94102c1128ca16f5aabedab7",
+        "InfoHashV1": "ab7271081517e22d94102c1128ca16f5aabedab7",
+        "InfoHashV2": null,
+        "filteredCount": 1
+      }
+    },
+    {
+      "fixture": "fixture-v2.torrent",
+      "seed": {
+        "Hash": "90456daa5c925686ea147d297bf0763045f7da32",
+        "InfoHashV1": null,
+        "InfoHashV2": "90456daa5c925686ea147d297bf0763045f7da32067080f1c855e955c933874e"
+      },
+      "downloadBeforeMetadata": {
+        "Hash": "90456daa5c925686ea147d297bf0763045f7da32",
+        "InfoHashV1": null,
+        "InfoHashV2": "90456daa5c925686ea147d297bf0763045f7da32067080f1c855e955c933874e",
+        "filteredCount": 1
+      },
+      "downloadAfterMetadata": {
+        "Hash": "90456daa5c925686ea147d297bf0763045f7da32",
+        "InfoHashV1": null,
+        "InfoHashV2": "90456daa5c925686ea147d297bf0763045f7da32067080f1c855e955c933874e",
+        "filteredCount": 1
+      }
+    },
+    {
+      "fixture": "fixture-hybrid.torrent",
+      "seed": {
+        "Hash": "656396a4ccfc1e562c018eae72aeb219be311b70",
+        "InfoHashV1": "7dffcd042eba96dcf79de71c85b24463d3ea5ed8",
+        "InfoHashV2": "656396a4ccfc1e562c018eae72aeb219be311b705ab871b0b0db7d6ac18f1a56"
+      },
+      "downloadBeforeMetadata": {
+        "Hash": "7dffcd042eba96dcf79de71c85b24463d3ea5ed8",
+        "InfoHashV1": "7dffcd042eba96dcf79de71c85b24463d3ea5ed8",
+        "InfoHashV2": null,
+        "filteredCount": 1
+      },
+      "downloadAfterMetadata": {
+        "Hash": "656396a4ccfc1e562c018eae72aeb219be311b70",
+        "InfoHashV1": "7dffcd042eba96dcf79de71c85b24463d3ea5ed8",
+        "InfoHashV2": "656396a4ccfc1e562c018eae72aeb219be311b705ab871b0b0db7d6ac18f1a56",
+        "filteredCount": 1
+      }
+    },
+    {
+      "fixture": "zero-length-v1.torrent",
+      "seed": {
+        "Hash": "da48175a1203c2b1c8ab5c39ce1447c798712c51",
+        "InfoHashV1": "da48175a1203c2b1c8ab5c39ce1447c798712c51",
+        "InfoHashV2": null
+      },
+      "downloadBeforeMetadata": {
+        "Hash": "da48175a1203c2b1c8ab5c39ce1447c798712c51",
+        "InfoHashV1": "da48175a1203c2b1c8ab5c39ce1447c798712c51",
+        "InfoHashV2": null,
+        "filteredCount": 1
+      },
+      "downloadAfterMetadata": {
+        "Hash": "da48175a1203c2b1c8ab5c39ce1447c798712c51",
+        "InfoHashV1": "da48175a1203c2b1c8ab5c39ce1447c798712c51",
+        "InfoHashV2": null,
+        "filteredCount": 1
+      }
+    }
+  ],
+  "testOutput": "Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll (.NETCoreApp,Version=v10.0)\nVSTest version 18.0.2-dev (x64)\n\nStarting test execution, please wait...\nA total of 1 test files matched the specified pattern.\n\nPassed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 15 s - DownloadTests.dll (net10.0)\n",
+  "release": "qBittorrent 5.2.4 / WebAPI 2.15.1 / libtorrent 2.0.15.0 (adapter-verified in adjacent pinned smoke)",
+  "fixtureRoot": "/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generated",
+  "log": "docs/evidence/M10/polish/server-engine/metadata.json"
+}

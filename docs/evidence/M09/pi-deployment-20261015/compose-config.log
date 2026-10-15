@@ -1,0 +1,196 @@
+{
+  "name": "briani-ops-ae2b50f79f",
+  "networks": {
+    "client-access": {
+      "name": "briani-ops-ae2b50f79f_client-access",
+      "ipam": {}
+    },
+    "control": {
+      "name": "briani-ops-ae2b50f79f_control",
+      "ipam": {},
+      "internal": true
+    },
+    "indexer-egress": {
+      "name": "briani-ops-ae2b50f79f_indexer-egress",
+      "ipam": {}
+    },
+    "torrent-egress": {
+      "name": "briani-ops-ae2b50f79f_torrent-egress",
+      "ipam": {}
+    }
+  },
+  "services": {
+    "briani": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": null,
+      "entrypoint": null,
+      "environment": {
+        "ASPNETCORE_HTTP_PORTS": "8088",
+        "AllowedHosts": "localhost;127.0.0.1;briani;raspberrypi;192.168.100.186"
+      },
+      "image": "briani-server:m10-arm64",
+      "mem_limit": "1073741824",
+      "networks": {
+        "client-access": null,
+        "control": null
+      },
+      "pids_limit": 256,
+      "ports": [
+        {
+          "mode": "ingress",
+          "host_ip": "192.168.100.186",
+          "target": 8088,
+          "published": "8088",
+          "protocol": "tcp"
+        }
+      ],
+      "read_only": true,
+      "restart": "unless-stopped",
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "stop_grace_period": "1m0s",
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ],
+      "user": "1000:1000",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/mnt/hassan_drive/briani/state/briani",
+          "target": "/config",
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "/mnt/hassan_drive/briani/media",
+          "target": "/data",
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "/mnt/family_drive/briani/media",
+          "target": "/data/Family",
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "/mnt/hassan_drive/briani/state/secrets",
+          "target": "/run/briani-secrets",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ]
+    },
+    "prowlarr": {
+      "command": null,
+      "entrypoint": null,
+      "environment": {
+        "PGID": "1000",
+        "PUID": "1000"
+      },
+      "image": "lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902",
+      "networks": {
+        "control": null,
+        "indexer-egress": null
+      },
+      "restart": "unless-stopped",
+      "stop_grace_period": "1m0s",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/mnt/hassan_drive/briani/state/prowlarr",
+          "target": "/config",
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ]
+    },
+    "qbittorrent": {
+      "command": null,
+      "depends_on": {
+        "torrent-egress-guard": {
+          "condition": "service_healthy",
+          "required": true
+        }
+      },
+      "entrypoint": null,
+      "environment": {
+        "PGID": "1000",
+        "PUID": "1000",
+        "TORRENTING_PORT": "6881",
+        "WEBUI_PORT": "8080"
+      },
+      "image": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
+      "network_mode": "service:torrent-egress-guard",
+      "restart": "unless-stopped",
+      "stop_grace_period": "1m0s",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/mnt/hassan_drive/briani/state/qbittorrent",
+          "target": "/config",
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "/mnt/hassan_drive/briani/media",
+          "target": "/data",
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "/mnt/family_drive/briani/media",
+          "target": "/data/Family",
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ]
+    },
+    "torrent-egress-guard": {
+      "cap_add": [
+        "NET_ADMIN"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 0.1,
+      "command": null,
+      "entrypoint": null,
+      "image": "briani-egress:m10-arm64",
+      "mem_limit": "33554432",
+      "networks": {
+        "control": {
+          "aliases": [
+            "qbittorrent"
+          ]
+        },
+        "torrent-egress": {}
+      },
+      "pids_limit": 16,
+      "read_only": true,
+      "restart": "unless-stopped",
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "stop_grace_period": "5s"
+    }
+  }
+}

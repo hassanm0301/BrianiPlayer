@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="0c3c8be4-cb52-409f-8868-a560088c1f49" name="@archlinux 2026-10-14 17:17:15" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-14T17:17:15.1288746+04:00" queuing="2026-10-14T17:17:15.1288746+04:00" start="2026-10-14T17:17:12.7431804+04:00" finish="2026-10-14T17:17:15.1368119+04:00" />
+  <TestSettings name="default" id="ec5c6037-6105-412f-b1bb-16d1c8cbb67c">
+    <Deployment runDeploymentRoot="_archlinux_2026-10-14_17_17_15" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="6cd7edd1-3cc1-40e1-a2cd-a68ea713f975" testId="5a542c27-5197-7e6f-e084-88de13a5bee9" testName="Briani.Tests.ContractTests.ServerInfoMatchesFrozenWireShape" computerName="archlinux" duration="00:00:01.8735135" startTime="2026-10-14T17:17:13.1295997+04:00" endTime="2026-10-14T17:17:15.0124782+04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6cd7edd1-3cc1-40e1-a2cd-a68ea713f975" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Briani.Tests.ContractTests.ServerInfoMatchesFrozenWireShape" storage="/home/hassan/projects/brianiplayer/server/tests/briani.contracttests/bin/debug/net10.0/contracttests.dll" id="5a542c27-5197-7e6f-e084-88de13a5bee9">
+      <Execution id="6cd7edd1-3cc1-40e1-a2cd-a68ea713f975" />
+      <TestMethod codeBase="/home/hassan/projects/BrianiPlayer/server/tests/Briani.ContractTests/bin/Debug/net10.0/ContractTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Briani.Tests.ContractTests" name="ServerInfoMatchesFrozenWireShape" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="5a542c27-5197-7e6f-e084-88de13a5bee9" executionId="6cd7edd1-3cc1-40e1-a2cd-a68ea713f975" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v4.0.1+0f7d528729 (64-bit .NET 10.0.12)
+[xUnit.net 00:00:00.06]   Discovering: ContractTests
+[xUnit.net 00:00:00.08]   Discovered:  ContractTests
+[xUnit.net 00:00:00.11]   Starting:    ContractTests
+[xUnit.net 00:00:02.03]   Finished:    ContractTests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

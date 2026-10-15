@@ -1,0 +1,77 @@
+{
+  "scope": "local synthetic SQLite/filesystem microbenchmark only",
+  "limitations": [
+    "Not EF-generated SQL or authenticated API latency",
+    "Python filesystem calls are not ContainedDirectory syscalls",
+    "No Pi, Docker, real library, media decoding, or engine contacted"
+  ],
+  "python": "3.14.8",
+  "sqlite": "3.54.0",
+  "platform": "Linux-7.2.9-zen1-1-zen-x86_64-with-glibc2.44",
+  "catalog": {
+    "rows": 10000,
+    "before": {
+      "samples": 200,
+      "medianMs": 0.5427230000000001,
+      "p95Ms": 0.683912
+    },
+    "after": {
+      "samples": 200,
+      "medianMs": 0.412956,
+      "p95Ms": 0.417635
+    },
+    "beforeStatementsPerCall": 2,
+    "afterStatementsPerCall": 1,
+    "values": [
+      10000,
+      30000
+    ],
+    "emptyValues": [
+      0,
+      0
+    ],
+    "beforePlans": [
+      [
+        [
+          3,
+          0,
+          56,
+          "SEARCH media_items USING COVERING INDEX ix (LibraryId=?)"
+        ]
+      ],
+      [
+        [
+          4,
+          0,
+          63,
+          "SEARCH media_items USING INDEX ix (LibraryId=?)"
+        ]
+      ]
+    ],
+    "afterPlan": [
+      [
+        4,
+        0,
+        63,
+        "SEARCH media_items USING INDEX ix (LibraryId=?)"
+      ]
+    ]
+  },
+  "thumbnailHeadroom": {
+    "cacheFiles": 1000,
+    "before": {
+      "samples": 30,
+      "medianMs": 0.810047,
+      "p95Ms": 0.814721
+    },
+    "after": {
+      "samples": 30,
+      "medianMs": 0.7873445,
+      "p95Ms": 0.791747
+    },
+    "beforeEntriesSorted": 1000,
+    "afterEntriesSorted": 0,
+    "entriesInspectedPerCallBoth": 1000,
+    "remainingEnumerationCost": "unchanged; this isolates only unnecessary sorting"
+  }
+}

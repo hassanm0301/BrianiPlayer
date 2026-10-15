@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-15",
+  "purpose": "Private Landlock-free Pi candidate; startup blocked by memory cgroup",
+  "source": "Current server and operations checkout; two-drive Compose preserved",
+  "files": [
+    {
+      "path": "bin/docker",
+      "sha256": "8cfe615e78bcbfb6151a360c1e80e8c5119b61edaa51c17b2852ad645707eb1c",
+      "bytes": 53
+    },
+    {
+      "path": "briani",
+      "sha256": "d6fdf63caa75d2ee317035b2d8d4d8abc83f378ef11c0d06bf8562437e4be9bb",
+      "bytes": 395
+    },
+    {
+      "path": "dist/images/briani-egress-linux-arm64.tar",
+      "sha256": "f77d3fff31cf8a0bcf52e6f0d2df74de0f38693066968d879c8bc1f03f46a18b",
+      "bytes": 5273088
+    },
+    {
+      "path": "dist/images/briani-server-linux-arm64.tar",
+      "sha256": "b835466e416b52ea079dc5a0e6222e464e05b43fc7bf5ef08723a093f2639395",
+      "bytes": 120745472
+    },
+    {
+      "path": "images.lock.json",
+      "sha256": "7421479c672338ecef6f52b10dc1375d74e84fcce3d078075fcce21fcf116747",
+      "bytes": 4049
+    },
+    {
+      "path": "infra/compose/compose.admin.yaml",
+      "sha256": "ccbccc646da142e989655cd26fe5a3844d22a60294665b14a39778d21541fba1",
+      "bytes": 196
+    },
+    {
+      "path": "infra/compose/compose.yaml",
+      "sha256": "8be9a1042d9a84a6d87829079d9f399b12e2f8f59f2ceb6ea09bcae38692866b",
+      "bytes": 3285
+    },
+    {
+      "path": "toolchain.lock.json",
+      "sha256": "d9be8dc508f38a308304b085d910fb07860d1ef021cf9df97d51d1e168699675",
+      "bytes": 3607
+    },
+    {
+      "path": "tools/operations/briani.py",
+      "sha256": "5f64cce2c60fdef6fce65225881f1008f5fac7f53da4364aa010cd0f7d77cf69",
+      "bytes": 38969
+    }
+  ]
+}

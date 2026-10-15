@@ -263,7 +263,7 @@ void main() {
       final entriesRequest = adapter.requests.singleWhere(
         (request) => request.path.endsWith('/entries'),
       );
-      expect(entriesRequest.queryParameters['sort'], 'sizeBytes');
+      expect(entriesRequest.queryParameters['sort'], 'size');
       expect(entriesRequest.queryParameters['order'], 'desc');
       expect(find.byType(GridView), findsOneWidget);
       expect(find.text('Example'), findsOneWidget);

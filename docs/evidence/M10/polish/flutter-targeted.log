@@ -1,0 +1,64 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:00 +1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:00 +2: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:00 +3: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:00 +4: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:00 +5: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:00 +6: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:00 +7: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:00 +8: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: folder shows its empty state after a successful page response
+00:00 +9: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: folder shows its empty state after a successful page response
+00:00 +10: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:01 +11: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:01 +12: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:01 +13: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:01 +14: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:01 +15: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:01 +16: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:01 +17: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +18: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +19: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +20: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +21: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +22: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +22: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: <2>
+  Actual: <1>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart:364:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart line 364
+The test description was:
+  Continue Watching refreshes after Libraries becomes visible again
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +22 -1: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:01 +22 -1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again [E]
+  Test failed. See exception logs above.
+  The test description was: Continue Watching refreshes after Libraries becomes visible again
+  
+00:01 +23 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:01 +24 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:01 +25 -1: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:01 +26 -1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: library grid uses responsive lazy slivers at large text scale
+00:01 +27 -1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: library grid uses responsive lazy slivers at large text scale
+00:01 +28 -1: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: library grid uses responsive lazy slivers at large text scale
+00:01 +29 -1: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:02 +30 -1: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:02 +31 -1: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: Most seeded sorts seeders descending and stores its mode view
+00:02 +32 -1: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:02 +33 -1: Some tests failed.
+
+Failing tests:
+  /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: Continue Watching refreshes after Libraries becomes visible again

@@ -50,6 +50,11 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   String? _preferenceScope;
   final _search = TextEditingController();
   CancelToken? _operationToken;
+  CancelToken? _loadToken;
+  bool _viewEdited = false;
+  bool _failedPage = false;
+  List<String> _warnings = [];
+  int _requestGeneration = 0;
 
   List<FolderBreadcrumb> get _breadcrumbPath {
     if (widget.breadcrumbs.isNotEmpty) return widget.breadcrumbs;
@@ -70,15 +75,36 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   @override
   void initState() {
     super.initState();
+    ref.listenManual(activeApiProvider, (previous, next) {
+      if (!mounted || identical(previous, next)) return;
+      _loadToken?.cancel('The signed-in session changed');
+      _operationToken?.cancel('The signed-in session changed');
+      ++_requestGeneration;
+      setState(() {
+        _library = null;
+        _items = [];
+        _cursor = null;
+        _warnings = [];
+        _truncated = false;
+        _error = null;
+        _loading = next != null;
+        _loadingMore = false;
+        _viewEdited = false;
+        _preferencesApplied = false;
+      });
+      if (next != null) _load(reset: true);
+    });
     ref.listenManual(userPreferencesProvider, (previous, next) {
       final preferences = next.asData?.value;
       if (preferences == null || !mounted) return;
       final scope = ref.read(userPreferencesScopeProvider);
       if (!_preferencesApplied || scope != _preferenceScope) {
         _preferenceScope = scope;
-        _applyPreferences(preferences);
         _preferencesApplied = true;
-        _load(reset: true);
+        if (!_viewEdited) {
+          _applyPreferences(preferences);
+          _load(reset: true);
+        }
       }
     }, fireImmediately: true);
     if (!_preferencesApplied) {
@@ -100,8 +126,8 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
         : null;
     final sort = saved?.sort.name ?? preferences.defaultSort?.name ?? 'byName';
     _sort = switch (sort) {
-      'date' => 'modifiedAt',
-      'size' => 'sizeBytes',
+      'date' => 'date',
+      'size' => 'size',
       _ => 'name',
     };
     _order = saved?.order.name ?? preferences.defaultSortOrder?.name ?? 'asc';
@@ -132,8 +158,8 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
               ? UserPreferencesFolderPreferencesInnerLayoutEnum.grid
               : UserPreferencesFolderPreferencesInnerLayoutEnum.list
           ..sort = switch (_sort) {
-            'modifiedAt' => UserPreferencesFolderPreferencesInnerSortEnum.date,
-            'sizeBytes' => UserPreferencesFolderPreferencesInnerSortEnum.size,
+            'date' => UserPreferencesFolderPreferencesInnerSortEnum.date,
+            'size' => UserPreferencesFolderPreferencesInnerSortEnum.size,
             _ => UserPreferencesFolderPreferencesInnerSortEnum.byName,
           }
           ..order = UserPreferencesFolderPreferencesInnerOrderEnum.valueOf(
@@ -163,6 +189,13 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
         oldWidget.libraryId != widget.libraryId ||
         oldWidget.folderId != widget.folderId;
     if (folderChanged) {
+      _library = null;
+      _items = [];
+      _warnings = [];
+      _truncated = false;
+      _query = '';
+      _search.clear();
+      _viewEdited = false;
       final preferences = ref.read(userPreferencesProvider).asData?.value;
       if (preferences != null) _applyPreferences(preferences);
     }
@@ -185,57 +218,76 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   @override
   void dispose() {
     _operationToken?.cancel('Folder screen disposed');
+    _loadToken?.cancel('Folder screen disposed');
     _search.dispose();
     super.dispose();
   }
 
   Future<void> _load({required bool reset}) async {
-    if (reset) {
-      setState(() {
-        _loading = true;
-        _loadingMore = false;
-        _error = null;
-        _cursor = null;
-        _items = [];
-      });
-    } else {
-      if (_cursor == null || _loadingMore) return;
-      setState(() => _loadingMore = true);
-    }
+    if (!reset && (_cursor == null || _loadingMore || _loading)) return;
+    _loadToken?.cancel('A newer folder request started');
+    final token = _loadToken = CancelToken();
+    final generation = ++_requestGeneration;
+    final libraryId = widget.libraryId;
+    final folderId = widget.folderId == 'root' ? null : widget.folderId;
+    final query = _query.trim().isEmpty ? null : _query.trim();
+    final sort = _sort;
+    final order = _order;
+    final cursor = reset ? null : _cursor;
+    setState(() {
+      _loading = reset;
+      _loadingMore = !reset;
+      if (reset) _cursor = null;
+      _error = null;
+      _failedPage = false;
+    });
+    BrianiApi? api;
+    bool current() =>
+        mounted &&
+        !token.isCancelled &&
+        generation == _requestGeneration &&
+        identical(ref.read(activeApiProvider), api);
     try {
-      final api = requireActiveApi(ref);
+      api = requireActiveApi(ref);
       final libs = _library == null
-          ? await api.getLibrariesApi().listLibraries()
+          ? await api.getLibrariesApi().listLibraries(cancelToken: token)
           : null;
-      final lib =
-          _library ?? libs!.data!.firstWhere((x) => x.id == widget.libraryId);
+      if (!current()) return;
+      final lib = _library ?? libs!.data!.firstWhere((x) => x.id == libraryId);
       final page = await api.getLibrariesApi().listEntries(
-        id: widget.libraryId,
-        folderId: widget.folderId == 'root' ? null : widget.folderId,
-        query: _query.trim().isEmpty ? null : _query.trim(),
-        sort: _sort,
-        order: _order,
-        cursor: reset ? null : _cursor,
+        id: libraryId,
+        folderId: folderId,
+        query: query,
+        sort: sort,
+        order: order,
+        cursor: cursor,
         limit: 50,
+        cancelToken: token,
       );
-      if (!mounted) return;
+      if (!current()) return;
+      final result = page.data!;
       setState(() {
         _library = lib;
         if (reset) {
-          _items = page.data!.items.toList();
+          _items = result.items.toList();
         } else {
-          _items.addAll(page.data!.items);
+          final existing = _items.map((entry) => entry.id).toSet();
+          _items.addAll(result.items.where((entry) => existing.add(entry.id)));
         }
-        _cursor = page.data!.nextCursor;
-        _truncated = page.data!.truncated;
+        _cursor = result.nextCursor;
+        _truncated = reset ? result.truncated : _truncated || result.truncated;
+        _warnings = reset
+            ? result.warnings.toList()
+            : {..._warnings, ...result.warnings}.toList();
         _error = null;
         _loading = false;
         _loadingMore = false;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!current()) return;
       setState(() {
         _error = clientError(error);
+        _failedPage = !reset;
         _loading = false;
         _loadingMore = false;
       });
@@ -260,16 +312,25 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (ref.watch(activeApiProvider) == null) return const SizedBox.shrink();
     final locale = ref.watch(userPreferencesProvider).asData?.value.locale;
     return Scaffold(
       appBar: AppBar(
         title: Text(_library?.name ?? 'Library'),
         actions: [
           IconButton(
+            tooltip: 'Refresh folder',
+            onPressed: _loading ? null : () => _load(reset: true),
+            icon: const Icon(Icons.refresh),
+          ),
+          IconButton(
             tooltip: _grid ? 'List view' : 'Grid view',
             icon: Icon(_grid ? Icons.view_list : Icons.grid_view),
             onPressed: () {
-              setState(() => _grid = !_grid);
+              setState(() {
+                _viewEdited = true;
+                _grid = !_grid;
+              });
               _persistFolderPreferences();
             },
           ),
@@ -279,6 +340,7 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
             onSelected: (value) {
               final parts = value.split(':');
               setState(() {
+                _viewEdited = true;
                 _sort = parts[0];
                 _order = parts[1];
               });
@@ -289,13 +351,10 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
               PopupMenuItem(value: 'name:asc', child: Text('Name (A–Z)')),
               PopupMenuItem(value: 'name:desc', child: Text('Name (Z–A)')),
               PopupMenuItem(
-                value: 'modifiedAt:desc',
+                value: 'date:desc',
                 child: Text('Recently changed'),
               ),
-              PopupMenuItem(
-                value: 'sizeBytes:desc',
-                child: Text('Largest first'),
-              ),
+              PopupMenuItem(value: 'size:desc', child: Text('Largest first')),
             ],
           ),
         ],
@@ -367,21 +426,35 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
               content: Text(_error!),
               actions: [
                 TextButton(
-                  onPressed: () => _load(reset: true),
-                  child: const Text('Retry'),
+                  onPressed: () => _load(reset: !_failedPage),
+                  child: Text(_failedPage ? 'Retry page' : 'Retry'),
                 ),
               ],
             ),
-          if (_truncated)
-            const MaterialBanner(
+          if (_truncated || _warnings.isNotEmpty)
+            MaterialBanner(
               content: Text(
-                'Some entries could not be listed. Refresh to retry the scan.',
+                _warnings.isEmpty
+                    ? 'Some entries could not be listed. Retry the scan.'
+                    : _warnings.join('\n'),
               ),
-              actions: [],
+              actions: [
+                TextButton(
+                  onPressed: _loading ? null : () => _load(reset: true),
+                  child: const Text('Retry scan'),
+                ),
+              ],
             ),
+          if (_loading && _items.isNotEmpty) const LinearProgressIndicator(),
           Expanded(
-            child: _loading
+            child: _loading && _items.isEmpty
                 ? const Center(child: CircularProgressIndicator())
+                : _error != null && _items.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Files could not be loaded. Use Retry to try again.',
+                    ),
+                  )
                 : _items.isEmpty
                 ? Center(
                     child: Text(
@@ -398,7 +471,9 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: OutlinedButton.icon(
-                onPressed: _loadingMore ? null : () => _load(reset: false),
+                onPressed: _loadingMore || _loading
+                    ? null
+                    : () => _load(reset: false),
                 icon: _loadingMore
                     ? const SizedBox(
                         width: 16,
@@ -415,10 +490,14 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   }
 
   Widget _listView(String? locale) => ListView.builder(
+    key: PageStorageKey('folder-list-${widget.libraryId}-${widget.folderId}'),
+    findChildIndexCallback: _entryIndex,
     itemCount: _items.length,
     itemBuilder: (context, index) => _entryTile(_items[index], locale: locale),
   );
   Widget _gridView(String? locale) => GridView.builder(
+    key: PageStorageKey('folder-grid-${widget.libraryId}-${widget.folderId}'),
+    findChildIndexCallback: _entryIndex,
     padding: const EdgeInsets.all(12),
     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
       maxCrossAxisExtent: 220,
@@ -430,6 +509,13 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
     itemBuilder: (context, index) =>
         _entryTile(_items[index], grid: true, locale: locale),
   );
+
+  int? _entryIndex(Key key) {
+    final index = _items.indexWhere(
+      (entry) => ValueKey('entry-${entry.id}') == key,
+    );
+    return index < 0 ? null : index;
+  }
 
   Widget _entryTile(Entry entry, {bool grid = false, String? locale}) {
     final folder = entry.kind == EntryKindEnum.folder;
@@ -445,7 +531,11 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
     final thumbId = entry.mediaId;
     final shownName = _displayName(entry.name, folder: folder);
     final leading = entry.thumbnailAvailable && thumbId != null
-        ? _AuthorizedThumbnail(mediaId: thumbId)
+        ? _AuthorizedThumbnail(
+            key: ValueKey(thumbId),
+            mediaId: thumbId,
+            grid: grid,
+          )
         : Icon(icon, size: grid ? 50 : 32);
     final canEdit = _canManage && !folder && (video || photo);
     return Card(
@@ -742,10 +832,10 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
         await Future<void>.delayed(const Duration(milliseconds: 400));
         if (!mounted || token.isCancelled) return false;
         operation =
-            (await requireActiveApi(ref)
-                    .getOperationsApi()
-                    .getOperation(id: operation.id, cancelToken: token))
-                .data!;
+            (await requireActiveApi(ref).getOperationsApi().getOperation(
+              id: operation.id,
+              cancelToken: token,
+            )).data!;
       }
       throw const _MutationFailure(
         'The server is still processing this change. Refresh shortly to check its result.',
@@ -824,17 +914,15 @@ class _FolderMovePickerState extends ConsumerState<_FolderMovePicker> {
       setState(() => _loadingMore = true);
     }
     try {
-      final page = await requireActiveApi(ref)
-          .getLibrariesApi()
-          .listEntries(
-            id: widget.libraryId,
-            folderId: _stack.isEmpty ? null : _stack.last.id,
-            kind: 'folder',
-            limit: 50,
-            cursor: reset ? null : _cursor,
-            sort: 'name',
-            order: 'asc',
-          );
+      final page = await requireActiveApi(ref).getLibrariesApi().listEntries(
+        id: widget.libraryId,
+        folderId: _stack.isEmpty ? null : _stack.last.id,
+        kind: 'folder',
+        limit: 50,
+        cursor: reset ? null : _cursor,
+        sort: 'name',
+        order: 'asc',
+      );
       if (!mounted) return;
       if (generation != _requestGeneration) return;
       setState(() {
@@ -985,8 +1073,13 @@ class _FolderMovePickerState extends ConsumerState<_FolderMovePicker> {
 }
 
 class _AuthorizedThumbnail extends ConsumerStatefulWidget {
-  const _AuthorizedThumbnail({required this.mediaId});
+  const _AuthorizedThumbnail({
+    super.key,
+    required this.mediaId,
+    this.grid = false,
+  });
   final String mediaId;
+  final bool grid;
   @override
   ConsumerState<_AuthorizedThumbnail> createState() =>
       _AuthorizedThumbnailState();
@@ -994,32 +1087,48 @@ class _AuthorizedThumbnail extends ConsumerStatefulWidget {
 
 class _AuthorizedThumbnailState extends ConsumerState<_AuthorizedThumbnail> {
   Future<Uint8List>? _future;
+  BrianiApi? _api;
+  String? _mediaId;
+  CancelToken? _token;
+
   @override
-  void initState() {
-    super.initState();
-    _future = requireActiveApi(ref)
-        .getMediaApi()
-        .getThumbnail(id: widget.mediaId)
-        .then((r) => r.data!);
+  void dispose() {
+    _token?.cancel('Thumbnail left the viewport');
+    super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<Uint8List>(
-    future: _future,
-    builder: (context, snapshot) => snapshot.hasData
-        ? ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: Image.memory(
-              snapshot.data!,
-              fit: BoxFit.cover,
-              width: 48,
-              height: 48,
-              errorBuilder: (_, _, _) =>
-                  const Icon(Icons.broken_image_outlined),
-            ),
-          )
-        : const Icon(Icons.image_outlined, size: 30),
-  );
+  Widget build(BuildContext context) {
+    final api = ref.watch(activeApiProvider);
+    if (!identical(api, _api) || _mediaId != widget.mediaId) {
+      _token?.cancel('Thumbnail identity changed');
+      _api = api;
+      _mediaId = widget.mediaId;
+      final token = _token = CancelToken();
+      _future = api
+          ?.getMediaApi()
+          .getThumbnail(id: widget.mediaId, cancelToken: token)
+          .then((r) => r.data!);
+    }
+    return FutureBuilder<Uint8List>(
+      key: ValueKey((api, widget.mediaId)),
+      future: _future,
+      builder: (context, snapshot) => snapshot.hasData
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.memory(
+                snapshot.data!,
+                fit: BoxFit.cover,
+                width: widget.grid ? double.infinity : 48,
+                height: widget.grid ? double.infinity : 48,
+                cacheWidth: widget.grid ? 440 : 96,
+                errorBuilder: (_, _, _) =>
+                    const Icon(Icons.broken_image_outlined),
+              ),
+            )
+          : const Icon(Icons.image_outlined, size: 30),
+    );
+  }
 }
 
 String _duration(int ms) {

@@ -308,12 +308,17 @@ public sealed class ScanWorker(IServiceScopeFactory scopes, ContainedStorage sto
             }
             catch (ApiException) { }
         }
-        foreach (var old in files.OrderBy(x => x.Mtime))
+        // Physical enumeration remains authoritative, including orphaned files.
+        // Sorting is only needed when this write actually requires eviction.
+        if (used + data.Length > cacheLimit)
         {
-            if (used + data.Length <= cacheLimit) break;
-            try { state.Unlink(old.Path); } catch (ApiException) { }
-            var rows = await db.ThumbnailEntries.Where(x => x.CacheRelativePath == old.Path).Take(16).ToListAsync(ct);
-            db.ThumbnailEntries.RemoveRange(rows); used -= old.Bytes;
+            foreach (var old in files.OrderBy(x => x.Mtime))
+            {
+                if (used + data.Length <= cacheLimit) break;
+                try { state.Unlink(old.Path); } catch (ApiException) { }
+                var rows = await db.ThumbnailEntries.Where(x => x.CacheRelativePath == old.Path).Take(16).ToListAsync(ct);
+                db.ThumbnailEntries.RemoveRange(rows); used -= old.Bytes;
+            }
         }
         if (used + data.Length > cacheLimit) return null;
         var relative = "cache/media/" + Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant() + ".jpg";

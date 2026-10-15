@@ -1,0 +1,80 @@
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:191: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root), accept)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:200: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:210: DeprecationWarning: files() is deprecated
+  storage = info.files()
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:235: DeprecationWarning: add_files is deprecated, use list_files() instead
+  lt.add_files(fs, str(root))
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:236: DeprecationWarning: create_torrent constructor from file_storage is deprecated
+  ct = lt.create_torrent(fs, piece_length, flags)
+/home/hassan/projects/BrianiPlayer/prototypes/playback/fixtures/generate.py:244: DeprecationWarning: files() is deprecated
+  storage = lt.torrent_info(encoded).files()
+{
+  "manifest": "/home/hassan/projects/BrianiPlayer/docs/evidence/M10/polish/desktop/87e48899e5f64e55bd22fee11244f09b/fixtures/manifest.json",
+  "torrent": {
+    "binding_version": "2.1.2.0",
+    "generated": [
+      {
+        "mode": "v1",
+        "status": "generated",
+        "path": "fixture-v1.torrent",
+        "layout_oracle": {
+          "format": "v1",
+          "piece_length": 262144,
+          "torrent_length": 1754059,
+          "files": [
+            {
+              "path": "corpus/Tail metadata.mp4",
+              "length": 333516,
+              "torrent_offset": 0,
+              "first_piece": 0,
+              "last_piece": 1,
+              "padding": false
+            },
+            {
+              "path": "corpus/Faststart café [test].mp4",
+              "length": 333516,
+              "torrent_offset": 333516,
+              "first_piece": 1,
+              "last_piece": 2,
+              "padding": false
+            },
+            {
+              "path": "corpus/payloads/media/雪片.dat",
+              "length": 524301,
+              "torrent_offset": 667032,
+              "first_piece": 2,
+              "last_piece": 4,
+              "padding": false
+            },
+            {
+              "path": "corpus/payloads/ignored Ω.bin",
+              "length": 73123,
+              "torrent_offset": 1191333,
+              "first_piece": 4,
+              "last_piece": 4,
+              "padding": false
+            },
+            {
+              "path": "corpus/payloads/neighbour one.bin",
+              "length": 131071,
+              "torrent_offset": 1264456,
+              "first_piece": 4,
+              "last_piece": 5,
+              "padding": false
+            },
+            {
+              "path": "corpus/Tracks 演示.mkv",
+              "length": 358532,
+              "torrent_offset": 1395527,
+              "first_piece": 5,
+              "last_piece": 6,
+              "padding": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

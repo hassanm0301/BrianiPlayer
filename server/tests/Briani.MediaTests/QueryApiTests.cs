@@ -14,6 +14,22 @@ public sealed class QueryApiTests : IAsyncLifetime
     public Task InitializeAsync() => fixture.InitializeAsync();
     public Task DisposeAsync() => fixture.DisposeAsync();
 
+    [Theory]
+    [InlineData("name")]
+    [InlineData("date")]
+    [InlineData("size")]
+    public async Task Empty_catalog_supports_all_folder_sorts(string sort)
+    {
+        var library = await AddLibraryWithItems();
+        var client = IdentityFixture.As(fixture.Client, fixture.Admin.AccessToken);
+        var response = await client.GetAsync($"/api/v1/libraries/{library:D}/entries?sort={sort}");
+        response.EnsureSuccessStatusCode();
+        using var page = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Empty(page.RootElement.GetProperty("items").EnumerateArray());
+        Assert.Equal(0, page.RootElement.GetProperty("totalKnown").GetInt64());
+        Assert.Equal(JsonValueKind.Null, page.RootElement.GetProperty("nextCursor").ValueKind);
+    }
+
     [Fact]
     public async Task Entry_search_is_unicode_normalized_and_treats_like_wildcards_literally()
     {

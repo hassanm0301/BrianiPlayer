@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-15",
+  "purpose": "Private Pi deployment; startup blocked pending required kernel capabilities",
+  "source": "Current operations tool and Compose, tailored for two drives; retained locked ARM64 images",
+  "files": [
+    {
+      "path": "bin/docker",
+      "sha256": "8cfe615e78bcbfb6151a360c1e80e8c5119b61edaa51c17b2852ad645707eb1c",
+      "bytes": 53
+    },
+    {
+      "path": "briani",
+      "sha256": "0b725c558bff101e8f9b958f58fb5597d5e3151a0c8405e87efff3bc2a67d3ed",
+      "bytes": 381
+    },
+    {
+      "path": "dist/images/briani-egress-linux-arm64.tar",
+      "sha256": "f77d3fff31cf8a0bcf52e6f0d2df74de0f38693066968d879c8bc1f03f46a18b",
+      "bytes": 5273088
+    },
+    {
+      "path": "dist/images/briani-server-linux-arm64.tar",
+      "sha256": "00e8482ea89b182c846075d113549e34ac98d862b7e4bbea8c3e6ed366aad32f",
+      "bytes": 120102400
+    },
+    {
+      "path": "images.lock.json",
+      "sha256": "33ad71edbc7477dad90482e2591e6c80c1a5c4cb33990972bf0c7e0563473eaf",
+      "bytes": 3762
+    },
+    {
+      "path": "infra/compose/compose.admin.yaml",
+      "sha256": "ccbccc646da142e989655cd26fe5a3844d22a60294665b14a39778d21541fba1",
+      "bytes": 196
+    },
+    {
+      "path": "infra/compose/compose.yaml",
+      "sha256": "8be9a1042d9a84a6d87829079d9f399b12e2f8f59f2ceb6ea09bcae38692866b",
+      "bytes": 3285
+    },
+    {
+      "path": "toolchain.lock.json",
+      "sha256": "d9be8dc508f38a308304b085d910fb07860d1ef021cf9df97d51d1e168699675",
+      "bytes": 3607
+    },
+    {
+      "path": "tools/operations/briani.py",
+      "sha256": "cd73e90dbf41f3fc7b531b119d3059aaab3bb05fbf53bb6bc35d72831bcdb4a8",
+      "bytes": 38232
+    }
+  ]
+}

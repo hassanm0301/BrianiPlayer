@@ -1,0 +1,7 @@
+  Briani.Api -> /home/hassan/projects/BrianiPlayer/server/src/Briani.Api/bin/Debug/net10.0/Briani.Api.dll
+  DownloadTests -> /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll
+Test run for /home/hassan/projects/BrianiPlayer/server/tests/Briani.DownloadTests/bin/Debug/net10.0/DownloadTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: /home/hassan/projects/BrianiPlayer/docs/evidence/M10/polish/server/downloads-application.trx
+
+Passed!  - Failed:     0, Passed:   108, Skipped:     0, Total:   108, Duration: 23 s - DownloadTests.dll (net10.0)

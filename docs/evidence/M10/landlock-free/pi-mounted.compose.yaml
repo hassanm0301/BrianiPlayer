@@ -1,0 +1,47 @@
+name: briani-mounted-probe-20261015
+services:
+  probe:
+    image: briani-server:landlock-free-20261015-arm64
+    pull_policy: never
+    user: 1000:1000
+    entrypoint:
+    - dotnet
+    - /probe/Briani.PiContainmentProbe.dll
+    command:
+    - --mounted-libraries
+    network_mode: none
+    read_only: true
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    cpus: 0.5
+    pids_limit: 64
+    environment:
+      DOTNET_GCHeapHardLimit: '0x10000000'
+      DOTNET_EnableDiagnostics: '0'
+    tmpfs:
+    - /tmp:rw,noexec,nosuid,size=16m
+    restart: 'no'
+    volumes:
+    - type: bind
+      source: /home/hassan/briani/landlock-free-verification-20261015/probe
+      target: /probe
+      read_only: true
+      bind:
+        create_host_path: false
+    - type: bind
+      source: /mnt/hassan_drive/briani/mounted-containment-probe-20261015/data
+      target: /data
+      bind:
+        create_host_path: false
+    - type: bind
+      source: /mnt/family_drive/briani/mounted-containment-probe-20261015
+      target: /data/Family
+      bind:
+        create_host_path: false
+    - type: bind
+      source: /mnt/hassan_drive/briani/mounted-containment-probe-20261015/config
+      target: /config
+      bind:
+        create_host_path: false

@@ -1,0 +1,8 @@
+Preserved previous package and .env rollback copy; staged new candidate.
+{"files": 9, "package": "/home/hassan/briani/package-landlock-free-20261015"}
+Docker Compose version v5.5.1
+29.8.1
+
+operations: Docker cannot enforce container memory limits on this host; enable the kernel/cgroup memory controller before deploying. No host configuration was changed.
+
+DOCTOR EXIT CODE: 2

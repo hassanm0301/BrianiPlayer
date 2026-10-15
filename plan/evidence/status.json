@@ -321,7 +321,7 @@
     "All M00-M11 application implementation paths are present; this ledger distinguishes code completeness from release certification.",
     "Local final-image desktop and Android TV workflows passed; packaged four-service install/backup/restore/rollback passed with exact cleanup.",
     "Final regression counts and commands are in docs/evidence/M11/report.md; no physical-platform, reproducibility or signing passes are invented.",
-    "Pi and physical Android testing are reserved to the user. No further access is authorized.",
+    "Pi access was reauthorized on 2026-10-15 for deployment only; deployment is staged but blocked by compiled-out Landlock and disabled memory cgroups. Physical Android and Pi performance testing remain deferred. On 2026-10-16 the user authorized enabling the memory cgroup (cmdline.txt + reboot); the stack now runs on the Pi with /healthz and /readyz returning 200; administrator not yet claimed.",
     "Only private local artifacts are produced. No tag/image/app was published and no owner public-license grant was assigned."
   ],
   "localVerification": {
@@ -447,6 +447,183 @@
       "limitations": [
         "Documentation-only change; no deployment, hardware or clean-install checks rerun.",
         "Existing milestone/release gates unchanged; packaged archives retain original documentation."
+      ]
+    }
+  ],
+  "implementationUpdates": [
+    {
+      "date": "2026-10-14",
+      "scope": "Add direct Docker Compose setup; media and state paths remain required",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_local",
+      "report": "docs/evidence/M09/compose-setup.md",
+      "checks": {
+        "operationsPythonTestsPassed": 30,
+        "composeConfig": "passed_with_required_paths_missing_paths_rejected",
+        "documentationValidation": "passed",
+        "planValidation": "passed",
+        "optionalFeatureReversion": "verified",
+        "supersededDrillCleanup": "verified",
+        "operationsServerTestsPassed": 8,
+        "operationsSuiteExitCode": 0,
+        "manifestIdentityReview": "fixed_and_regression_tested"
+      },
+      "limitations": [
+        "Existing hardware and release certification gates unchanged.",
+        "Original operations archive was not regenerated; no new installation or hardware pass claimed."
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "scope": "Existing-feature UI consistency, accessibility, bug fixes and bounded optimization",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_local",
+      "report": "docs/evidence/M10/polish/report.md",
+      "checks": {
+        "flutterTestsPassed": 112,
+        "flutterTestExitCode": 0,
+        "flutterAnalyze": "no_issues",
+        "linuxDebugBuildExitCode": 0,
+        "serverApplicationTestsPassed": 415,
+        "dedicatedEngineTestsPassed": 2,
+        "nativeDesktopTestsPassed": 2,
+        "nativeMediaCasesPassed": 3,
+        "nativeDesktopExitCode": 0,
+        "isolatedResourceCleanup": "verified",
+        "planStructuralChecks": 1062,
+        "secretScan": "passed",
+        "independentReview": "two_state_races_fixed_regression_tested_final_review_clear",
+        "reconnectSingleBoundedTrial": "passed_without_daemon_restart_not_reliability_certification"
+      },
+      "limitations": [
+        "Existing intermittent reconnect reliability blocker remains; no automatic daemon-restart behavior added.",
+        "Pi and physical Android/TV remain user-deferred; Windows/macOS and signing/release gates unchanged.",
+        "Optimization timing evidence is a local synthetic comparison, not authenticated API latency or Pi performance.",
+        "Native desktop used the existing locked local server image; current server changes passed host-side tests.",
+        "Distribution archives and image locks were not rebuilt or published."
+      ]
+    },
+    {
+      "date": "2026-10-15",
+      "scope": "Remove Landlock dependency using descriptor containment within dedicated Briani folders",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_local_and_native_containment",
+      "report": "docs/evidence/M10/landlock-free/report.md",
+      "checks": {
+        "serverApplicationTestsPassed": 421,
+        "serverApplicationExitCode": 0,
+        "identityTestsWithLandlockDeniedPassed": 52,
+        "operationsPythonTestsPassed": 32,
+        "isolatedEngineTestsPassed": 2,
+        "nativePiDriveCasesPassed": 6,
+        "nativePiNestedLibrariesPassed": 2,
+        "temporaryTestCleanup": "verified",
+        "independentReview": "no_blocking_finding_under_user_accepted_dedicated_folder_boundary"
+      },
+      "limitations": [
+        "Arbitrary concurrent host directory moves are outside the accepted boundary; stop Briani before external directory reorganization.",
+        "Initial parallel solution run had one stream-revocation timeout; unchanged scoped and sequential runs passed, root cause not conclusively diagnosed.",
+        "Production startup still blocked by Docker memory-limit enforcement; no kernel or boot setting changed.",
+        "No Pi workload benchmark, full-stack startup, client check or release certification claimed."
+      ]
+    }
+  ],
+  "deploymentAttempts": [
+    {
+      "date": "2026-10-15",
+      "target": "hassan@192.168.100.186",
+      "state": "blocked_verification",
+      "deploymentStatus": "staged_not_running",
+      "report": "docs/evidence/M09/pi-deployment-20261015/report.md",
+      "project": "/home/hassan/briani/ops",
+      "mediaPaths": [
+        "/mnt/hassan_drive/briani/media/Hassan",
+        "/mnt/family_drive/briani/media"
+      ],
+      "statePath": "/mnt/hassan_drive/briani/state",
+      "checks": {
+        "operationsTestsPassed": 30,
+        "operationsTestsExitCode": 0,
+        "transferredPayloadHashesPassed": 9,
+        "lockedArm64ImagesLoaded": 2,
+        "initExitCode": 0,
+        "composeConfigExitCode": 0,
+        "twoDriveBindAssertions": "passed_config_only",
+        "doctorExitCode": 2,
+        "brianiContainersStarted": 0
+      },
+      "blockers": [
+        "Kernel 6.18.50+rpt-rpi-2712 was built without CONFIG_SECURITY_LANDLOCK; ABI and ERRATA syscalls return ENOSYS.",
+        "Docker MemoryLimit=false; memory cgroup disabled at boot.",
+        "User has not authorized kernel replacement or reboot; no replacement kernel prepared."
+      ],
+      "limitations": [
+        "Retained locked private server image does not include subsequent uncommitted server optimizations.",
+        "Two-drive layout is configured but application runtime and library setup remain unverified.",
+        "No Pi benchmark, client, full-stack backup/restore, or release certification pass claimed."
+      ]
+    },
+    {
+      "date": "2026-10-15",
+      "target": "hassan@192.168.100.186",
+      "state": "blocked_verification",
+      "deploymentStatus": "landlock_free_candidate_staged_not_running",
+      "report": "docs/evidence/M10/landlock-free/report.md",
+      "project": "/home/hassan/briani/ops",
+      "package": "/home/hassan/briani/package-landlock-free-20261015",
+      "mediaPaths": [
+        "/mnt/hassan_drive/briani/media/Hassan",
+        "/mnt/family_drive/briani/media"
+      ],
+      "statePath": "/mnt/hassan_drive/briani/state",
+      "image": "briani-server:landlock-free-20261015-arm64",
+      "runtimeConfigDigest": "sha256:101712497fce90e254adb3b9576bb50582fd6f81a3535b8be43c1bf840d52c64",
+      "checks": {
+        "openat2": "supported",
+        "landlock": "not_required_ENOSYS_confirmed",
+        "nativePiDriveCasesPassed": 6,
+        "nativePiNestedLibrariesPassed": 2,
+        "doctorExitCode": 2,
+        "productionBrianiContainersStarted": 0,
+        "testContainersRemoved": true,
+        "previousPackageAndEnvironmentRetained": true,
+        "composeConfigExitCode": 0,
+        "twoDriveBindAssertions": "passed_native_containment_and_config",
+        "transferredPayloadHashesPassed": 9
+      },
+      "blockers": [
+        "Docker MemoryLimit=false; memory cgroup controller disabled at boot."
+      ],
+      "limitations": [
+        "Dedicated folders approved by user; external directory moves require stopping Briani.",
+        "Kernel, boot settings and existing services unchanged.",
+        "No administrator or production library records created; no full-stack readiness or benchmark claimed."
+      ]
+    },
+    {
+      "date": "2026-10-16",
+      "target": "hassan@192.168.100.186",
+      "state": "blocked_verification",
+      "deploymentStatus": "running_admin_unclaimed",
+      "report": "docs/evidence/M09/pi-deployment-20261016/report.md",
+      "project": "/home/hassan/briani/ops",
+      "package": "/home/hassan/briani/package-landlock-free-20261015",
+      "image": "briani-server:landlock-free-20261015-arm64",
+      "hostChange": "Appended cgroup_enable=memory to /boot/firmware/cmdline.txt (backup cmdline.txt.before-briani-20261016) and rebooted, with user authorization.",
+      "checks": {
+        "dockerMemoryLimit": true,
+        "doctorExitCode": 0,
+        "qbitBootstrapExitCode": 0,
+        "upExitCode": 0,
+        "captureProwlarrKeyExitCode": 0,
+        "healthzHttp": 200,
+        "readyzHttp": 200,
+        "brianiMemoryLimitBytes": 1073741824
+      },
+      "blockers": [],
+      "limitations": [
+        "Administrator not claimed; no libraries, indexers or users created.",
+        "No client, playback, download, backup/restore, benchmark or release certification run against this deployment."
       ]
     }
   ]

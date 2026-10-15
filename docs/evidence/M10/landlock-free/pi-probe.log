@@ -1,0 +1,18 @@
+PASS transferred image SHA256
+Loaded image: briani-server:landlock-free-20261015-arm64
+sha256:53c60d6f4be24a8750a8369ba7d053a89a084b156b8daf100bf56d86b3a8de22 arm64
+{"drive": "hassan_drive", "command": ["timeout", "--signal=TERM", "--kill-after=10s", "60s", "sudo", "-n", "--preserve-env=BRIANI_PROBE_FIXTURE", "docker", "compose", "-f", "/home/hassan/briani/landlock-free-verification-20261015/pi-probe.compose.yaml", "run", "--rm", "--no-deps", "probe"]}
+ Container briani-containment-probe-20261015-probe-run-ac2b64fd4ea4 Creating 
+ Container briani-containment-probe-20261015-probe-run-ac2b64fd4ea4 Created 
+PASS nested create/read/link/rename/unlink
+PASS symlink escape rejected
+PASS retained child moved outside rejected
+EXIT CODE: 0
+{"drive": "family_drive", "command": ["timeout", "--signal=TERM", "--kill-after=10s", "60s", "sudo", "-n", "--preserve-env=BRIANI_PROBE_FIXTURE", "docker", "compose", "-f", "/home/hassan/briani/landlock-free-verification-20261015/pi-probe.compose.yaml", "run", "--rm", "--no-deps", "probe"]}
+ Container briani-containment-probe-20261015-probe-run-de5f850f0f62 Creating 
+ Container briani-containment-probe-20261015-probe-run-de5f850f0f62 Created 
+PASS nested create/read/link/rename/unlink
+PASS symlink escape rejected
+PASS retained child moved outside rejected
+EXIT CODE: 0
+[{"drive": "hassan_drive", "exitCode": 0, "fixtureRemoved": true}, {"drive": "family_drive", "exitCode": 0, "fixtureRemoved": true}]
