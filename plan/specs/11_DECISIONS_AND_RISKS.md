@@ -29,6 +29,7 @@
 - File progress percentage and allocated size do not identify a contiguous valid byte range.
 - A downloaded piece notification and durable/readable data can be different events; pin/test exact implementation.
 - First/last-piece priority does not guarantee the whole metadata structure needed by every container.
+- With the pinned qBittorrent 5.2.4/libtorrent 2.0.15, a file-priority change can silently drop the first/last boost: libtorrent rebuilds piece priorities when its asynchronous file-priority job finishes, after qBittorrent applied the boost. Briani re-asserts the same fixed assist (an off/on toggle, under the job lock) until the assist pieces arrive, and an MP4/MOV is eligible only once its whole `moov` box is verified (2026-10-16 measurements: `prototypes/downloads/engine/run_piece_order_experiment.py`).
 - mpv is not the torrent engine, and no player choice removes the server's availability problem.
 - Android TV HDR/hardware decoding and external-player handling are device-specific. Do not characterize one engine as universally best.
 - “All popular torrents” is not an achievable coverage promise from one finite provider query. Most seeded is a local result-set ranking.
@@ -69,6 +70,7 @@ Keep media_kit on desktop. Document unsupported advanced subtitle/HDR cases accu
 | Incomplete-file corruption | Byte oracle, sparse-file and restart/recheck tests | Hard gate; correct map/read lifecycle or D12. |
 | Container metadata delays | Faststart/tail-MP4/MKV fixture matrix | Show metadata wait; fixed assist only; no false instant-start promise. |
 | Swarm slower than video | Controlled starvation test | Buffer/resume; show state; no uptime promise. |
+| One slow peer holds the next sequential piece (head-of-line) | Fast + slow seeder experiment: the contiguous edge stalled 15–21 s while later pieces kept arriving; on a real swarm, 2.5 min at 84% downloaded | Open, owner decision needed. A stop/start nudge was measured worse (66–123 s stalls) and is rejected. Remaining options change D08 or need D12: engine piece timeouts/deadlines, or accept buffering. |
 | Multi-file selection/padding | v1/v2/hybrid fixture offsets | Exact map and cross-check; fail closed. |
 | ARM native dependency gaps | Native image/player smoke | Pin compatible builds; report platform blocker, never substitute emulated benchmark. |
 | Prowlarr outage/changes | Version/contract tests, health | Cached partial results and retry; upstream-only provider support. |

@@ -61,7 +61,7 @@ public sealed class ProbeService(ContainedStorage storage, IOptions<MediaProcess
                 if (parsed.Width is > 0 && parsed.Height is > 0 && checked((long)parsed.Width * parsed.Height) <= PixelLimit)
                 {
                     await ThumbnailSlots.WaitAsync(cancellationToken);
-                    try { source.Position = 0; thumb = await MakeThumbnailAsync(procPath, video, exifOrientation, cancellationToken); }
+                    try { source.Position = 0; thumb = await MakeThumbnailAsync(procPath, video, exifOrientation, parsed.DurationMs, cancellationToken); }
                     catch (Exception e) when (e is InvalidDataException or IOException or JsonException or InvalidOperationException or TimeoutException) { }
                     finally { ThumbnailSlots.Release(); }
                 }
@@ -109,7 +109,13 @@ public sealed class ProbeService(ContainedStorage storage, IOptions<MediaProcess
             BoundString(GetString(format, "format_name") ?? item.Extension.TrimStart('.').ToLowerInvariant(), 128)!, "ffprobe", "ready", null, null);
     }
 
-    private async Task<byte[]?> MakeThumbnailAsync(string procPath, bool video, int? exifOrientation, CancellationToken ct)
+    /// Where a video thumbnail is taken: 10% in (at most ten minutes), because
+    /// the first frame of many films is black. An input seek is keyframe-based,
+    /// so the cost stays within the bounded thumbnail budget.
+    internal static TimeSpan ThumbnailPosition(long? durationMs) =>
+        durationMs is > 0 ? TimeSpan.FromMilliseconds(Math.Min(durationMs.Value / 10, 600_000)) : TimeSpan.Zero;
+
+    private async Task<byte[]?> MakeThumbnailAsync(string procPath, bool video, int? exifOrientation, long? durationMs, CancellationToken ct)
     {
         var transforms = video ? "" : exifOrientation switch
         {
@@ -118,7 +124,16 @@ public sealed class ProbeService(ContainedStorage storage, IOptions<MediaProcess
         };
         var filter = $"{transforms}scale={ThumbnailEdge}:{ThumbnailEdge}:force_original_aspect_ratio=decrease";
         var args = new List<string> { "-v", "error", "-nostdin", "-noautorotate", "-protocol_whitelist", string.Join(',', AllowedProtocols), "-format_whitelist", string.Join(',', AllowedDemuxers), "-max_pixels", PixelLimit.ToString(CultureInfo.InvariantCulture), "-threads", "1", "-filter_threads", "1", "-i", procPath, "-frames:v", "1", "-vf", filter, "-f", "image2pipe", "-vcodec", "mjpeg", "-threads", "1", "pipe:1" };
+        var position = video ? ThumbnailPosition(durationMs) : TimeSpan.Zero;
+        if (position > TimeSpan.Zero)
+            args.InsertRange(args.IndexOf("-i"), ["-ss", position.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture)]);
         var p = await RunBoundedAsync(options.FfmpegPath, args, ThumbnailOutputLimit, ct);
+        if (position > TimeSpan.Zero && (p.ExitCode != 0 || !IsJpeg(p.Stdout)))
+        {
+            // A damaged or unseekable file may still decode from the start.
+            args.RemoveRange(args.IndexOf("-ss"), 2);
+            p = await RunBoundedAsync(options.FfmpegPath, args, ThumbnailOutputLimit, ct);
+        }
         if (p.ExitCode != 0 || !IsJpeg(p.Stdout)) return null;
         return p.Stdout;
     }

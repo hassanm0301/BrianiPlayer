@@ -160,6 +160,58 @@ public sealed class SubtitleApiTests
         }
     }
 
+    [Fact]
+    public async Task Imported_video_lists_each_subtitle_once_with_its_language()
+    {
+        await using var fixture = await LifecycleFixture.Create();
+        await fixture.SeedReadyDownload(fixture.Admin.User.Id, fixture.Admin.SessionId);
+        var stageRelative = $".briani/staging/{fixture.Engine.JobId:N}";
+        var stagePath = Path.Combine(fixture.LibraryPath, stageRelative);
+        Directory.CreateDirectory(stagePath);
+        var subtitle = Encoding.UTF8.GetBytes(Subtitle);
+        await File.WriteAllBytesAsync(Path.Combine(stagePath, "fixture.en.srt"), subtitle);
+        var stagedNode = Inspect(fixture.LibraryPath, stageRelative + "/fixture.en.srt");
+        // The import placed the same files in the library folder.
+        var importedDirectory = "Downloads/fixture--" + fixture.Engine.JobId.ToString("N")[..8];
+        Directory.CreateDirectory(Path.Combine(fixture.LibraryPath, importedDirectory));
+        await File.WriteAllBytesAsync(Path.Combine(fixture.LibraryPath, importedDirectory, "fixture.mp4"), VideoFixture);
+        await File.WriteAllBytesAsync(Path.Combine(fixture.LibraryPath, importedDirectory, "fixture.en.srt"), subtitle);
+        var videoNode = Inspect(fixture.LibraryPath, importedDirectory + "/fixture.mp4");
+        var mediaId = Guid.NewGuid();
+        await fixture.InDb(async db =>
+        {
+            var job = await db.TorrentJobs.SingleAsync(x => x.Id == fixture.Engine.JobId);
+            job.TotalBytes = LifecycleFixture.FileBytes + subtitle.Length;
+            job.PieceCount = 5;
+            db.DownloadFiles.Add(SubtitleFile(Guid.NewGuid(), job.Id, "fixture.en.srt", subtitle.Length, stagedNode, true));
+            var item = new MediaItem
+            {
+                Id = mediaId, LibraryId = fixture.LibraryId, ParentRelativePath = importedDirectory, RelativePath = importedDirectory + "/fixture.mp4",
+                DisplayName = "fixture.mp4", SearchKey = "fixture.mp4", Kind = "video", Extension = ".mp4", MimeType = "video/mp4",
+                SizeBytes = VideoFixture.Length, MtimeNs = videoNode.MtimeNs, FileIdentity = videoNode.Key, SourceKind = "hardlink",
+                DownloadFileId = fixture.Engine.FileId, Lifecycle = "available", Version = 1, CreatedAt = fixture.Clock.GetUtcNow(), IndexedAt = fixture.Clock.GetUtcNow()
+            };
+            db.MediaItems.Add(item);
+            db.MediaMetadata.Add(new MediaMetadata { MediaItemId = item.Id, ProbeStatus = "ready", ContentGeneration = item.Version, Container = "mp4", ProbeVersion = "fixture" });
+            await db.SaveChangesAsync();
+            return 0;
+        });
+        fixture.Engine.ConfigureFiles(5,
+            new Briani.Api.Integrations.QBittorrent.EngineFile(0, "fixture.mp4", LifecycleFixture.FileBytes, 1, 7, 0, 3),
+            new Briani.Api.Integrations.QBittorrent.EngineFile(1, "fixture.en.srt", subtitle.Length, 1, 7, 4, 4));
+        fixture.Engine.RegisterExisting(LifecycleFixture.Hash, stagePath);
+
+        using var response = await fixture.Client.PostAsJsonAsync("/api/v1/playback/sessions", new
+        {
+            target = new { kind = "media", id = mediaId }, mode = "internal", initialPositionMs = 0
+        });
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var sidecar = Assert.Single(document.RootElement.GetProperty("sidecars").EnumerateArray());
+        Assert.Equal("fixture.en.srt", sidecar.GetProperty("name").GetString());
+        Assert.Equal("en", sidecar.GetProperty("language").GetString());
+    }
+
     private static async Task<SeededMedia> SeedPhysicalVideo(LifecycleFixture fixture, byte[] subtitleBytes, bool addSecond)
     {
         var directory = "subtitle-fixture-" + Guid.NewGuid().ToString("N");

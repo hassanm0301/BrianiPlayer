@@ -36,6 +36,10 @@ public sealed class TorrentAvailability(IServiceScopeFactory scopes,ITorrentEngi
         if(value is null || !value.Healthy || value.Generation!=Generation(job,e))throw new EngineFailure("engine_unavailable");
         return value.CopyStates();
     }
+    /// Refreshes outside the download worker and the polling loop. The job lock
+    /// keeps a request from observing an engine change the worker is making.
+    public async Task RefreshGuardedAsync(Entry e,CancellationToken ct)
+    {using var held=await jobLocks.EnterAsync(e.Id,ct);await RefreshAsync(e,ct);}
     public async Task RefreshAsync(Entry e,CancellationToken ct)
     {
         await e.Fetch.WaitAsync(ct);

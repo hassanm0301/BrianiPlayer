@@ -61,7 +61,9 @@ public sealed class SubtitleDelivery(BrianiDb db,MediaAccess media,PermissionSer
                 foreach(var f in files.Where(f=>Parent(f.RelativePath)==Parent(video.RelativePath) && Related(video.DisplayName,f.DisplayName)).Take(16-candidates.Count))
                 {
                     var path=job.ManagedPath+"/"+f.RelativePath;
-                    try{var node=root.Inspect(path);if(!node.IsFile || node.Key!=f.FileIdentity || node.Length!=f.SizeBytes || node.MtimeNs!=f.MtimeNs)continue;candidates.Add(new(f.Id,library,path,f.DisplayName,node.Key,node.Length,node.MtimeNs));}catch(ApiException){}
+                    // An imported subtitle is already offered from the library folder.
+                    if(candidates.Any(c=>c.Name.Equals(f.DisplayName,StringComparison.OrdinalIgnoreCase)))continue;
+                    try{var node=root.Inspect(path);if(!node.IsFile || node.Key!=f.FileIdentity || node.Length!=f.SizeBytes || node.MtimeNs!=f.MtimeNs || candidates.Any(c=>c.Library.Id==library.Id && c.Identity==node.Key))continue;candidates.Add(new(f.Id,library,path,f.DisplayName,node.Key,node.Length,node.MtimeNs));}catch(ApiException){}
                 }
             }
         }
@@ -70,7 +72,7 @@ public sealed class SubtitleDelivery(BrianiDb db,MediaAccess media,PermissionSer
     public async Task<PlaybackSidecarView[]> DescribeAsync(PlaybackSession session,HttpContext context,CancellationToken ct)
     {
         if(!session.TicketIssued)return[];
-        try{var(_,files)=await ResolveAsync(session,ct);var origin=await AdministratorConfiguration.OriginAsync(database,context,ct);return files.Select(f=>new PlaybackSidecarView(f.Id,f.Name,null,Mime(f.Name),$"{origin}/stream/{Token(session,f)}/{Uri.EscapeDataString(f.Name)}")).ToArray();}
+        try{var(_,files)=await ResolveAsync(session,ct);var origin=await AdministratorConfiguration.OriginAsync(database,context,ct);return files.Select(f=>new PlaybackSidecarView(f.Id,f.Name,SubtitleLanguage.FromFileName(f.Name),Mime(f.Name),$"{origin}/stream/{Token(session,f)}/{Uri.EscapeDataString(f.Name)}")).ToArray();}
         catch(ApiException){return[];}
     }
     public async Task StreamAsync(string token,string name,HttpContext c)

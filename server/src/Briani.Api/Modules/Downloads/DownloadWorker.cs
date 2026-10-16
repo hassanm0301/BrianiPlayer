@@ -11,9 +11,11 @@ using Briani.Api.Modules.Playback;
 using Briani.Api.Integrations.QBittorrent;
 using Microsoft.EntityFrameworkCore;
 namespace Briani.Api.Modules.Downloads;
-public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine engine,WriteGate gate,ContainedStorage storage,SecretStore secrets,ServerOptions options,TimeProvider clock,ISafeDns dns,MediaReaders readers,DownloadJobLocks jobLocks,TorrentAvailability availability):BackgroundService
+public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine engine,WriteGate gate,ContainedStorage storage,SecretStore secrets,ServerOptions options,TimeProvider clock,ISafeDns dns,MediaReaders readers,DownloadJobLocks jobLocks,TorrentAvailability availability,MediaIndexProbe indexProbe):BackgroundService
 {
     private readonly SemaphoreSlim execution=new(1,1),pollExecution=new(1,1);private readonly string leaseOwner=Guid.NewGuid().ToString("N");
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<Guid,DateTimeOffset> assistReassertedAt=new();
+    internal TimeSpan AssistReassertInterval {get;set;}=TimeSpan.FromSeconds(5);
     internal TimeSpan MetadataOperationTimeout {get;set;}=TimeSpan.FromSeconds(120);
     public Action<string>? TransactionBoundary{get;set;}
     protected override async Task ExecuteAsync(CancellationToken ct)
@@ -154,7 +156,7 @@ public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine en
     }
     private async Task FetchMetadataCoreAsync(BrianiDb db,TorrentJob job,Library library,CancellationToken ct)
     {
-        var upstream=await RequireOwnedAsync(job,library,ct);if(upstream.State is "metaDL" or "forcedMetaDL")return;await StopSettledAsync(upstream.Hash,ct);
+        var upstream=await RequireOwnedAsync(job,library,ct);if(!MetadataReceived(upstream))return;await StopSettledAsync(upstream.Hash,ct);
         var bytes=await engine.ExportAsync(upstream.Hash,ct);var metadata=Metainfo.Parse(bytes);ValidateHashes(job,metadata);await SourceValidation.ValidateTrackerDnsAsync(metadata.Trackers,dns,ct);
         var layout=DownloadLayout.Map(job.Id,metadata,await engine.FilesAsync(upstream.Hash,ct));
         await engine.SetFilePriorityAsync(upstream.Hash,layout.Where(x=>x.UpstreamFileIndex>=0).Select(x=>x.UpstreamFileIndex).ToArray(),0,ct);
@@ -271,7 +273,8 @@ public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine en
                 {
                     var fresh=await db.TorrentJobs.AsNoTracking().SingleAsync(x=>x.Id==job.Id,ct);if(fresh.RetiredAt is not null || fresh.Revision!=job.Revision || await db.Operations.AnyAsync(x=>x.Kind.StartsWith("download-") && (x.State=="pending"||x.State=="running") && db.DownloadRequests.Any(r=>r.Id==x.TargetId && r.TorrentJobId==job.Id),ct))continue;
                     if(job.MetadataDeadline<=clock.GetUtcNow()){await StopSettledAsync(t.Hash,ct);await engine.RemoveAsync(t.Hash,false,ct);using var h=await gate.EnterAsync(ct);job.ErrorCode="metadata_timeout";job.MetadataStatus="failed";job.ReservedBytes=0;job.UpstreamId=null;foreach(var r in await db.DownloadRequests.Where(x=>x.TorrentJobId==job.Id && x.RemovedAt==null).ToArrayAsync(ct)){r.State="stalled";r.ErrorCode="metadata_timeout";r.ReservedBytes=0;r.Version++;}await db.SaveChangesAsync(ct);continue;}
-                    if(t.State is not("metaDL" or "forcedMetaDL"))await FetchMetadataAsync(db,job,library,ct);continue;
+                    // A new magnet reports queuedDL before metaDL, so the state alone does not mean metadata arrived.
+                    if(MetadataReceived(t))await FetchMetadataAsync(db,job,library,ct);continue;
                 }
                 if(await db.Operations.AnyAsync(x=>x.Kind.StartsWith("download-") && (x.State=="pending"||x.State=="running") && db.DownloadRequests.Any(r=>r.Id==x.TargetId && r.TorrentJobId==job.Id),ct))continue;
                 if(t.State.StartsWith("checking",StringComparison.Ordinal) || t.State is "unknown" or "error" or "missingFiles")
@@ -282,8 +285,9 @@ public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine en
                 {
                     var current=await db.TorrentJobs.AsNoTracking().SingleAsync(x=>x.Id==job.Id,ct);if(current.Generation!=snapshot.Generation || current.Revision!=job.Revision || await db.Operations.AnyAsync(x=>x.Kind.StartsWith("download-") && (x.State=="pending"||x.State=="running") && db.DownloadRequests.Any(r=>r.Id==x.TargetId && r.TorrentJobId==job.Id),ct))continue;
                     foreach(var file in files)
-                    {if(file.Padding)continue;var ef=actual.SingleOrDefault(x=>x.Index==file.UpstreamFileIndex);if(ef is null||ef.Path!=file.RelativePath||ef.Bytes!=file.SizeBytes||ef.FirstPiece!=file.PieceFirst||ef.LastPiece!=file.PieceLast)throw new ApiException(409,"engine_layout_mismatch");file.DownloadedBytes=DownloadLayout.Available(file,job.PieceLength,pieces);file.ContiguousBytes=DownloadLayout.Available(file,job.PieceLength,pieces,true);file.Completed=file.DownloadedBytes==file.SizeBytes;file.PlaybackState=!file.Wanted?"notSelected":file.Completed?"complete":file.Kind=="video" && file.SizeBytes>0 && file.ContiguousBytes>=Math.Min(file.SizeBytes,16777216)?"eligible":"waitingForData";
-                        try{using var root=storage.OpenLibrary(library);var node=root.Inspect(job.ManagedPath+"/"+file.RelativePath);if(node.IsFile){if(file.FileIdentity is not null && file.FileIdentity!=node.Key)throw new ApiException(409,"file_identity_changed");file.FileIdentity=node.Key;file.MtimeNs=node.MtimeNs;}}catch(ApiException e)when(e.Code=="path_unavailable"){} }
+                    {if(file.Padding)continue;var ef=actual.SingleOrDefault(x=>x.Index==file.UpstreamFileIndex);if(ef is null||ef.Path!=file.RelativePath||ef.Bytes!=file.SizeBytes||ef.FirstPiece!=file.PieceFirst||ef.LastPiece!=file.PieceLast)throw new ApiException(409,"engine_layout_mismatch");file.DownloadedBytes=DownloadLayout.Available(file,job.PieceLength,pieces);file.ContiguousBytes=DownloadLayout.Available(file,job.PieceLength,pieces,true);file.Completed=file.DownloadedBytes==file.SizeBytes;
+                        try{using var root=storage.OpenLibrary(library);var node=root.Inspect(job.ManagedPath+"/"+file.RelativePath);if(node.IsFile){if(file.FileIdentity is not null && file.FileIdentity!=node.Key)throw new ApiException(409,"file_identity_changed");file.FileIdentity=node.Key;file.MtimeNs=node.MtimeNs;}}catch(ApiException e)when(e.Code=="path_unavailable"){}
+                        file.PlaybackState=!file.Wanted?"notSelected":file.Completed?"complete":file.Kind=="video" && file.SizeBytes>0 && file.ContiguousBytes>=Math.Min(file.SizeBytes,16777216) && indexProbe.IndexReady(file,job,library,p=>p>=0 && p<pieces.Length && pieces[p]==2)?"eligible":"waitingForData"; }
                     job.SelectedComplete=files.Any(x=>x.Wanted)&&files.Where(x=>x.Wanted).All(x=>x.Completed);job.DownloadedBytes=t.DownloadedBytes;job.UploadedBytes=t.UploadedBytes;job.DownloadBps=t.DownloadBps;job.UploadBps=t.UploadBps;job.SeedersConnected=t.SeedersConnected;job.PeersConnected=t.PeersConnected;job.EtaSeconds=t.EtaSeconds;job.LastContactAt=clock.GetUtcNow();job.ErrorCode=null;job.Sequential=t.Sequential;job.MetadataAssist=t.MetadataAssist;job.EngineState=MapState(t.State,job.SelectedComplete);
                     job.ReservedBytes=files.Where(x=>x.Wanted).Sum(x=>Math.Max(0,x.SizeBytes-x.DownloadedBytes)+ (x.Completed?0:2*job.PieceLength));job.UpdatedAt=clock.GetUtcNow();
                     foreach(var r in await db.DownloadRequests.Where(x=>x.TorrentJobId==job.Id && x.RemovedAt==null).ToArrayAsync(ct)){r.State=r.SelectedBytes is null?"awaitingSelection":job.SelectedComplete?"completeSelected":job.EngineState switch{"stopped"=>"paused","seeding"=>"seeding","failed"=>"failed",_=>job.EngineState};r.UpdatedAt=job.UpdatedAt;}
@@ -310,6 +314,8 @@ public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine en
                     }
                     if(admitted) {await RequireReservationsAsync(db,job,library,ct);await engine.StartAsync(t.Hash,ct);}
                 }
+                else if(job.DesiredState=="running" && t.State is "downloading" or "forcedDL" or "stalledDL" && t.Sequential && t.MetadataAssist && AssistReassertDue(job,files,pieces))
+                    await engine.ReassertMetadataAssistAsync(t.Hash,ct);
 
             }
             catch(Exception e)when(e is ApiException or EngineFailure or IOException)
@@ -323,6 +329,21 @@ public sealed class DownloadWorker(IServiceScopeFactory scopes,ITorrentEngine en
             finally{observationGuard?.Dispose();}
 
         }
+    }
+    /// qBittorrent's has_metadata when present; older responses fall back to the
+    /// state, where a queued or resuming magnet has no metadata yet.
+    internal static bool MetadataReceived(EngineTorrent t)=>t.HasMetadata ?? t.State is not("metaDL" or "forcedMetaDL" or "queuedDL" or "checkingResumeData");
+    /// True when a wanted, unfinished video still lacks first/last-assist pieces
+    /// and the boost was not re-applied recently. Without the tail, an MP4 whose
+    /// index sits at the end cannot start until the download is nearly done.
+    private bool AssistReassertDue(TorrentJob job,DownloadFile[] files,byte[] pieces)
+    {
+        var pending=pieces.Length==job.PieceCount && files.Any(f=>f.Wanted && f.Kind=="video" && !f.Completed &&
+            DownloadLayout.AssistPieces(f,job.PieceLength).Any(p=>p<0 || p>=pieces.Length || pieces[p]!=2));
+        if(!pending){assistReassertedAt.TryRemove(job.Id,out _);return false;}
+        var now=clock.GetUtcNow();
+        if(assistReassertedAt.TryGetValue(job.Id,out var last) && now-last<AssistReassertInterval)return false;
+        assistReassertedAt[job.Id]=now;return true;
     }
     private static async Task<bool> LiveSelectionsAuthorizedAsync(BrianiDb db,TorrentJob job,CancellationToken ct)
     {

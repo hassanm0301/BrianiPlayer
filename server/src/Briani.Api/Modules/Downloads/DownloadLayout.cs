@@ -28,6 +28,14 @@ public static class DownloadLayout
     }
     public static string Kind(string path)=>Path.GetExtension(path).ToLowerInvariant() switch
     {".mp4" or ".m4v" or ".mkv" or ".webm" or ".mov" or ".avi" or ".mpeg" or ".mpg" or ".ts" or ".m2ts" or ".ogv" or ".3gp"=>"video", ".jpg" or ".jpeg" or ".png" or ".webp" or ".gif" or ".bmp" or ".tif" or ".tiff" or ".avif"=>"photo", ".srt" or ".ass" or ".ssa" or ".vtt"=>"subtitle",_=>"other"};
+    /// qBittorrent's first/last-piece span for a file: ceil(1% of the file / piece
+    /// length) pieces at each end (TorrentImpl::applyFirstLastPiecePriority).
+    public static IEnumerable<int> AssistPieces(DownloadFile file,long pieceLength)
+    {
+        if(file.SizeBytes<=0 || pieceLength<=0)yield break;
+        var count=(int)Math.Ceiling(file.SizeBytes*0.01/pieceLength);
+        for(var i=0;i<count;i++){yield return file.PieceFirst+i;yield return file.PieceLast-i;}
+    }
     public static long Available(DownloadFile file,long pieceLength,byte[] pieces,bool contiguous=false)
     {
         long bytes=0;for(var p=file.PieceFirst;p<=file.PieceLast && file.SizeBytes>0;p++)

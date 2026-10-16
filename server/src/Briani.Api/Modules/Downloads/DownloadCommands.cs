@@ -47,7 +47,8 @@ public sealed class DownloadCommands(BrianiDb db,PermissionService permissions,D
         {
             if(await db.TorrentJobs.CountAsync(x=>x.RetiredAt==null && x.MetadataStatus=="pending" && x.ErrorCode==null,ct)>=policy.MetadataConcurrency)throw new ApiException(429,"metadata_limit");
             var volume=await admission.RequireAsync(actor,library,null,policy.ProvisionalBytes,policy.ProvisionalBytes,null,ct);
-            job=new(){LibraryId=library.Id,InfoHashV1=hash1,InfoHashV2=hash2,VolumeIdentity=volume.Volume,ReservedBytes=volume.Bytes,CreatedAt=now,UpdatedAt=now,MetadataDeadline=now.AddSeconds(120)};
+            // A provisional name until metadata arrives; the metadata name replaces it.
+            job=new(){LibraryId=library.Id,InfoHashV1=hash1,InfoHashV2=hash2,Name=source.Metadata?.Name??magnet?.DisplayName??"",VolumeIdentity=volume.Volume,ReservedBytes=volume.Bytes,CreatedAt=now,UpdatedAt=now,MetadataDeadline=now.AddSeconds(120)};
             var configured=await Briani.Api.Modules.Preferences.AdministratorConfiguration.ReadAsync(db,ct);
             job.SettingsJson=JsonSerializer.Serialize(new DownloadSettings(Version:1,RatioLimit:configured["defaultRatioLimit"]?.GetValue<double>(),SeedTimeMinutes:configured["defaultSeedTimeMinutes"]?.GetValue<long>()),Json);
             job.ManagedPath=$".briani/staging/{job.Id:N}";job.OwnershipTag=$"briani-{job.Id:N}";job.EncryptedMagnet=source.Magnet is null?null:secrets.Encrypt(source.Magnet);

@@ -256,6 +256,9 @@ internal sealed class FakeTorrentEngine : ITorrentEngine
     public int StartCalls => Volatile.Read(ref startCalls);
     public int StopCalls => Volatile.Read(ref stopCalls);
     public int PriorityUpdateCalls => Volatile.Read(ref priorityUpdateCalls);
+    private int assistReasserts;
+    public int AssistReasserts => Volatile.Read(ref assistReasserts);
+    public Task ReassertMetadataAssistAsync(string hash, CancellationToken ct = default) { Interlocked.Increment(ref assistReasserts); return Task.CompletedTask; }
     public Func<int, CancellationToken, Task>? BeforePriorityUpdate { get; set; }
     public bool TimeoutAfterAddOnce { get; set; }
     public bool IncludeTrackerInExport { get; set; }

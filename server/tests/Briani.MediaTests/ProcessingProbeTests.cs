@@ -226,6 +226,37 @@ public sealed class ProcessingProbeTests
         }
     }
 
+    [Fact]
+    public async Task VideoThumbnailIsTakenPastAnOpeningBlackFrame()
+    {
+        var root = NewTemp();
+        try
+        {
+            var data = Path.Combine(root, "data"); var state = Path.Combine(root, "state");
+            Directory.CreateDirectory(Path.Combine(data, "library")); Directory.CreateDirectory(state);
+            var videoPath = Path.Combine(data, "library", "opening.mp4");
+            // Ten seconds of blue whose first half second is black, like many film openings.
+            await RunFfmpegAsync("-v", "error", "-f", "lavfi", "-i", "color=c=blue:s=64x32:d=10:r=10",
+                "-vf", "drawbox=x=0:y=0:w=iw:h=ih:color=black:t=fill:enable='lt(t,0.5)'",
+                "-c:v", "libx264", "-g", "5", "-pix_fmt", "yuv420p", "-threads", "1", videoPath);
+            var server = new ServerOptions { DataRoot = data, StateRoot = state };
+            using var storage = new ContainedStorage(server);
+            var library = new Library { Id = Guid.NewGuid(), RootPath = "library", RootIdentity = storage.ValidateLibraryRoot("library").Identity };
+            NodeIdentity stat; using (var opened = storage.OpenLibrary(library)) stat = opened.Inspect("opening.mp4");
+            var item = new Briani.Api.Modules.Media.MediaItem { Id = Guid.NewGuid(), LibraryId = library.Id, RelativePath = "opening.mp4", Extension = ".mp4", Kind = "video", FileIdentity = stat.Key, SizeBytes = stat.Length, MtimeNs = stat.MtimeNs };
+            var service = new ProbeService(storage, Options.Create(new MediaProcessingOptions()));
+            var result = await service.ProbeAsync(item, library, CancellationToken.None);
+
+            Assert.Equal("ready", result.ProbeStatus);
+            var (_, _, pixels) = ParsePpm(await DecodePpmAsync(Assert.IsType<byte[]>(result.ThumbnailJpeg)));
+            var rgb = pixels.ToArray();
+            var blue = Enumerable.Range(0, rgb.Length / 3).Average(i => rgb[i * 3 + 2]);
+            var red = Enumerable.Range(0, rgb.Length / 3).Average(i => rgb[i * 3]);
+            Assert.True(blue > 150 && red < 60, $"thumbnail should be blue, not the black opening (r={red:F0}, b={blue:F0})");
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
     private static string NewTemp() { var path = Path.Combine(Path.GetTempPath(), "briani-media-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(path); return path; }
     private static byte[] ExifOrientationSegment(ushort orientation) =>
     [0xff, 0xe1, 0x00, 0x22, 0x45, 0x78, 0x69, 0x66, 0, 0,

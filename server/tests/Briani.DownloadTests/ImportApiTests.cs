@@ -72,6 +72,8 @@ public sealed class ImportApiTests
             .OrderBy(x => x.UpstreamFileIndex).Select(x => x.ImportedItemId).ToArrayAsync());
         Assert.NotNull(afterFirstPoll[0]);
         Assert.Null(afterFirstPoll[1]);
+        // One of two wanted files imported is not an imported request.
+        Assert.Equal("running", await fixture.InDb(db => db.TorrentJobs.AsNoTracking().Where(x => x.Id == fixture.Engine.JobId).Select(x => x.ImportState).SingleAsync()));
 
         await fixture.Worker.PollOnceAsync();
         var afterSecondPoll = await fixture.InDb(async db => await db.DownloadFiles.AsNoTracking()
@@ -79,6 +81,7 @@ public sealed class ImportApiTests
             .OrderBy(x => x.UpstreamFileIndex).Select(x => x.ImportedItemId).ToArrayAsync());
         Assert.All(afterSecondPoll, value => Assert.True(value.HasValue));
         Assert.NotEqual(afterSecondPoll[0], afterSecondPoll[1]);
+        Assert.Equal("complete", await fixture.InDb(db => db.TorrentJobs.AsNoTracking().Where(x => x.Id == fixture.Engine.JobId).Select(x => x.ImportState).SingleAsync()));
     }
 
     [Fact]

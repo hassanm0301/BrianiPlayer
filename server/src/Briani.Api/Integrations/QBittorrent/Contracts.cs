@@ -1,6 +1,6 @@
 namespace Briani.Api.Integrations.QBittorrent;
 public sealed record EngineVersion(string Application,string WebApi,string Libtorrent);
-public sealed record EngineTorrent(string Hash,string? InfoHashV1,string? InfoHashV2,string Name,string SavePath,string State,long TotalBytes,long DownloadedBytes,long UploadedBytes,long DownloadBps,long UploadBps,double Progress,double Availability,bool Sequential,bool MetadataAssist,string[] Tags,long? EtaSeconds,long? SeedersConnected,long? PeersConnected,int QueuePosition);
+public sealed record EngineTorrent(string Hash,string? InfoHashV1,string? InfoHashV2,string Name,string SavePath,string State,long TotalBytes,long DownloadedBytes,long UploadedBytes,long DownloadBps,long UploadBps,double Progress,double Availability,bool Sequential,bool MetadataAssist,string[] Tags,long? EtaSeconds,long? SeedersConnected,long? PeersConnected,int QueuePosition,bool? HasMetadata=null);
 public sealed record EngineFile(int Index,string Path,long Bytes,double Progress,int Priority,int FirstPiece,int LastPiece);
 public sealed record EngineTracker(string Host,string Status,int? Seeds,int? Peers);
 public sealed record EngineAdd(byte[]? Torrent,string? Magnet,string SavePath,string OwnershipTag,bool MetadataOnly);
@@ -19,6 +19,8 @@ public interface ITorrentEngine
     Task StartAsync(string hash,CancellationToken ct=default);
     Task EnsureSequentialAsync(string hash,bool enabled,CancellationToken ct=default);
     Task EnsureMetadataAssistAsync(string hash,bool enabled,CancellationToken ct=default);
+    /// Re-applies first/last-piece priority to a torrent that already has it enabled.
+    Task ReassertMetadataAssistAsync(string hash,CancellationToken ct=default)=>EnsureMetadataAssistAsync(hash,true,ct);
     Task SetFilePriorityAsync(string hash,int[] indexes,int priority,CancellationToken ct=default);
     Task ApplyLimitsAsync(string hash,EngineLimits limits,CancellationToken ct=default);
     Task RecheckAsync(string hash,CancellationToken ct=default);

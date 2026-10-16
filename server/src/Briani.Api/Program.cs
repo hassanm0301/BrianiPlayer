@@ -53,7 +53,7 @@ builder.Services.AddSingleton<WriteGate>();builder.Services.AddSingleton<AuthLim
 builder.Services.AddSingleton<SecretStore>();builder.Services.AddSingleton<PageCursor>();builder.Services.AddSingleton<ContainedStorage>();
 builder.Services.AddOptions<MediaProcessingOptions>().Bind(builder.Configuration.GetSection("MediaProcessing"));
 builder.Services.AddScoped<MediaOperations>();builder.Services.AddHostedService<MutationWorker>();
-builder.Services.AddSingleton<TorrentAvailability>();builder.Services.AddHostedService(sp=>sp.GetRequiredService<TorrentAvailability>());
+builder.Services.AddSingleton<TorrentAvailability>();builder.Services.AddSingleton<MediaIndexProbe>();builder.Services.AddHostedService(sp=>sp.GetRequiredService<TorrentAvailability>());
 builder.Services.AddScoped<MediaAccess>();builder.Services.AddScoped<CompletedPlayback>();builder.Services.AddScoped<ProgressivePlayback>();builder.Services.AddScoped<SubtitleDelivery>();builder.Services.AddSingleton<MediaReaders>();
 builder.Services.AddSingleton<ProbeService>();builder.Services.AddSingleton<ScanWorker>();builder.Services.AddHostedService(sp=>sp.GetRequiredService<ScanWorker>());
 builder.Services.AddSingleton<ApplicationOperationsWorker>();

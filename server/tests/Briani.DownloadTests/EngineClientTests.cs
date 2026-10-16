@@ -148,6 +148,46 @@ public sealed class EngineClientTests
         await server.WaitAsync(TimeSpan.FromSeconds(10));
     }
 
+    [Fact]
+    public async Task ReassertTogglesFirstLastOffThenOnAndReadsMetadataFlag()
+    {
+        await using var host = new TestHost();
+        using var app = host.CreateClient();
+        var origin = new Uri($"http://127.0.0.1:{FreePort()}/");
+        await Configure(host, origin, "engine-test", "fixture-" + Credentials.NewToken(), 8);
+        using var listener = new HttpListener(); listener.Prefixes.Add(origin.AbsoluteUri); listener.Start();
+        const string hash = "0123456789abcdef0123456789abcdef01234567";
+        var firstLast = true; var toggles = 0; using var stop = new CancellationTokenSource();
+        var server = Task.Run(async () =>
+        {
+            while (!stop.IsCancellationRequested)
+            {
+                HttpListenerContext context;
+                try { context = await listener.GetContextAsync().WaitAsync(stop.Token); } catch (OperationCanceledException) { return; }
+                var path = context.Request.Url!.AbsolutePath;
+                if (path.EndsWith("/auth/login", StringComparison.Ordinal))
+                {
+                    context.Response.Headers.Add("Set-Cookie", "QBT_SID=reassert; Path=/; HttpOnly");
+                    await Reply(context, 200, "Ok."); continue;
+                }
+                if (path.EndsWith("/torrents/toggleFirstLastPiecePrio", StringComparison.Ordinal)) { toggles++; firstLast = !firstLast; await Reply(context, 200, ""); }
+                else if (path.EndsWith("/torrents/info", StringComparison.Ordinal))
+                    await Reply(context, 200, "[{\"hash\":\"" + hash + "\",\"name\":\"magnet\",\"save_path\":\"/data/test/.briani/staging/job\",\"state\":\"queuedDL\",\"has_metadata\":false,\"seq_dl\":true,\"f_l_piece_prio\":" + (firstLast ? "true" : "false") + ",\"tags\":\"\",\"eta\":8640000,\"priority\":1}]", "application/json");
+                else await Reply(context, 404, "Not found");
+            }
+        });
+
+        var engine = new QBitTorrentClient(host.Services.GetRequiredService<ServiceConnections>(), new SystemSafeDns());
+        var torrent = Assert.Single(await engine.TorrentsAsync());
+        Assert.False(torrent.HasMetadata);
+        Assert.Null(torrent.EtaSeconds);
+        await engine.ReassertMetadataAssistAsync(hash);
+        Assert.Equal(2, toggles);
+        Assert.True(firstLast);
+        stop.Cancel();
+        await server;
+    }
+
     [Theory]
     [InlineData("/data/not-a-library/.briani/staging/1234", "invalid_add_request")]
     [InlineData("/data/00000000-0000-0000-0000-000000000000/.briani/staging/00000000-0000-0000-0000-000000000000", "invalid_add_request")]

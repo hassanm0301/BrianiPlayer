@@ -134,6 +134,31 @@ public sealed class QBitTorrentClient(ServiceConnections connections, ISafeDns d
     public Task EnsureSequentialAsync(string hash, bool enabled, CancellationToken ct = default) => EnsureToggleAsync(hash, "seq_dl", "torrents/toggleSequentialDownload", enabled, ct);
     public Task EnsureMetadataAssistAsync(string hash, bool enabled, CancellationToken ct = default) => EnsureToggleAsync(hash, "f_l_piece_prio", "torrents/toggleFirstLastPiecePrio", enabled, ct);
 
+    // libtorrent 2.0 applies file priorities on its disk thread and then rebuilds
+    // every piece priority from them (torrent::on_file_priority). qBittorrent
+    // boosts the first/last pieces right after posting file priorities
+    // (TorrentImpl::prioritizeFiles), so a disk job that finishes later wipes the
+    // boost and a sequential download then fetches the tail last. A toggle only
+    // calls prioritize_pieces, so an off/on pair restores it; the Web API has no
+    // setter. The caller holds the job lock, so Briani never observes the gap.
+    public async Task ReassertMetadataAssistAsync(string hash, CancellationToken ct = default)
+    {
+        hash = ValidHash(hash); var gate = TorrentLocks[int.Parse(hash.AsSpan(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture) & (TorrentLocks.Length - 1)]; await gate.WaitAsync(ct);
+        try
+        {
+            var current = await FindTorrentAsync(hash, ct) ?? throw new EngineFailure("torrent_not_found");
+            if (!Bool(current, "f_l_piece_prio")) throw new EngineFailure("engine_action_unverified");
+            // A toggle is not safe to repeat after an uncertain outcome; reconcile by observation.
+            try { await PostAsync("torrents/toggleFirstLastPiecePrio", new() { ["hashes"] = hash }, ct); }
+            catch (EngineFailure e) when (e.Code == "engine_timeout") { }
+            var middle = await FindTorrentAsync(hash, ct) ?? throw new EngineFailure("torrent_not_found");
+            if (!Bool(middle, "f_l_piece_prio")) await PostAsync("torrents/toggleFirstLastPiecePrio", new() { ["hashes"] = hash }, ct);
+            var after = await FindTorrentAsync(hash, ct);
+            if (after is null || !Bool(after.Value, "f_l_piece_prio")) throw new EngineFailure("engine_action_unverified");
+        }
+        finally { gate.Release(); }
+    }
+
     public async Task SetFilePriorityAsync(string hash, int[] indexes, int priority, CancellationToken ct = default)
     {
         if (indexes is null || indexes.Length is < 1 or > 10000 || indexes.Any(x => x < 0) || indexes.Distinct().Count() != indexes.Length || priority is not (0 or 1 or 6 or 7))
@@ -425,8 +450,11 @@ public sealed class QBitTorrentClient(ServiceConnections connections, ISafeDns d
         return new(hash.ToLowerInvariant(), EmptyNull(Str(e, "infohash_v1")), EmptyNull(Str(e, "infohash_v2")), Str(e, "name"), Str(e, "save_path"), state,
             Math.Max(0, Long(e, "total_size", Long(e, "size", 0))), Math.Max(0, Long(e, "downloaded", 0)), Math.Max(0, Long(e, "uploaded", 0)), Math.Max(0, Long(e, "dlspeed", 0)), Math.Max(0, Long(e, "upspeed", 0)),
             Double(e, "progress"), Double(e, "availability"), Bool(e, "seq_dl"), Bool(e, "f_l_piece_prio"), tags,
-            Nonnegative(Long(e, "eta", -1)), NullableInt(e, "num_seeds"), NullableInt(e, "num_leechs"), Int(e, "priority", -1));
+            Eta(Long(e, "eta", -1)), NullableInt(e, "num_seeds"), NullableInt(e, "num_leechs"), Int(e, "priority", -1),
+            e.TryGetProperty("has_metadata", out var metadata) && metadata.ValueKind is JsonValueKind.True or JsonValueKind.False ? metadata.GetBoolean() : null);
     }
     private static string? EmptyNull(string value) => value.Length == 0 ? null : value;
     private static long? Nonnegative(long value) => value < 0 ? null : value;
+    // qBittorrent reports an unbounded ETA as MAX_ETA, 8,640,000 s (src/base/types.h).
+    internal static long? Eta(long value) => value is < 0 or >= 8640000 ? null : value;
 }

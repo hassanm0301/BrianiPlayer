@@ -3,7 +3,7 @@ using System.Text;
 using Briani.Api.Infrastructure.Integrations;
 using Briani.Api.Infrastructure.Security;
 namespace Briani.Api.Modules.Discovery.Sources;
-public sealed record ValidatedMagnet(string Uri,string? InfoHashV1,string? InfoHashV2,string[] Trackers);
+public sealed record ValidatedMagnet(string Uri,string? InfoHashV1,string? InfoHashV2,string[] Trackers,string? DisplayName=null);
 public static class SourceValidation
 {
     public static void Tracker(string value)
@@ -15,7 +15,7 @@ public static class SourceValidation
     public static ValidatedMagnet Magnet(string value)
     {
         if(value.Length is <1 or >65536 || value.Any(char.IsControl) || !value.StartsWith("magnet:?",StringComparison.OrdinalIgnoreCase) || value.Contains('#'))throw new ApiException(400,"invalid_magnet");
-        string? v1=null,v2=null;var trackers=new List<string>();int parameters=0;
+        string? v1=null,v2=null,displayName=null;var trackers=new List<string>();int parameters=0;
         foreach(var field in value[8..].Split('&'))
         {
             if(++parameters>128)throw new ApiException(400,"invalid_magnet");var pair=field.Split('=',2);if(pair.Length!=2 || pair[0]=="")throw new ApiException(400,"invalid_magnet");string argument;
@@ -30,12 +30,12 @@ public static class SourceValidation
                     {var hash=argument[13..];if(hash.Length!=64 || !hash.All(Uri.IsHexDigit) || v2 is not null && !v2.Equals(hash,StringComparison.OrdinalIgnoreCase))throw new ApiException(400,"invalid_magnet");v2=hash.ToLowerInvariant();}
                     else throw new ApiException(400,"invalid_magnet");break;
                 case "tr":Tracker(argument);if(trackers.Count>=100)throw new ApiException(400,"invalid_magnet");trackers.Add(argument);break;
-                case "dn":if(argument.Length>512)throw new ApiException(400,"invalid_magnet");break;
+                case "dn":if(argument.Length>512)throw new ApiException(400,"invalid_magnet");displayName??=argument.Trim().Length==0?null:argument.Trim();break;
                 case "xl":if(!long.TryParse(argument,out var length) || length<0)throw new ApiException(400,"invalid_magnet");break;
                 default:throw new ApiException(400,"unsafe_magnet_field");
             }
         }
-        if(v1 is null && v2 is null)throw new ApiException(400,"invalid_magnet");return new(value,v1,v2,trackers.Distinct(StringComparer.Ordinal).ToArray());
+        if(v1 is null && v2 is null)throw new ApiException(400,"invalid_magnet");return new(value,v1,v2,trackers.Distinct(StringComparer.Ordinal).ToArray(),displayName);
     }
     private static string Base32(string text)
     {

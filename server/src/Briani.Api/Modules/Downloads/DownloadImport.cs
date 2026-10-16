@@ -50,7 +50,13 @@ public sealed class DownloadImport(BrianiDb db,ITorrentEngine engine,ContainedSt
                 else if(linked && item.SourceKind=="virtual"){item.RelativePath=intent.Destination;item.ParentRelativePath=intent.Destination[..intent.Destination.LastIndexOf('/')];item.ParentId=parentId;item.SourceKind="hardlink";item.Version++;}
                 file.ImportedItemId=item.Id;
             }
-            op.State="completed";op.UpdatedAt=clock.GetUtcNow();job.ImportState="complete";job.Imported=true;library.Version++;await db.SaveChangesAsync(ct);TransactionBoundary?.Invoke("catalog_committed");
+            // The request is imported only once every wanted file is; early subtitles
+            // finishing first must not report the whole download as imported.
+            var others=await db.DownloadFiles.AsNoTracking().Where(x=>x.TorrentJobId==job.Id && x.Wanted && !x.Padding && x.Id!=file.Id).Select(x=>new{x.Id,x.Kind,x.Completed,x.ImportedItemId}).ToArrayAsync(ct);
+            var subtitleIds=others.Where(x=>x.Kind=="subtitle").Select(x=>x.Id).ToArray();
+            var importedSubtitles=subtitleIds.Length==0?[]:await db.Operations.AsNoTracking().Where(o=>o.Kind=="download-import" && o.State=="completed" && subtitleIds.Contains(o.TargetId)).Select(o=>o.TargetId).ToArrayAsync(ct);
+            var allImported=others.All(x=>x.Completed && (x.Kind=="subtitle"?importedSubtitles.Contains(x.Id):x.ImportedItemId!=null));
+            op.State="completed";op.UpdatedAt=clock.GetUtcNow();job.ImportState=allImported?"complete":"running";job.Imported=true;library.Version++;await db.SaveChangesAsync(ct);TransactionBoundary?.Invoke("catalog_committed");
         }
         if(item is not null)await ProbePendingAsync(item.Id,ct);
     }

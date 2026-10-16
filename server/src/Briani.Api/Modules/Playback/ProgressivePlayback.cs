@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core.Features;
 using Microsoft.EntityFrameworkCore;
 namespace Briani.Api.Modules.Playback;
 
-public sealed class ProgressivePlayback(BrianiDb db,PermissionService permissions,WriteGate gate,TimeProvider clock,MediaReaders readers,IServiceScopeFactory scopes,ContainedStorage storage,SecretStore secrets,TorrentAvailability availability,SubtitleDelivery subtitles)
+public sealed class ProgressivePlayback(BrianiDb db,PermissionService permissions,WriteGate gate,TimeProvider clock,MediaReaders readers,IServiceScopeFactory scopes,ContainedStorage storage,SecretStore secrets,TorrentAvailability availability,SubtitleDelivery subtitles,MediaIndexProbe indexProbe)
 {
     private readonly BrianiDb database=db;
     internal TimeSpan FirstByteTimeout {get;set;}=TimeSpan.FromSeconds(60);
@@ -39,7 +39,8 @@ public sealed class ProgressivePlayback(BrianiDb db,PermissionService permission
     {
         var s=entry.Current;
         if(s is null || s.Generation!=availability.Generation(t.Job,entry) || !s.Healthy || clock.GetUtcNow()-s.ObservedAt>TimeSpan.FromSeconds(2))return("waitingForData",0);
-        var prefix=Prefix(t,s);return(prefix==t.File.SizeBytes?"complete":prefix>=Math.Min(t.File.SizeBytes,16777216)?"ready":"buffering",prefix);
+        // A prefix is not enough for an MP4/MOV whose index follows the media data.
+        var prefix=Prefix(t,s);return(prefix==t.File.SizeBytes?"complete":prefix>=Math.Min(t.File.SizeBytes,16777216) && indexProbe.IndexReady(t.File,t.Job,t.Library,s.Contains)?"ready":"buffering",prefix);
     }
     private async Task<PlaybackSessionView> ViewAsync(PlaybackSession s,Target t,string state,long prefix,string? url,HttpContext c)=>new(s.Id,state,url,s.FirstUseDeadline,s.LastActivityAt?.AddMinutes(30),s.AbsoluteExpiresAt,s.TargetGeneration,prefix,t.File.SizeBytes,ScanWorker.Mime(Path.GetExtension(t.File.DisplayName)),t.File.DisplayName,await subtitles.DescribeAsync(s,c,c.RequestAborted),state is "buffering" or "waitingForData"?2:null,t.File.ImportedItemId);
     private async Task<string> UrlAsync(HttpContext c,string token,string name)=>$"{await AdministratorConfiguration.OriginAsync(database,c,c.RequestAborted)}/stream/{token}/{Uri.EscapeDataString(name)}";
@@ -47,7 +48,7 @@ public sealed class ProgressivePlayback(BrianiDb db,PermissionService permission
     {
         if(request.Target is null || request.Target.Kind!="downloadFile" || request.Mode is not("internal" or "external") || request.InitialPositionMs<0)throw new ApiException(400,"invalid_playback_target");
         var ct=c.RequestAborted;var target=await RequireAsync(actor,request.Target.Id,ct);
-        using var subscription=availability.Subscribe(target.Job.Id);await availability.RefreshAsync(subscription.Source,ct);
+        using var subscription=availability.Subscribe(target.Job.Id);await availability.RefreshGuardedAsync(subscription.Source,ct);
         var key=c.Request.Headers["Idempotency-Key"].ToString();if(key.Length>200 || key.Any(char.IsControl))throw new ApiException(400,"invalid_idempotency_key");var storedKey=key==""?null:Credentials.Hash(key);
         var digest=secrets.Digest(JsonSerializer.Serialize(request));
         using var held=await gate.EnterAsync(ct);target=await RequireAsync(actor,request.Target.Id,ct);
@@ -66,7 +67,7 @@ public sealed class ProgressivePlayback(BrianiDb db,PermissionService permission
     public async Task<PlaybackSessionView> StatusAsync(Actor actor,Guid id,HttpContext c)
     {
         var ct=c.RequestAborted;var session=await database.PlaybackSessions.AsNoTracking().SingleOrDefaultAsync(x=>x.Id==id && x.UserId==actor.UserId,ct)??throw new ApiException(404,"not_found");
-        var target=await RequireAsync(actor,session.DownloadFileId??Guid.Empty,ct);using var subscription=availability.Subscribe(target.Job.Id);await availability.RefreshAsync(subscription.Source,ct);
+        var target=await RequireAsync(actor,session.DownloadFileId??Guid.Empty,ct);using var subscription=availability.Subscribe(target.Job.Id);await availability.RefreshGuardedAsync(subscription.Source,ct);
         using var held=await gate.EnterAsync(ct);database.ChangeTracker.Clear();session=await database.PlaybackSessions.SingleAsync(x=>x.Id==id && x.UserId==actor.UserId,ct);target=await RequireAsync(actor,session.DownloadFileId!.Value,ct);var readiness=State(target,subscription.Source);
         if(session.RevokedAt is not null || !await permissions.IsSessionValidAsync(session.AuthSessionId,ct))return await ViewAsync(session,target,"revoked",0,null,c);
         if(PlaybackExpiry.Expired(session,clock.GetUtcNow()))return await ViewAsync(session,target,"expired",0,null,c);
@@ -111,7 +112,7 @@ public sealed class ProgressivePlayback(BrianiDb db,PermissionService permission
             try
             {
                 using var initialStop=CancellationTokenSource.CreateLinkedTokenSource(ct,requestCt);
-                await availability.RefreshAsync(subscription.Source,initialStop.Token);
+                await availability.RefreshGuardedAsync(subscription.Source,initialStop.Token);
                 var reader=new ProgressiveReader(new(session.TargetGeneration,target.Job.PieceLength,target.Job.PieceCount,target.File.TorrentOffset,length,target.File.FileIdentity!),subscription.Source,clock);
                 long offset=range.Start,remaining=range.Length;var count=await reader.ReadAsync(descriptor!,offset,buffer.AsMemory(0,(int)Math.Min(remaining,262144)),FirstByteTimeout,initialStop.Token);
                 firstDeadline.CancelAfter(Timeout.InfiniteTimeSpan);
