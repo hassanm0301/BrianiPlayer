@@ -1,0 +1,38 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from server-arm64-overlay.Dockerfile
+#1 transferring dockerfile: 108B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE_IMAGE} results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/briani-server:m10-arm64
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/2] FROM docker.io/library/briani-server:m10-arm64@sha256:9ea570f5eda301b2806dd8f41cecde55667626dd5d1b21243a134be8fccc050c
+#4 resolve docker.io/library/briani-server:m10-arm64@sha256:9ea570f5eda301b2806dd8f41cecde55667626dd5d1b21243a134be8fccc050c 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 41.71MB 0.0s done
+#5 DONE 0.1s
+
+#4 [1/2] FROM docker.io/library/briani-server:m10-arm64@sha256:9ea570f5eda301b2806dd8f41cecde55667626dd5d1b21243a134be8fccc050c
+#4 CACHED
+
+#6 [2/2] COPY api/ /app/
+#6 DONE 0.1s
+
+#7 exporting to image
+#7 exporting layers 0.1s done
+#7 exporting manifest sha256:0bc9682e776bb87bbe0fd25e460e20774069beaf5376c9b9d23006982269f15e done
+#7 exporting config sha256:7bf89adc4c0a3451eee9166637241b7b3ad72e55cbbcbc6deee94ff01ae17f0b done
+#7 naming to docker.io/library/briani-server:v1.1.0-arm64 done
+#7 DONE 0.1s
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG ${BASE_IMAGE} results in empty or invalid base image name (line 2)
+exit 0

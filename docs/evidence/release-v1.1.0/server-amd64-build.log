@@ -1,0 +1,87 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from server.Dockerfile
+#1 transferring dockerfile: 4.30kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317
+#2 DONE 0.4s
+
+#3 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4
+#3 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 99B done
+#4 DONE 0.0s
+
+#5 [ffmpeg-build 1/6] FROM mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317
+#5 resolve mcr.microsoft.com/dotnet/sdk@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317 0.0s done
+#5 DONE 0.0s
+
+#6 [stage-2 1/5] FROM mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4
+#6 resolve mcr.microsoft.com/dotnet/aspnet@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 538.61kB done
+#7 DONE 0.0s
+
+#8 [build 2/7] WORKDIR /src
+#8 CACHED
+
+#9 [build 3/7] COPY global.json ./
+#9 CACHED
+
+#10 [build 4/7] COPY contracts/defaults.json contracts/defaults.json
+#10 CACHED
+
+#11 [build 5/7] COPY server/ server/
+#11 DONE 0.1s
+
+#12 [build 6/7] RUN dotnet restore server/src/Briani.Api/Briani.Api.csproj --locked-mode
+#12 0.425   Determining projects to restore...
+#12 9.723   Restored /src/server/src/Briani.Api/Briani.Api.csproj (in 9.16 sec).
+#12 DONE 9.9s
+
+#13 [build 7/7] RUN dotnet publish server/src/Briani.Api/Briani.Api.csproj --no-restore -c Release -o /out --self-contained false
+#13 3.190   Briani.Api -> /src/server/src/Briani.Api/bin/Release/net10.0/Briani.Api.dll
+#13 3.254   Briani.Api -> /out/
+#13 DONE 3.3s
+
+#14 [stage-2 2/5] WORKDIR /app
+#14 CACHED
+
+#15 [ffmpeg-build 2/6] RUN apt-get update && apt-get install -y --no-install-recommends     build-essential=12.10ubuntu1 ca-certificates=20260601~24.04.1     curl=8.5.0-2ubuntu10.15 gpg=2.4.4-2ubuntu17.6 nasm=2.16.01-1build1     pkg-config=1.8.1-2build1 xz-utils=5.6.1+really5.4.5-1ubuntu0.3     zlib1g-dev=1:1.3.dfsg-3.1ubuntu2.2     && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [ffmpeg-build 3/6] WORKDIR /tmp/ffmpeg-build
+#16 CACHED
+
+#17 [ffmpeg-build 5/6] WORKDIR /tmp/ffmpeg-build/source
+#17 CACHED
+
+#18 [ffmpeg-build 4/6] RUN set -eux;     curl --fail --location --retry 3 --output ffmpeg.tar.xz "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz";     curl --fail --location --retry 3 --output ffmpeg.tar.xz.asc "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz.asc";     curl --fail --location --retry 3 --output ffmpeg-devel.asc https://ffmpeg.org/ffmpeg-devel.asc;     actual="$(sha256sum ffmpeg.tar.xz | cut -d' ' -f1)";     test -n "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" && test "$actual" = "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e";     fingerprint="$(gpg --show-keys --with-colons ffmpeg-devel.asc | awk -F: '$1 == "fpr" {print $10; exit}')";     test "$fingerprint" = "FCF986EA15E6E293A5644F10B4322F04D67658D8";     gpg --batch --dearmor --output ffmpeg-keyring.gpg ffmpeg-devel.asc;     gpgv --keyring ./ffmpeg-keyring.gpg ffmpeg.tar.xz.asc ffmpeg.tar.xz;     mkdir source && tar -xJf ffmpeg.tar.xz --strip-components=1 -C source
+#18 CACHED
+
+#19 [stage-2 3/5] RUN mkdir -p /config /data && chown 1000:1000 /config /data
+#19 CACHED
+
+#20 [ffmpeg-build 6/6] RUN set -eux;     ./configure       --prefix=/opt/briani-media --bindir=/opt/briani-media/bin --libdir=/opt/briani-media/lib       --disable-gpl --disable-version3 --disable-nonfree --disable-autodetect       --disable-doc --disable-debug --disable-network --disable-avdevice       --disable-shared --enable-static --enable-small --enable-zlib       --disable-everything --enable-ffmpeg --enable-ffprobe       --enable-avcodec --enable-avformat --enable-avfilter --enable-swscale --enable-avutil       --enable-protocol=file,pipe       --enable-demuxer=mov,matroska,avi,mpegps,mpegts,mpegvideo,ogg,image2,image2pipe,image_jpeg_pipe,image_png_pipe,image_webp_pipe,image_gif_pipe,gif       --enable-muxer=image2,image2pipe       --enable-decoder=h264,hevc,mpeg4,mjpeg,png,webp,gif       --enable-encoder=mjpeg       --enable-parser=h264,hevc,mpeg4video,mjpeg,png,webp,gif,aac,ac3,flac,opus,vorbis       --enable-filter=scale,transpose,format,hflip,vflip       --extra-cflags=-fstack-protector-strong --extra-ldflags=-Wl,-z,relro,-z,now;     make -j"2";     make DESTDIR=/out install;     install -D LICENSE.md /out/opt/briani-media/share/ffmpeg/LICENSE.md;     install -D COPYING.LGPLv2.1 /out/opt/briani-media/share/ffmpeg/COPYING.LGPLv2.1;     cp ffbuild/config.log /out/opt/briani-media/share/ffmpeg/config.log;     dpkg-query -W -f='${binary:Package}=${Version}\n' build-essential ca-certificates curl gpg nasm pkg-config xz-utils zlib1g-dev > /out/opt/briani-media/share/ffmpeg/build-packages.txt;     printf '%s  ffmpeg-%s.tar.xz\n' "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e" "9.0.2" > /out/opt/briani-media/share/ffmpeg/source.sha256
+#20 CACHED
+
+#21 [stage-2 4/5] COPY --from=build /out ./
+#21 DONE 0.1s
+
+#22 [stage-2 5/5] COPY --from=ffmpeg-build /out/opt/briani-media /opt/briani-media
+#22 DONE 0.1s
+
+#23 exporting to image
+#23 exporting layers
+#23 exporting layers 0.5s done
+#23 exporting manifest sha256:0682a3e5a38873ef5b67729a59bfdc7859cadfc618fa8740625169175378e79d done
+#23 exporting config sha256:c2b9760de78b4590f6b303305b0f342ceffdf0c1ebe906c61118add594c3e5f5 done
+#23 naming to docker.io/library/briani-server:v1.1.0 done
+#23 unpacking to docker.io/library/briani-server:v1.1.0
+#23 unpacking to docker.io/library/briani-server:v1.1.0 0.3s done
+#23 DONE 0.8s
+exit 0
