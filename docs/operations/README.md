@@ -34,7 +34,7 @@ docker image load -i dist/images/briani-egress-linux-arm64.tar
 
 ## 2. Choose your folders and address
 
-Run this in the same terminal. Change the disk paths and IP to yours. On ARM64, set the image to `briani-server:v1.1.0-arm64`.
+Run this in the same terminal. Change the disk paths and IP to yours. On ARM64, set the image to `briani-server:v1.2.0-arm64`.
 
 ```bash
 BRIANI_PACKAGE="$PWD"
@@ -42,7 +42,7 @@ BRIANI_PROJECT="$HOME/briani/ops"
 BRIANI_STATE_DIR="/mnt/briani/state"
 BRIANI_MEDIA_DIR="/mnt/briani/media"
 BRIANI_SERVER_IP="192.168.1.50"
-BRIANI_SERVER_IMAGE="briani-server:v1.1.0"
+BRIANI_SERVER_IMAGE="briani-server:v1.2.0"
 
 python3 "$BRIANI_PACKAGE/tools/operations/briani.py" init \
   --project "$BRIANI_PROJECT" \
