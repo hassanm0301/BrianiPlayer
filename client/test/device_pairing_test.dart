@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:briani_player/core/server_profiles/credential_vault.dart';
 import 'package:briani_player/core/server_profiles/providers.dart';
@@ -9,6 +8,7 @@ import 'package:briani_player/core/session/client_session.dart';
 import 'package:briani_player/features/session/device_pairing.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -200,11 +200,12 @@ void main() {
     );
     await tester.tap(find.text('Link a device'));
     await tester.pumpAndSettle();
+    // The eighth character checks the code without a separate button press.
     await tester.enterText(find.byType(TextField), 'abcd2345');
-    await tester.tap(find.text('Check device'));
     await tester.pumpAndSettle();
 
     expect(adapter.inspectCount, 1);
+    expect(adapter.inspectedCode, 'ABCD2345');
     expect(find.textContaining('Living Room TV'), findsOneWidget);
     expect(find.text('Server: Media server'), findsOneWidget);
     expect(find.text('https://media.example'), findsOneWidget);
@@ -249,6 +250,132 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     container.dispose();
   });
+  testWidgets('pasted code is normalised into one box per character',
+      (tester) async {
+    final vault = _Vault();
+    final adapter = _PairingAdapter();
+    final container = _container(adapter, vault, DateTime.now);
+    await tester.runAsync(() => container
+        .read(clientSessionProvider.notifier)
+        .login(_profile, 'member', 'password'));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => FilledButton(
+                onPressed: () => ApproveDeviceDialog.show(context),
+                child: const Text('Open approve'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open approve'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'ab-cd');
+    await tester.pump();
+
+    // Separators are dropped, letters are upper-cased, and each character
+    // is drawn in its own box; nothing is sent before the code is complete.
+    for (final char in ['A', 'B', 'C', 'D']) {
+      expect(find.text(char), findsOneWidget);
+    }
+    expect(adapter.inspectCount, 0);
+
+    await tester.enterText(find.byType(TextField), 'abcd 2345 extra');
+    await tester.pumpAndSettle();
+    expect(adapter.inspectCount, 1);
+    expect(adapter.inspectedCode, 'ABCD2345');
+    expect(find.textContaining('Living Room TV'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    container.dispose();
+  });
+
+  testWidgets('expired TV code says so instead of blaming the server',
+      (tester) async {
+    final vault = _Vault();
+    final adapter = _PairingAdapter()..codeExpiresAt = '2020-01-01T00:00:00Z';
+    final container = _container(adapter, vault, DateTime.now);
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => DeviceLinkScreen(profile: _profile),
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Request device code'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('This code expired. Request a new code.'), findsOneWidget);
+    expect(find.textContaining('did not explain'), findsNothing);
+    expect(find.text('Waiting for approval…'), findsNothing);
+    expect(adapter.exchangeCount, 0);
+    await tester.pumpWidget(const SizedBox.shrink());
+    router.dispose();
+    container.dispose();
+  });
+
+  testWidgets('TV pairing code can be copied', (tester) async {
+    final vault = _Vault();
+    final adapter = _PairingAdapter();
+    final container = _container(adapter, vault, DateTime.now);
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null));
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => DeviceLinkScreen(profile: _profile),
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Request device code'));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.tap(find.text('Copy code'));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(copied, _PairingAdapter.userCode);
+    expect(find.text('Code copied.'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    router.dispose();
+    container.dispose();
+  });
 }
 
 ProviderContainer _container(
@@ -278,6 +405,7 @@ class _Vault implements CredentialVault {
 class _PairingAdapter implements HttpClientAdapter {
   static const deviceSecret = 'server-private-device-secret';
   static const userCode = 'ABCD2345';
+  String codeExpiresAt = '2030-01-01T00:05:00Z';
 
   final exchangeStatuses = <int>[];
   final exchangeBodies = <Map<String, dynamic>>[];
@@ -288,6 +416,7 @@ class _PairingAdapter implements HttpClientAdapter {
   int inspectCount = 0;
   int approveCount = 0;
   String? approvedCode;
+  String? inspectedCode;
 
   @override
   Future<ResponseBody> fetch(
@@ -305,7 +434,7 @@ class _PairingAdapter implements HttpClientAdapter {
       body = {
         'deviceSecret': deviceSecret,
         'userCode': userCode,
-        'expiresAt': '2030-01-01T00:05:00Z',
+        'expiresAt': codeExpiresAt,
         'pollIntervalSeconds': 5,
       };
     } else if (path == '/api/v1/auth/device-code/token') {
@@ -319,6 +448,7 @@ class _PairingAdapter implements HttpClientAdapter {
       body = _tokens(loginAccessToken);
     } else if (path == '/api/v1/auth/device-code/inspect') {
       inspectCount++;
+      inspectedCode = requestBody['userCode'] as String?;
       body = {
         'deviceName': 'Living Room TV',
         'expiresAt': '2030-01-01T00:05:00Z',

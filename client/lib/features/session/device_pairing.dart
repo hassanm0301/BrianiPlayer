@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:briani_api/briani_api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/server_profiles/server_profile.dart';
 import '../../core/session/client_session.dart';
 import '../../core/widgets/brand.dart';
+import '../../core/widgets/code_input.dart';
 import '../../core/widgets/states.dart';
 
 class DeviceLinkScreen extends ConsumerStatefulWidget {
@@ -71,10 +73,27 @@ class _DeviceLinkState extends ConsumerState<DeviceLinkScreen> {
       }
     } catch (error) {
       _timer?.cancel();
-      if (mounted) setState(() => _error = clientError(error));
+      final expired =
+          _code != null && !DateTime.now().isBefore(_code!.expiresAt);
+      if (mounted) {
+        setState(
+          () => _error = expired
+              ? 'This code expired. Request a new code.'
+              : clientError(error),
+        );
+      }
     } finally {
       _polling = false;
     }
+  }
+
+  Future<void> _copyCode() async {
+    final code = _code;
+    if (code == null) return;
+    await Clipboard.setData(ClipboardData(text: code.userCode));
+    if (!mounted) return;
+    ScaffoldMessenger.maybeOf(context)
+        ?.showSnackBar(const SnackBar(content: Text('Code copied.')));
   }
 
   @override
@@ -147,6 +166,15 @@ class _DeviceLinkState extends ConsumerState<DeviceLinkScreen> {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: scheme.onPrimaryContainer,
+                    ),
+                    onPressed: _copyCode,
+                    icon: const Icon(Icons.copy, size: 18),
+                    label: const Text('Copy code'),
+                  ),
                 ],
               ),
             ),
@@ -164,19 +192,20 @@ class _DeviceLinkState extends ConsumerState<DeviceLinkScreen> {
               text: 'Approve. The code expires in five minutes.',
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                const SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Waiting for approval…',
-                  style: theme.textTheme.bodyMedium,
-                ),
-              ],
-            ),
+            if (_error == null)
+              Row(
+                children: [
+                  const SizedBox.square(
+                    dimension: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Waiting for approval…',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ],
+              ),
           ],
           if (_error != null) ...[
             const SizedBox(height: 16),
@@ -333,20 +362,11 @@ class _ApproveDeviceState extends ConsumerState<ApproveDeviceDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
+              CodeInput(
                 controller: _code,
-                maxLength: 8,
-                textCapitalization: TextCapitalization.characters,
+                label: 'Device code',
                 autofocus: true,
-                textAlign: TextAlign.center,
-                autocorrect: false,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  letterSpacing: 4,
-                ),
-                decoration: const InputDecoration(
-                  labelText: 'Device code',
-                  counterText: '',
-                ),
+                onCompleted: (_) => _inspect(),
                 onSubmitted: (_) => _inspect(),
               ),
             ] else ...[
