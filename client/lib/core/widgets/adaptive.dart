@@ -31,6 +31,17 @@ bool get pointerPlatform => switch (defaultTargetPlatform) {
   _ => false,
 };
 
+/// Whether the app counts as in the foreground for playback and live refresh.
+///
+/// A desktop window reports `inactive` whenever it merely loses focus while
+/// still on screen, so only phones and TVs treat `inactive` as background
+/// (a call, the notification shade, a system dialog).
+bool isForegroundLifecycle(AppLifecycleState? state) => switch (state) {
+  null || AppLifecycleState.resumed => true,
+  AppLifecycleState.inactive => pointerPlatform,
+  _ => false,
+};
+
 /// True when the app is driven by a D-pad (Android TV or the TV override).
 bool isTelevision(BuildContext context) =>
     MediaQuery.maybeNavigationModeOf(context) == NavigationMode.directional;

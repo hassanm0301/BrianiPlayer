@@ -87,7 +87,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) _stop();
+    if (!isForegroundLifecycle(state)) _stop();
   }
 
   @override

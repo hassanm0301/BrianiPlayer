@@ -19,6 +19,7 @@ import '../../core/preferences/preferences_providers.dart';
 import '../../core/widgets/adaptive.dart';
 import '../../core/widgets/states.dart';
 import 'download_formatters.dart';
+import 'download_rules.dart';
 import 'transfer_settings_dialog.dart';
 import 'transfer_widgets.dart';
 
@@ -62,7 +63,7 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+    if (isForegroundLifecycle(state)) {
       _startPolling();
       if (RouteActivity.isVisible(context)) _load(quiet: true);
     } else {
@@ -865,8 +866,7 @@ class _DownloadDetailsScreenState extends ConsumerState<DownloadDetailsScreen>
           icon: const Icon(Icons.pause),
           label: const Text('Pause'),
         ),
-      if (_managing &&
-          download.transferState == DownloadTransferStateEnum.paused)
+      if (_managing && canResumeDownload(download))
         FilledButton.icon(
           onPressed: () => _action(DownloadActionActionEnum.resume),
           icon: const Icon(Icons.play_arrow),

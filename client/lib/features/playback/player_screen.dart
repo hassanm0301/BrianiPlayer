@@ -20,6 +20,7 @@ import '../../core/server_profiles/server_profile.dart';
 import '../../core/session/client_session.dart';
 import '../../core/input/remote_navigation.dart';
 import '../../core/input/tv_auto_hide_controls.dart';
+import '../../core/widgets/adaptive.dart';
 import '../../core/widgets/playback_seek_bar.dart';
 import '../../core/platform/platform_capabilities.dart';
 import 'immersive.dart';
@@ -94,8 +95,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    final lifecycle = WidgetsBinding.instance.lifecycleState;
-    _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
+    _foreground = isForegroundLifecycle(
+      WidgetsBinding.instance.lifecycleState,
+    );
     _platform = ref.read(nativePlatformProvider);
     _platformEvents = _platform!.events.listen((event) {
       if (!mounted || _closing) return;
@@ -681,7 +683,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _foreground = state == AppLifecycleState.resumed;
+    _foreground = isForegroundLifecycle(state);
     if (!_foreground) _pauseForInterruption();
   }
 

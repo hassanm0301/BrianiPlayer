@@ -14,6 +14,7 @@ import '../../core/preferences/preferences_providers.dart';
 import '../../core/widgets/adaptive.dart';
 import '../../core/widgets/states.dart';
 import 'download_formatters.dart';
+import 'download_rules.dart';
 import 'transfer_widgets.dart';
 
 export 'download_details_screen.dart';
@@ -48,7 +49,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+    if (isForegroundLifecycle(state)) {
       _startPolling();
       if (RouteActivity.isVisible(context)) _load(reset: true, quiet: true);
     } else {
@@ -342,8 +343,7 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen>
           (download.transferState == DownloadTransferStateEnum.downloading ||
               download.transferState == DownloadTransferStateEnum.seeding))
         ('pause', Icons.pause, 'Pause'),
-      if (canControl &&
-          download.transferState == DownloadTransferStateEnum.paused)
+      if (canControl && canResumeDownload(download))
         ('resume', Icons.play_arrow, 'Resume'),
       if (canControl &&
           (download.state == DownloadStateEnum.failed ||

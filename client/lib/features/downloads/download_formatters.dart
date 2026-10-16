@@ -11,8 +11,13 @@ String formatBytes(int? value, {String? locale}) =>
 String formatRate(int bytesPerSecond, {String? locale}) =>
     locale_formatters.formatRate(bytesPerSecond, locale: locale);
 
+/// qBittorrent reports an unbounded ETA as 8,640,000 s (100 days).
+const unboundedEtaSeconds = 8640000;
+
 String formatEta(int? seconds, {String? locale}) {
-  if (seconds == null || seconds < 0) return '—';
+  if (seconds == null || seconds < 0 || seconds >= unboundedEtaSeconds) {
+    return '—';
+  }
   if (seconds < 60) return '${formatCount(seconds, locale: locale)}s';
   final minutes = seconds ~/ 60;
   if (minutes < 60) return '${formatCount(minutes, locale: locale)}m';
