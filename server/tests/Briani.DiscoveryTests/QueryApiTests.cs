@@ -311,6 +311,43 @@ public sealed class QueryApiTests
     }
 
     [Fact]
+    public async Task Missing_download_library_explains_the_requirement_per_role()
+    {
+        var fake = new FakeProwlarr();
+        fake.Providers = [Provider("a")];
+        await using var fixture = await QueryFixture.Create(fake);
+        await fixture.InDb(async db =>
+        {
+            var library = await db.Libraries.SingleAsync();
+            library.ReadOnly = true;
+            await db.SaveChangesAsync();
+            return 0;
+        });
+
+        using var admin = await fixture.Client.GetAsync("/api/v1/discovery/providers");
+        Assert.Equal(HttpStatusCode.Forbidden, admin.StatusCode);
+        var adminProblem = await admin.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+        Assert.NotNull(adminProblem);
+        Assert.Equal("forbidden", adminProblem["code"].ToString());
+        Assert.Equal(DiscoveryAccess.NoAdministratorLibrary, adminProblem["detail"].ToString());
+        Assert.Equal(0, fake.ProviderCount);
+
+        using var created = await fixture.Client.PostAsJsonAsync("/api/v1/admin/users", new
+        { username = "nolibrary", displayName = "No library", password = TestPasswords.Member, confirmPassword = TestPasswords.Member, role = "member" });
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        using var login = await fixture.Client.PostAsJsonAsync("/api/v1/auth/login", new
+        { username = "nolibrary", password = TestPasswords.Member, deviceName = "test" });
+        var memberAuth = await login.Content.ReadFromJsonAsync<AuthReply>();
+        Assert.NotNull(memberAuth);
+        fixture.Client.DefaultRequestHeaders.Authorization = new("Bearer", memberAuth.AccessToken);
+        using var member = await fixture.Client.PostAsJsonAsync("/api/v1/discovery/queries", new { mode = "latest" });
+        Assert.Equal(HttpStatusCode.Forbidden, member.StatusCode);
+        var memberProblem = await member.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+        Assert.NotNull(memberProblem);
+        Assert.Equal(DiscoveryAccess.NoGrantedLibrary, memberProblem["detail"].ToString());
+    }
+
+    [Fact]
     public async Task Worker_recovers_expired_lease_and_completes_job()
     {
         var fake = new FakeProwlarr();

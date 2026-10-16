@@ -50,11 +50,39 @@ void main() {
       );
     },
   );
+
+  testWidgets('missing download library shows the server explanation once', (
+    tester,
+  ) async {
+    final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
+      ..httpClientAdapter = _DiscoveryAdapter(discoveryForbidden: true);
+    final api = BrianiApi(dio: dio);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [activeApiProvider.overrideWithValue(api)],
+        child: const MaterialApp(home: DiscoverScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Provider details are unavailable'),
+      findsNothing,
+    );
+    expect(find.text('Retry providers'), findsNothing);
+    expect(find.widgetWithText(MaterialBanner, _noLibrary), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+  });
 }
 
+const _noLibrary = 'Discovery needs a library to download into.';
+
 class _DiscoveryAdapter implements HttpClientAdapter {
-  _DiscoveryAdapter({this.providerFailure = false});
+  _DiscoveryAdapter({
+    this.providerFailure = false,
+    this.discoveryForbidden = false,
+  });
   final bool providerFailure;
+  final bool discoveryForbidden;
 
   @override
   Future<ResponseBody> fetch(
@@ -63,6 +91,20 @@ class _DiscoveryAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     final path = options.path;
+    if (discoveryForbidden && path.contains('/discovery/')) {
+      return ResponseBody.fromString(
+        jsonEncode({
+          'title': _noLibrary,
+          'status': 403,
+          'code': 'forbidden',
+          'detail': _noLibrary,
+        }),
+        403,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      );
+    }
     if (path.endsWith('/discovery/providers') && providerFailure) {
       return ResponseBody.fromString(
         jsonEncode({'title': 'Offline', 'status': 503}),

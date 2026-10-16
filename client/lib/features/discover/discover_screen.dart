@@ -45,6 +45,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   CancelToken? _queryCancel;
   String? _error;
   String? _providerError;
+  // A 403 here means discovery itself is unavailable to this account, not just the indexer list.
+  bool _discoveryForbidden = false;
   bool _loading = true;
   bool _loadingMore = false;
   bool _submitting = false;
@@ -76,6 +78,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         _libraries = [];
         _error = null;
         _providerError = null;
+        _discoveryForbidden = false;
         _loading = next != null;
         _viewEdited = false;
         _preferencesApplied = false;
@@ -171,11 +174,21 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         _providers =
             response.data?.whereType<Provider>().toList() ?? <Provider>[];
         _providerError = null;
+        _discoveryForbidden = false;
       });
     } catch (error) {
       if (!mounted || !identical(ref.read(activeApiProvider), api)) return;
-      setState(() => _providerError = clientError(error));
+      setState(() {
+        _providerError = clientError(error);
+        _discoveryForbidden =
+            error is DioException && error.response?.statusCode == 403;
+      });
     }
+  }
+
+  Future<void> _retryDiscoveryAccess() async {
+    await _loadProviders();
+    if (mounted && !_discoveryForbidden) await _runQuery();
   }
 
   void _cancelQuery() {
@@ -693,12 +706,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           if (_providerError != null)
             MaterialBanner(
               content: Text(
-                'Provider details are unavailable: $_providerError',
+                _discoveryForbidden
+                    ? _providerError!
+                    : 'Provider details are unavailable: $_providerError',
               ),
               actions: [
                 TextButton(
-                  onPressed: _loadProviders,
-                  child: const Text('Retry providers'),
+                  onPressed: _discoveryForbidden
+                      ? _retryDiscoveryAccess
+                      : _loadProviders,
+                  child: Text(
+                    _discoveryForbidden ? 'Retry' : 'Retry providers',
+                  ),
                 ),
               ],
             ),
@@ -717,7 +736,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ),
               ],
             ),
-          if (_error != null && !_loading)
+          if (_error != null &&
+              !_loading &&
+              !(_discoveryForbidden && _error == _providerError))
             MaterialBanner(
               content: Text(_error!),
               actions: [
