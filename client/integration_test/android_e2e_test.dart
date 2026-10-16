@@ -1022,9 +1022,14 @@ void main() {
         await _focusByDpad(tester, tracks, 'TV Tracks control');
         await _activate(tester);
         await _until(tester, find.text('Tracks'), 'tracks panel');
+        // The panel groups tracks under section headings; the Audio heading
+        // appears only once the native player reports audio tracks.
         await _until(
           tester,
-          find.textContaining('Audio:'),
+          find.descendant(
+            of: find.byType(TvFocusPanel),
+            matching: find.text('Audio'),
+          ),
           'native audio track list',
         );
         expect(
@@ -1103,25 +1108,31 @@ void main() {
           'Downloads library folder',
         );
         await _activate(tester);
+        // Match folder entries only: the app bar breadcrumb also names the
+        // current folder, and it is not a link.
+        Finder folderEntry(String name) => find.descendant(
+          of: find.byType(CustomScrollView),
+          matching: find.textContaining(name),
+        );
         await _until(
           tester,
-          find.textContaining(config['downloadName'] as String),
+          folderEntry(config['downloadName'] as String),
           'import job folder',
         );
         await _focusByDpad(
           tester,
-          find.textContaining(config['downloadName'] as String).last,
+          folderEntry(config['downloadName'] as String).last,
           'imported torrent directory',
         );
         await _activate(tester);
         await _until(
           tester,
-          find.textContaining(config['downloadName'] as String),
+          folderEntry(config['downloadName'] as String),
           'torrent root directory',
         );
         await _focusByDpad(
           tester,
-          find.textContaining(config['downloadName'] as String).last,
+          folderEntry(config['downloadName'] as String).last,
           'nested torrent root directory',
         );
         await _activate(tester);

@@ -1,0 +1,235 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.0.1 (2.1.1 available)
+  archive 4.5.1 (4.5.2 available)
+  build 4.0.11 (5.0.0 available)
+  build_config 1.3.3 (1.4.0 available)
+  build_daemon 4.1.6 (4.1.7 available)
+  build_runner 2.16.2 (2.17.1 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  cupertino_ui 1.1.2 (1.1.3 available)
+  dart_style 3.1.13 (3.1.14 available)
+  file_picker_darwin 2.2.0 (2.3.2 available)
+  file_picker_platform_interface 4.1.0 (4.2.0 available)
+  file_picker_web 4.1.0 (4.2.0 available)
+  go_router 18.0.2 (18.1.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  material_ui 1.6.0 (1.7.0 available)
+! media_kit 1.2.6 from path vendor/media_kit (overridden)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  screen_retriever 0.2.2 (0.3.0 available)
+  source_gen 4.3.0 (4.3.1 available)
+  synchronized 3.4.2 (3.5.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.3 available)
+  vm_service 15.3.0 (15.4.0 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+29 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +1: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +2: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +3: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +4: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +5: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +6: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +7: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +8: /home/hassan/projects/BrianiPlayer/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +9: /home/hassan/projects/BrianiPlayer/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:00 +10: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:00 +11: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:01 +12: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:01 +13: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:01 +14: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +15: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +16: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +17: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +18: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +19: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +20: /home/hassan/projects/BrianiPlayer/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +21: /home/hassan/projects/BrianiPlayer/client/test/tv_text_traversal_test.dart: TV vertical arrows leave single-line fields and reach controls
+00:01 +22: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: account menu offers Administration only to administrators
+00:01 +23: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: account menu offers Administration only to administrators
+00:01 +24: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: shared states render their message and action
+00:01 +25: /home/hassan/projects/BrianiPlayer/client/test/ui_shell_test.dart: both theme brightnesses provide status colors
+00:01 +26: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +27: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +28: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +29: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +30: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +31: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +32: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +33: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +34: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +35: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +36: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +37: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +38: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +39: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +40: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +41: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +42: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +43: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+
+Warning: A call to tap() with finder "Found 1 widget with text "Recently changed": [
+  Text("Recently changed", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 192.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#46d7e relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#3a61e@Offset(160.0, 28.0), RenderSemanticsAnnotations#76141@Offset(160.0, 28.0), RenderMouseRegion#11eee@Offset(160.0, 28.0), RenderSemanticsAnnotations#beaea@Offset(160.0, 28.0), RenderSemanticsAnnotations#e4374@Offset(160.0, 28.0), RenderMergeSemantics#40c56@Offset(160.0, 28.0), RenderAnimatedOpacity#d5ee9@Offset(160.0, 28.0), _RenderMenuItem#5e9cc@Offset(160.0, 28.0), RenderListBody#19aee@Offset(160.0, 140.0), RenderPadding#f3dee@Offset(160.0, 148.0), _RenderSingleChildViewport#c86a3@Offset(160.0, 148.0), RenderIgnorePointer#c798f@Offset(160.0, 148.0), RenderSemanticsAnnotations#db535@Offset(160.0, 148.0), RenderPointerListener#c2921@Offset(160.0, 148.0), RenderSemanticsGestureHandler#0211f@Offset(160.0, 148.0), RenderPointerListener#a46c8@Offset(160.0, 148.0), _RenderScrollSemantics#31a4f@Offset(160.0, 148.0), RenderClipRect#3f31d@Offset(160.0, 148.0), RenderSemanticsAnnotations#7bc26@Offset(160.0, 148.0), RenderIntrinsicWidth#96da7@Offset(160.0, 148.0), RenderConstrainedBox#57ef8@Offset(160.0, 148.0), RenderPositionedBox#d2d67@Offset(160.0, 148.0), _RenderInkFeatures#4a95c@Offset(160.0, 148.0), RenderCustomPaint#a4682@Offset(160.0, 148.0), RenderPhysicalShape#ac1a6@Offset(160.0, 148.0), RenderAnimatedOpacity#76db6@Offset(160.0, 148.0), RenderCustomSingleChildLayoutBox#30e98@Offset(576.0, 192.0), _RenderLayoutBuilder#301f4@Offset(576.0, 192.0), RenderRepaintBoundary#eb139@Offset(576.0, 192.0), RenderIgnorePointer#81a99@Offset(576.0, 192.0), RenderRepaintBoundary#89b50@Offset(576.0, 192.0), RenderSemanticsAnnotations#d4c73@Offset(576.0, 192.0), RenderOffstage#0dd5f@Offset(576.0, 192.0), RenderSemanticsAnnotations#40d5f@Offset(576.0, 192.0), _RenderTheater#74639@Offset(576.0, 192.0), RenderAbsorbPointer#c84cf@Offset(576.0, 192.0), RenderPointerListener#30446@Offset(576.0, 192.0), RenderSemanticsAnnotations#b64d3@Offset(576.0, 192.0), RenderCustomPaint#9c4c0@Offset(576.0, 192.0), RenderSemanticsAnnotations#8d579@Offset(576.0, 192.0), RenderSemanticsAnnotations#a406f@Offset(576.0, 192.0), RenderSemanticsAnnotations#3439b@Offset(576.0, 192.0), RenderTapRegionSurface#4a3d1@Offset(576.0, 192.0), RenderSemanticsAnnotations#85dc2@Offset(576.0, 192.0), RenderSemanticsAnnotations#c9145@Offset(576.0, 192.0), HitTestEntry<HitTestTarget>#3756d(_ReusableRenderView#9b310), HitTestEntry<HitTestTarget>#091fa(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart:139:17)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:02 +44: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +45: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +46: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:02 +46: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Largest first sends a supported wire value and keeps content
+
+Warning: A call to tap() with finder "Found 1 widget with text "Largest first": [
+  Text("Largest first", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 248.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#5a6a8 relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#3e1bd@Offset(160.0, 28.0), RenderSemanticsAnnotations#9b1b0@Offset(160.0, 28.0), RenderMouseRegion#6d2af@Offset(160.0, 28.0), RenderSemanticsAnnotations#c4bd0@Offset(160.0, 28.0), RenderSemanticsAnnotations#038f8@Offset(160.0, 28.0), RenderMergeSemantics#0eea7@Offset(160.0, 28.0), RenderAnimatedOpacity#058ba@Offset(160.0, 28.0), _RenderMenuItem#7ab65@Offset(160.0, 28.0), RenderListBody#aafe4@Offset(160.0, 196.0), RenderPadding#4eeea@Offset(160.0, 204.0), _RenderSingleChildViewport#2fe44@Offset(160.0, 204.0), RenderIgnorePointer#0bdf0@Offset(160.0, 204.0), RenderSemanticsAnnotations#cb545@Offset(160.0, 204.0), RenderPointerListener#787c6@Offset(160.0, 204.0), RenderSemanticsGestureHandler#56a40@Offset(160.0, 204.0), RenderPointerListener#fcd8d@Offset(160.0, 204.0), _RenderScrollSemantics#07f38@Offset(160.0, 204.0), RenderClipRect#eaa23@Offset(160.0, 204.0), RenderSemanticsAnnotations#a95cc@Offset(160.0, 204.0), RenderIntrinsicWidth#c10f1@Offset(160.0, 204.0), RenderConstrainedBox#092b9@Offset(160.0, 204.0), RenderPositionedBox#bfcc7@Offset(160.0, 204.0), _RenderInkFeatures#b5788@Offset(160.0, 204.0), RenderCustomPaint#62806@Offset(160.0, 204.0), RenderPhysicalShape#22798@Offset(160.0, 204.0), RenderAnimatedOpacity#f6cc1@Offset(160.0, 204.0), RenderCustomSingleChildLayoutBox#18b61@Offset(576.0, 248.0), _RenderLayoutBuilder#a00b9@Offset(576.0, 248.0), RenderRepaintBoundary#5225c@Offset(576.0, 248.0), RenderIgnorePointer#fef7c@Offset(576.0, 248.0), RenderRepaintBoundary#539a0@Offset(576.0, 248.0), RenderSemanticsAnnotations#cf668@Offset(576.0, 248.0), RenderOffstage#48a73@Offset(576.0, 248.0), RenderSemanticsAnnotations#abf26@Offset(576.0, 248.0), _RenderTheater#f39d9@Offset(576.0, 248.0), RenderAbsorbPointer#7a72f@Offset(576.0, 248.0), RenderPointerListener#7cc38@Offset(576.0, 248.0), RenderSemanticsAnnotations#db3ef@Offset(576.0, 248.0), RenderCustomPaint#095cf@Offset(576.0, 248.0), RenderSemanticsAnnotations#10e91@Offset(576.0, 248.0), RenderSemanticsAnnotations#10c43@Offset(576.0, 248.0), RenderSemanticsAnnotations#e5941@Offset(576.0, 248.0), RenderTapRegionSurface#67197@Offset(576.0, 248.0), RenderSemanticsAnnotations#49df0@Offset(576.0, 248.0), RenderSemanticsAnnotations#7ac0f@Offset(576.0, 248.0), HitTestEntry<HitTestTarget>#1adc6(_ReusableRenderView#9b310), HitTestEntry<HitTestTarget>#8c23d(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart:139:17)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:02 +47: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: sort Largest first sends a supported wire value and keeps content
+00:02 +48: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: photo viewer arrow keys browse with wrap-around and Space toggles slideshow
+00:02 +49: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: late folder search cannot overwrite newer results
+00:02 +50: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +51: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +52: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +53: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +54: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +55: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +56: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +57: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +58: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:02 +59: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:03 +60: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:03 +61: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: breadcrumb keeps its scroll position and crumb focus at the start
+00:03 +62: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: breadcrumb keeps its scroll position and crumb focus at the start
+00:03 +63: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: breadcrumb keeps its scroll position and crumb focus at the start
+00:03 +64: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: breadcrumb keeps its scroll position and crumb focus at the start
+00:03 +65: /home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart: late preferences do not reset a folder sort chosen by the user
+
+Warning: A call to tap() with finder "Found 1 widget with text "Largest first": [
+  Text("Largest first", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 248.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#2e60d relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#e47ac@Offset(160.0, 28.0), RenderSemanticsAnnotations#d6239@Offset(160.0, 28.0), RenderMouseRegion#a0e84@Offset(160.0, 28.0), RenderSemanticsAnnotations#21e4c@Offset(160.0, 28.0), RenderSemanticsAnnotations#311be@Offset(160.0, 28.0), RenderMergeSemantics#86fd8@Offset(160.0, 28.0), RenderAnimatedOpacity#1d81c@Offset(160.0, 28.0), _RenderMenuItem#19782@Offset(160.0, 28.0), RenderListBody#12af9@Offset(160.0, 196.0), RenderPadding#5ce3e@Offset(160.0, 204.0), _RenderSingleChildViewport#b3e04@Offset(160.0, 204.0), RenderIgnorePointer#80447@Offset(160.0, 204.0), RenderSemanticsAnnotations#43b8b@Offset(160.0, 204.0), RenderPointerListener#a41a6@Offset(160.0, 204.0), RenderSemanticsGestureHandler#ff045@Offset(160.0, 204.0), RenderPointerListener#a8d2b@Offset(160.0, 204.0), _RenderScrollSemantics#c8d4b@Offset(160.0, 204.0), RenderClipRect#cc6a6@Offset(160.0, 204.0), RenderSemanticsAnnotations#3149e@Offset(160.0, 204.0), RenderIntrinsicWidth#546ed@Offset(160.0, 204.0), RenderConstrainedBox#c589f@Offset(160.0, 204.0), RenderPositionedBox#f5985@Offset(160.0, 204.0), _RenderInkFeatures#531f8@Offset(160.0, 204.0), RenderCustomPaint#e5145@Offset(160.0, 204.0), RenderPhysicalShape#3c637@Offset(160.0, 204.0), RenderAnimatedOpacity#67ff0@Offset(160.0, 204.0), RenderCustomSingleChildLayoutBox#ec831@Offset(576.0, 248.0), _RenderLayoutBuilder#1f93f@Offset(576.0, 248.0), RenderRepaintBoundary#3b2d8@Offset(576.0, 248.0), RenderIgnorePointer#c1c5f@Offset(576.0, 248.0), RenderRepaintBoundary#0cc98@Offset(576.0, 248.0), RenderSemanticsAnnotations#a3e8f@Offset(576.0, 248.0), RenderOffstage#cf491@Offset(576.0, 248.0), RenderSemanticsAnnotations#86f77@Offset(576.0, 248.0), _RenderTheater#64e58@Offset(576.0, 248.0), RenderAbsorbPointer#48d37@Offset(576.0, 248.0), RenderPointerListener#8f0d5@Offset(576.0, 248.0), RenderSemanticsAnnotations#3605c@Offset(576.0, 248.0), RenderCustomPaint#82e22@Offset(576.0, 248.0), RenderSemanticsAnnotations#2d509@Offset(576.0, 248.0), RenderSemanticsAnnotations#098c2@Offset(576.0, 248.0), RenderSemanticsAnnotations#53ddd@Offset(576.0, 248.0), RenderTapRegionSurface#753be@Offset(576.0, 248.0), RenderSemanticsAnnotations#9c594@Offset(576.0, 248.0), RenderSemanticsAnnotations#524c9@Offset(576.0, 248.0), HitTestEntry<HitTestTarget>#00494(_ReusableRenderView#9b310), HitTestEntry<HitTestTarget>#8e510(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/client/test/browse_request_test.dart:332:15)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:03 +66: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: mounted download list and details tolerate disconnected polling and resumed lifecycle
+00:03 +67: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: administration jump list reaches sections below the fold
+00:03 +68: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: administration jump list reaches sections below the fold
+00:03 +69: /home/hassan/projects/BrianiPlayer/client/test/ui_review_regressions_test.dart: administration jump list reaches sections below the fold
+00:03 +70: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:03 +71: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:03 +72: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:03 +73: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:03 +74: /home/hassan/projects/BrianiPlayer/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:03 +75: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: partial download snapshot shows its warning rather than a successful empty state
+00:03 +76: /home/hassan/projects/BrianiPlayer/client/test/downloads_screen_test.dart: TV remote opens a download, toggles a file and reaches Save selection
+00:04 +77: /home/hassan/projects/BrianiPlayer/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:04 +78: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:04 +79: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:04 +80: /home/hassan/projects/BrianiPlayer/client/test/server_api_provider_test.dart: generated authenticated requests receive the vault token without putting it in the URL
+00:04 +81: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: provider lookup failure is visible while query results still load
+00:04 +82: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: provider lookup failure is visible while query results still load
+00:04 +83: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: missing download library shows the server explanation once
+00:04 +84: /home/hassan/projects/BrianiPlayer/client/test/discover_screen_test.dart: TV remote reaches a result and opens Add download
+00:04 +85: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +86: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +87: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +88: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +89: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +90: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +91: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +92: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +93: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +94: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +95: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +96: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +97: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +98: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +99: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +100: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +101: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +102: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +103: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:04 +104: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:05 +105: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:05 +106: /home/hassan/projects/BrianiPlayer/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:05 +107: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:05 +108: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:05 +109: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:05 +110: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:05 +111: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:05 +112: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:05 +113: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:05 +114: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:05 +115: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:05 +116: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: rejected create-member stays open with the server message
+00:05 +117: /home/hassan/projects/BrianiPlayer/client/test/settings_polish_test.dart: rejected create-member stays open with the server message
+00:05 +118: /home/hassan/projects/BrianiPlayer/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:05 +119: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +120: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +121: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +122: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +123: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +124: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:05 +125: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:06 +126: /home/hassan/projects/BrianiPlayer/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:06 +127: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:06 +128: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: selecting library root explicitly moves to a null folder id
+00:06 +129: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:06 +130: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: folder fetches the next page when scrolled near the end
+00:06 +131: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: photo viewer reports an unavailable authorized image and offers retry
+00:06 +132: /home/hassan/projects/BrianiPlayer/client/test/libraries_screens_test.dart: Flutter decodes the generated EXIF-oriented JPEG upright
+00:06 +133: All tests passed!
+exit=0

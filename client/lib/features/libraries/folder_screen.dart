@@ -1,15 +1,21 @@
-import 'dart:typed_data';
-
 import 'package:briani_api/briani_api.dart' hide Provider;
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/session/client_session.dart';
-import '../../core/preferences/preferences_providers.dart';
 import '../../core/formatting/locale_formatters.dart';
+import '../../core/input/remote_navigation.dart';
+import '../../core/preferences/preferences_providers.dart';
+import '../../core/session/client_session.dart';
+import '../../core/widgets/adaptive.dart';
+import '../../core/widgets/media_tile.dart';
 import '../../core/widgets/owned_text_dialog.dart';
+import '../../core/widgets/states.dart';
+
+part 'folder_entry_views.dart';
+part 'folder_dialogs.dart';
 
 @immutable
 class FolderBreadcrumb {
@@ -34,6 +40,13 @@ class FolderScreen extends ConsumerStatefulWidget {
   ConsumerState<FolderScreen> createState() => _FolderScreenState();
 }
 
+const _sortOptions = [
+  ('name:asc', 'Name (A–Z)'),
+  ('name:desc', 'Name (Z–A)'),
+  ('date:desc', 'Recently changed'),
+  ('size:desc', 'Largest first'),
+];
+
 class _FolderScreenState extends ConsumerState<FolderScreen> {
   ModelLibrary? _library;
   List<Entry> _items = [];
@@ -49,6 +62,9 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   bool _preferencesApplied = false;
   String? _preferenceScope;
   final _search = TextEditingController();
+  final _searchFocus = FocusNode(debugLabel: 'folder search');
+  bool _searchOpen = false;
+  Offset? _menuAnchor;
   CancelToken? _operationToken;
   CancelToken? _loadToken;
   bool _viewEdited = false;
@@ -173,11 +189,8 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
           .update((b) => b.folderPreferences.replace(updated));
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(clientError(error)),
-          ),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(clientError(error))));
       }
     }
   }
@@ -195,6 +208,7 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
       _truncated = false;
       _query = '';
       _search.clear();
+      _searchOpen = false;
       _viewEdited = false;
       final preferences = ref.read(userPreferencesProvider).asData?.value;
       if (preferences != null) _applyPreferences(preferences);
@@ -220,6 +234,7 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
     _operationToken?.cancel('Folder screen disposed');
     _loadToken?.cancel('Folder screen disposed');
     _search.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -297,6 +312,10 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   bool get _canManage =>
       (_library?.capabilities.manage ?? false) && !(_library?.readOnly ?? true);
 
+  bool _canEdit(Entry entry) =>
+      _canManage &&
+      (entry.kind == EntryKindEnum.video || entry.kind == EntryKindEnum.photo);
+
   void _navigateToBreadcrumb(int index) {
     final path = _breadcrumbPath.take(index + 1).toList(growable: false);
     final breadcrumb = path.last;
@@ -310,356 +329,598 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
     );
   }
 
+  void _applySort(String value) {
+    final parts = value.split(':');
+    setState(() {
+      _viewEdited = true;
+      _sort = parts[0];
+      _order = parts[1];
+    });
+    _persistFolderPreferences();
+    _load(reset: true);
+  }
+
+  void _toggleLayout() {
+    setState(() {
+      _viewEdited = true;
+      _grid = !_grid;
+    });
+    _persistFolderPreferences();
+  }
+
+  void _submitSearch(String value) {
+    setState(() => _query = value);
+    _load(reset: true);
+  }
+
+  void _clearSearch() {
+    _search.clear();
+    setState(() => _query = '');
+    _load(reset: true);
+  }
+
+  void _closeSearch() {
+    final hadQuery = _query.isNotEmpty;
+    _search.clear();
+    setState(() {
+      _searchOpen = false;
+      _query = '';
+    });
+    if (hadQuery) _load(reset: true);
+  }
+
+  bool _onScroll(ScrollNotification notification) {
+    // Fetch the next page shortly before the end; the visible Load more
+    // button remains for keyboard/TV users and after a failed page.
+    if (notification.depth == 0 &&
+        notification.metrics.axis == Axis.vertical &&
+        notification.metrics.extentAfter < 600 &&
+        _cursor != null &&
+        !_loading &&
+        !_loadingMore &&
+        !_failedPage) {
+      _load(reset: false);
+    }
+    return false;
+  }
+
+  void _open(Entry entry, String? locale) {
+    final mediaId = entry.mediaId;
+    switch (entry.kind) {
+      case EntryKindEnum.folder:
+        context.push(
+          '/libraries/${Uri.encodeComponent(widget.libraryId)}/folders/${Uri.encodeComponent(entry.id)}',
+          extra: [
+            ..._breadcrumbPath,
+            FolderBreadcrumb(id: entry.id, name: entry.name),
+          ],
+        );
+      case EntryKindEnum.photo when mediaId != null:
+        context.push(
+          '/photos/${Uri.encodeComponent(mediaId)}',
+          extra: _items
+              .where((e) => e.kind == EntryKindEnum.photo && e.mediaId != null)
+              .map((e) => e.mediaId!)
+              .toList(),
+        );
+      case EntryKindEnum.video when mediaId != null:
+        context.push('/play/media/${Uri.encodeComponent(mediaId)}');
+      default:
+        _showDetails(entry, locale);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (ref.watch(activeApiProvider) == null) return const SizedBox.shrink();
     final locale = ref.watch(userPreferencesProvider).asData?.value.locale;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_library?.name ?? 'Library'),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh folder',
-            onPressed: _loading ? null : () => _load(reset: true),
-            icon: const Icon(Icons.refresh),
-          ),
-          IconButton(
-            tooltip: _grid ? 'List view' : 'Grid view',
-            icon: Icon(_grid ? Icons.view_list : Icons.grid_view),
-            onPressed: () {
-              setState(() {
-                _viewEdited = true;
-                _grid = !_grid;
-              });
-              _persistFolderPreferences();
-            },
-          ),
-          PopupMenuButton<String>(
-            tooltip: 'Sort',
-            initialValue: '$_sort:$_order',
-            onSelected: (value) {
-              final parts = value.split(':');
-              setState(() {
-                _viewEdited = true;
-                _sort = parts[0];
-                _order = parts[1];
-              });
-              _persistFolderPreferences();
-              _load(reset: true);
-            },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'name:asc', child: Text('Name (A–Z)')),
-              PopupMenuItem(value: 'name:desc', child: Text('Name (Z–A)')),
-              PopupMenuItem(
-                value: 'date:desc',
-                child: Text('Recently changed'),
-              ),
-              PopupMenuItem(value: 'size:desc', child: Text('Largest first')),
-            ],
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Material(
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                children: [
-                  IconButton(
-                    tooltip: 'Back',
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          for (var i = 0; i < _breadcrumbPath.length; i++) ...[
-                            if (i > 0) const Icon(Icons.chevron_right),
-                            if (i == _breadcrumbPath.length - 1)
-                              Text(
-                                _breadcrumbPath[i].name,
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            else
-                              TextButton(
-                                onPressed: () => _navigateToBreadcrumb(i),
-                                child: Text(_breadcrumbPath[i].name),
-                              ),
-                          ],
-                        ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final compact = width < 600;
+        final path = _breadcrumbPath;
+        final atRoot = path.length <= 1;
+        final searching = compact && (_searchOpen || _query.isNotEmpty);
+        final gutters = pageGutters(context);
+        // On phones Back first leaves search mode, like other Android apps.
+        return PopScope(
+          canPop: !searching,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && searching) _closeSearch();
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              leading: searching
+                  ? IconButton(
+                      tooltip: 'Close search',
+                      onPressed: _closeSearch,
+                      icon: const Icon(Icons.arrow_back),
+                    )
+                  // Reached through a breadcrumb or link, there is no page
+                  // to pop; offer the way up instead of no back button.
+                  : !Navigator.of(context).canPop()
+                  ? IconButton(
+                      tooltip: atRoot ? 'All libraries' : 'Up to parent folder',
+                      onPressed: () => atRoot
+                          ? context.go('/libraries')
+                          : _navigateToBreadcrumb(path.length - 2),
+                      icon: const Icon(Icons.arrow_back),
+                    )
+                  : null,
+              titleSpacing: searching ? 0 : null,
+              title: searching
+                  ? _searchField(autofocus: _searchOpen && _query.isEmpty)
+                  : compact || atRoot
+                  ? Text(
+                      path.last.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : _BreadcrumbTrail(
+                      path: path,
+                      prominent: true,
+                      onSelected: _navigateToBreadcrumb,
+                    ),
+              actions: [
+                if (!compact)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: SizedBox(
+                        width: width >= 1100 ? 320 : 240,
+                        child: _searchField(),
                       ),
                     ),
                   ),
-                ],
-              ),
+                if (compact && !searching)
+                  IconButton(
+                    tooltip: 'Search this folder',
+                    onPressed: () => setState(() => _searchOpen = true),
+                    icon: const Icon(Icons.search),
+                  ),
+                if (!searching) ...[_sortButton(), _layoutButton()],
+                // Touch phones refresh by pulling the list; keep the app bar
+                // uncluttered there so the folder name stays readable.
+                if (!compact || pointerPlatform)
+                  IconButton(
+                    tooltip: 'Refresh folder',
+                    onPressed: _loading ? null : () => _load(reset: true),
+                    icon: const Icon(Icons.refresh),
+                  ),
+                const SizedBox(width: 8),
+              ],
+              bottom: compact && !atRoot && !searching
+                  ? _BreadcrumbBar(
+                      path: path,
+                      padding: gutters,
+                      onSelected: _navigateToBreadcrumb,
+                      textScale: _textScale,
+                    )
+                  : null,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: TextField(
-              controller: _search,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: 'Search this folder',
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    _search.clear();
-                    setState(() => _query = '');
-                    _load(reset: true);
-                  },
-                  icon: const Icon(Icons.clear),
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: _body(locale, width: width, gutters: gutters),
                 ),
-                border: const OutlineInputBorder(),
-              ),
-              onSubmitted: (value) {
-                setState(() => _query = value);
-                _load(reset: true);
-              },
-            ),
-          ),
-          if (_error != null && !_loading)
-            MaterialBanner(
-              content: Text(_error!),
-              actions: [
-                TextButton(
-                  onPressed: () => _load(reset: !_failedPage),
-                  child: Text(_failedPage ? 'Retry page' : 'Retry'),
-                ),
+                if (_loading && _items.isNotEmpty)
+                  const Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: LinearProgressIndicator(minHeight: 3),
+                  ),
               ],
             ),
-          if (_truncated || _warnings.isNotEmpty)
-            MaterialBanner(
-              content: Text(
-                _warnings.isEmpty
-                    ? 'Some entries could not be listed. Retry the scan.'
-                    : _warnings.join('\n'),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: _loading ? null : () => _load(reset: true),
-                  child: const Text('Retry scan'),
-                ),
-              ],
-            ),
-          if (_loading && _items.isNotEmpty) const LinearProgressIndicator(),
-          Expanded(
-            child: _loading && _items.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null && _items.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Files could not be loaded. Use Retry to try again.',
-                    ),
-                  )
-                : _items.isEmpty
-                ? Center(
-                    child: Text(
-                      _query.isEmpty
-                          ? 'This folder is empty.'
-                          : 'No matching files.',
-                    ),
-                  )
-                : _grid
-                ? _gridView(locale)
-                : _listView(locale),
           ),
-          if (_cursor != null)
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: OutlinedButton.icon(
-                onPressed: _loadingMore || _loading
-                    ? null
-                    : () => _load(reset: false),
-                icon: _loadingMore
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+        );
+      },
+    );
+  }
+
+  Widget _searchField({bool autofocus = false}) =>
+      ValueListenableBuilder<TextEditingValue>(
+        valueListenable: _search,
+        builder: (context, value, _) => TextField(
+          controller: _search,
+          focusNode: _searchFocus,
+          autofocus: autofocus,
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            hintText: 'Search this folder',
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            prefixIcon: const Icon(Icons.search, size: 20),
+            suffixIcon: value.text.isEmpty && _query.isEmpty
+                ? null
+                : IconButton(
+                    tooltip: 'Clear search',
+                    onPressed: _clearSearch,
+                    icon: const Icon(Icons.close, size: 20),
+                  ),
+          ),
+          onSubmitted: _submitSearch,
+        ),
+      );
+
+  Widget _sortButton() => PopupMenuButton<String>(
+    tooltip: 'Sort',
+    icon: const Icon(Icons.sort),
+    position: PopupMenuPosition.under,
+    onSelected: _applySort,
+    itemBuilder: (_) => [
+      for (final (value, label) in _sortOptions)
+        CheckedPopupMenuItem<String>(
+          value: value,
+          checked: value == '$_sort:$_order',
+          child: Text(label),
+        ),
+    ],
+  );
+
+  Widget _layoutButton() => IconButton(
+    tooltip: _grid ? 'List view' : 'Grid view',
+    onPressed: _toggleLayout,
+    icon: Icon(_grid ? Icons.view_list_outlined : Icons.grid_view_outlined),
+  );
+
+  Widget _body(
+    String? locale, {
+    required double width,
+    required EdgeInsets gutters,
+  }) {
+    if (_loading && _items.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null && _items.isEmpty) {
+      return EmptyState.error(
+        title: 'Files could not be loaded',
+        message: _error!,
+        onRetry: () => _load(reset: !_failedPage),
+      );
+    }
+    final folders = [
+      for (final entry in _items)
+        if (entry.kind == EntryKindEnum.folder) entry,
+    ];
+    final files = [
+      for (final entry in _items)
+        if (entry.kind != EntryKindEnum.folder) entry,
+    ];
+    final notices = <Widget>[
+      if (_error != null && !_loading)
+        NoticeBanner(
+          tone: NoticeTone.error,
+          message: _error!,
+          action: TextButton(
+            onPressed: () => _load(reset: !_failedPage),
+            child: Text(_failedPage ? 'Retry page' : 'Retry'),
+          ),
+        ),
+      if (_truncated || _warnings.isNotEmpty)
+        NoticeBanner(
+          tone: NoticeTone.warning,
+          message: _warnings.isEmpty
+              ? 'Some entries could not be listed. Retry the scan.'
+              : _warnings.join('\n'),
+          action: TextButton(
+            onPressed: _loading ? null : () => _load(reset: true),
+            child: const Text('Retry scan'),
+          ),
+        ),
+    ];
+    final content = gutters.copyWith(top: 12, bottom: 0);
+    return RefreshIndicator(
+      onRefresh: () => _load(reset: true),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: _onScroll,
+        child: CustomScrollView(
+          key: PageStorageKey(
+            'folder-${_grid ? 'grid' : 'list'}-${widget.libraryId}-${widget.folderId}',
+          ),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            for (final notice in notices)
+              SliverPadding(
+                padding: gutters.copyWith(top: 12),
+                sliver: SliverToBoxAdapter(child: notice),
+              ),
+            if (_items.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _query.isEmpty
+                    ? EmptyState(
+                        icon: Icons.folder_open_outlined,
+                        title: 'This folder is empty.',
+                        action: TextButton.icon(
+                          onPressed: () => _load(reset: true),
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Refresh'),
+                        ),
                       )
-                    : const Icon(Icons.expand_more),
-                label: const Text('Load more'),
+                    : EmptyState(
+                        icon: Icons.search_off_outlined,
+                        title: 'No matching files.',
+                        message:
+                            'Nothing in this folder matches “${_query.trim()}”.',
+                        action: TextButton(
+                          onPressed: _searchOpen ? _closeSearch : _clearSearch,
+                          child: const Text('Clear search'),
+                        ),
+                      ),
+              )
+            else if (_grid) ...[
+              if (folders.isNotEmpty)
+                SliverPadding(
+                  padding: content,
+                  sliver: _folderGrid(folders, width),
+                ),
+              if (files.isNotEmpty)
+                SliverPadding(
+                  padding: content.copyWith(
+                    left: content.left - 4,
+                    right: content.right - 4,
+                    top: folders.isEmpty ? 8 : 20,
+                  ),
+                  sliver: _fileGrid(
+                    files,
+                    locale,
+                    width - gutters.horizontal + 8,
+                  ),
+                ),
+            ] else ...[
+              if (width >= 720)
+                SliverPadding(
+                  padding: content.copyWith(
+                    left: content.left - 8,
+                    right: content.right - 8,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: _ListHeader(
+                      sort: _sort,
+                      order: _order,
+                      onSort: _applySort,
+                    ),
+                  ),
+                ),
+              SliverPadding(
+                padding: content.copyWith(
+                  left: content.left - 8,
+                  right: content.right - 8,
+                  top: width >= 720 ? 4 : 8,
+                ),
+                sliver: _entryList(
+                  [...folders, ...files],
+                  locale,
+                  wide: width >= 720,
+                ),
               ),
-            ),
-        ],
+            ],
+            if (_cursor != null)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: OutlinedButton.icon(
+                      onPressed: _loadingMore || _loading
+                          ? null
+                          : () => _load(reset: false),
+                      icon: _loadingMore
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.expand_more),
+                      label: const Text('Load more'),
+                    ),
+                  ),
+                ),
+              ),
+            const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _listView(String? locale) => ListView.builder(
-    key: PageStorageKey('folder-list-${widget.libraryId}-${widget.folderId}'),
-    findChildIndexCallback: _entryIndex,
-    itemCount: _items.length,
-    itemBuilder: (context, index) => _entryTile(_items[index], locale: locale),
-  );
-  Widget _gridView(String? locale) => GridView.builder(
-    key: PageStorageKey('folder-grid-${widget.libraryId}-${widget.folderId}'),
-    findChildIndexCallback: _entryIndex,
-    padding: const EdgeInsets.all(12),
-    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-      maxCrossAxisExtent: 220,
-      childAspectRatio: .9,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
+  double get _textScale =>
+      MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+
+  Widget _folderGrid(List<Entry> folders, double width) => SliverGrid(
+    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      maxCrossAxisExtent: width < 600 ? 240 : 300,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      mainAxisExtent: 56 * _textScale,
     ),
-    itemCount: _items.length,
-    itemBuilder: (context, index) =>
-        _entryTile(_items[index], grid: true, locale: locale),
+    delegate: SliverChildBuilderDelegate(
+      (context, index) {
+        final entry = folders[index];
+        return KeyedSubtree(
+          key: ValueKey('entry-${entry.id}'),
+          child: _FolderCard(name: entry.name, onTap: () => _open(entry, null)),
+        );
+      },
+      childCount: folders.length,
+      findChildIndexCallback: (key) => _indexIn(folders, key),
+    ),
   );
 
-  int? _entryIndex(Key key) {
-    final index = _items.indexWhere(
+  Widget _fileGrid(List<Entry> files, String? locale, double available) {
+    final photos = files.every((entry) => entry.kind == EntryKindEnum.photo);
+    final aspect = photos ? 1.0 : 16 / 9;
+    const spacing = 8.0;
+    final compact = available < 560;
+    final maxExtent = photos ? 220.0 : 300.0;
+    final columns = compact
+        ? 2
+        : ((available + spacing) / (maxExtent + spacing)).ceil().clamp(2, 12);
+    final tileWidth = (available - spacing * (columns - 1)) / columns;
+    // MediaTile: 4dp padding around artwork, then up to two title lines and
+    // a metadata line, all scaled with the user's text size.
+    final extent = 8 + (tileWidth - 8) / aspect + 70 * _textScale;
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columns,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: spacing,
+        mainAxisExtent: extent,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final entry = files[index];
+          return KeyedSubtree(
+            key: ValueKey('entry-${entry.id}'),
+            child: _anchored(
+              MediaTile(
+                artwork: _EntryArtwork(entry: entry, cacheWidth: 480),
+                aspectRatio: aspect,
+                title: _displayName(entry.name, folder: false),
+                subtitle: _metaLine(entry, locale),
+                showPlayOnHover: entry.kind == EntryKindEnum.video,
+                onTap: () => _open(entry, locale),
+                onSecondaryTap: () => _showEntryMenu(entry, locale),
+                menu: _entryMenuButton(entry, locale),
+              ),
+            ),
+          );
+        },
+        childCount: files.length,
+        findChildIndexCallback: (key) => _indexIn(files, key),
+      ),
+    );
+  }
+
+  Widget _entryList(
+    List<Entry> entries,
+    String? locale, {
+    required bool wide,
+  }) => SliverList(
+    delegate: SliverChildBuilderDelegate(
+      (context, index) {
+        final entry = entries[index];
+        final folder = entry.kind == EntryKindEnum.folder;
+        return KeyedSubtree(
+          key: ValueKey('entry-${entry.id}'),
+          child: _anchored(
+            _EntryRow(
+              entry: entry,
+              name: _displayName(entry.name, folder: folder),
+              wide: wide,
+              size: folder
+                  ? ''
+                  : entry.sizeBytes == null
+                  ? '—'
+                  : formatBytes(entry.sizeBytes, locale: locale),
+              modified: entry.modifiedAt == null
+                  ? (folder ? '' : '—')
+                  : formatDate(entry.modifiedAt!, locale: locale),
+              meta: _metaLine(entry, locale),
+              onTap: () => _open(entry, locale),
+              onSecondaryTap: folder
+                  ? null
+                  : () => _showEntryMenu(entry, locale),
+              menu: folder ? null : _entryMenuButton(entry, locale),
+            ),
+          ),
+        );
+      },
+      childCount: entries.length,
+      findChildIndexCallback: (key) => _indexIn(entries, key),
+    ),
+  );
+
+  /// Records where a secondary click or long press started, so the context
+  /// menu opens at the pointer rather than at the overflow button.
+  Widget _anchored(Widget child) => Listener(
+    onPointerDown: (event) {
+      if (event.kind == PointerDeviceKind.touch ||
+          event.buttons == kSecondaryMouseButton) {
+        _menuAnchor = event.position;
+      }
+    },
+    child: child,
+  );
+
+  int? _indexIn(List<Entry> entries, Key key) {
+    final index = entries.indexWhere(
       (entry) => ValueKey('entry-${entry.id}') == key,
     );
     return index < 0 ? null : index;
   }
 
-  Widget _entryTile(Entry entry, {bool grid = false, String? locale}) {
-    final folder = entry.kind == EntryKindEnum.folder;
-    final photo = entry.kind == EntryKindEnum.photo;
-    final video = entry.kind == EntryKindEnum.video;
-    final icon = folder
-        ? Icons.folder_outlined
-        : photo
-        ? Icons.image_outlined
-        : video
-        ? Icons.movie_outlined
-        : Icons.subtitles_outlined;
-    final thumbId = entry.mediaId;
-    final shownName = _displayName(entry.name, folder: folder);
-    final leading = entry.thumbnailAvailable && thumbId != null
-        ? _AuthorizedThumbnail(
-            key: ValueKey(thumbId),
-            mediaId: thumbId,
-            grid: grid,
-          )
-        : Icon(icon, size: grid ? 50 : 32);
-    final canEdit = _canManage && !folder && (video || photo);
-    return Card(
-      key: ValueKey('entry-${entry.id}'),
-      child: InkWell(
-        onTap: () {
-          if (folder) {
-            context.push(
-              '/libraries/${Uri.encodeComponent(widget.libraryId)}/folders/${Uri.encodeComponent(entry.id)}',
-              extra: [
-                ..._breadcrumbPath,
-                FolderBreadcrumb(id: entry.id, name: entry.name),
-              ],
-            );
-          } else if (photo && thumbId != null) {
-            context.push(
-              '/photos/${Uri.encodeComponent(thumbId)}',
-              extra: _items
-                  .where(
-                    (e) => e.kind == EntryKindEnum.photo && e.mediaId != null,
-                  )
-                  .map((e) => e.mediaId!)
-                  .toList(),
-            );
-          } else if (video && thumbId != null) {
-            context.push('/play/media/${Uri.encodeComponent(thumbId)}');
-          } else {
-            _showDetails(entry, locale);
-          }
-        },
-        child: grid
-            ? Column(
-                children: [
-                  Expanded(child: Center(child: leading)),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8,
-                      right: 4,
-                      bottom: 4,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            shownName,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (!folder)
-                          IconButton(
-                            tooltip: 'Details',
-                            visualDensity: VisualDensity.compact,
-                            icon: const Icon(Icons.info_outline),
-                            onPressed: () => _showDetails(entry, locale),
-                          ),
-                        if (canEdit)
-                          PopupMenuButton<String>(
-                            tooltip: 'File actions',
-                            onSelected: (action) => _action(entry, action),
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(
-                                value: 'rename',
-                                child: Text('Rename'),
-                              ),
-                              PopupMenuItem(value: 'move', child: Text('Move')),
-                              PopupMenuItem(
-                                value: 'trash',
-                                child: Text('Move to trash'),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              )
-            : ListTile(
-                leading: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: Center(child: leading),
-                ),
-                title: Text(
-                  shownName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Text(
-                  [
-                    if (entry.sizeBytes != null)
-                      formatBytes(entry.sizeBytes, locale: locale),
-                    if (entry.modifiedAt != null)
-                      formatDate(entry.modifiedAt!, locale: locale),
-                  ].join(' · '),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (!folder)
-                      IconButton(
-                        tooltip: 'Details',
-                        icon: const Icon(Icons.info_outline),
-                        onPressed: () => _showDetails(entry, locale),
-                      ),
-                    if (canEdit)
-                      PopupMenuButton<String>(
-                        tooltip: 'File actions',
-                        onSelected: (action) => _action(entry, action),
-                        itemBuilder: (_) => const [
-                          PopupMenuItem(value: 'rename', child: Text('Rename')),
-                          PopupMenuItem(value: 'move', child: Text('Move')),
-                          PopupMenuItem(
-                            value: 'trash',
-                            child: Text('Move to trash'),
-                          ),
-                        ],
-                      ),
-                    const Icon(Icons.chevron_right),
-                  ],
-                ),
-              ),
-      ),
+  String? _metaLine(Entry entry, String? locale) {
+    if (entry.kind == EntryKindEnum.folder) return null;
+    final parts = [
+      if (entry.sizeBytes != null) formatBytes(entry.sizeBytes, locale: locale),
+      if (entry.modifiedAt != null)
+        formatDate(entry.modifiedAt!, locale: locale),
+    ];
+    return parts.isEmpty ? null : parts.join(' · ');
+  }
+
+  List<PopupMenuEntry<String>> _menuItems(Entry entry) {
+    final scheme = Theme.of(context).colorScheme;
+    PopupMenuItem<String> item(
+      String value,
+      IconData icon,
+      String label, {
+      bool destructive = false,
+    }) {
+      final color = destructive ? scheme.error : null;
+      return PopupMenuItem<String>(
+        value: value,
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: color ?? scheme.onSurfaceVariant),
+            const SizedBox(width: 12),
+            Text(label, style: TextStyle(color: color)),
+          ],
+        ),
+      );
+    }
+
+    return [
+      item('details', Icons.info_outline, 'Details'),
+      if (_canEdit(entry)) ...[
+        const PopupMenuDivider(),
+        item('rename', Icons.drive_file_rename_outline, 'Rename'),
+        item('move', Icons.drive_file_move_outline, 'Move'),
+        const PopupMenuDivider(),
+        item('trash', Icons.delete_outline, 'Move to trash', destructive: true),
+      ],
+    ];
+  }
+
+  void _menuSelected(Entry entry, String action, String? locale) =>
+      action == 'details'
+      ? _showDetails(entry, locale)
+      : _action(entry, action);
+
+  Widget _entryMenuButton(Entry entry, String? locale) =>
+      PopupMenuButton<String>(
+        tooltip: 'File actions',
+        icon: const Icon(Icons.more_vert),
+        onSelected: (action) => _menuSelected(entry, action, locale),
+        itemBuilder: (_) => _menuItems(entry),
+      );
+
+  Future<void> _showEntryMenu(Entry entry, String? locale) async {
+    final overlay =
+        Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
+    final anchor = overlay.globalToLocal(
+      _menuAnchor ?? overlay.size.center(Offset.zero),
     );
+    final action = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        anchor & const Size(1, 1),
+        Offset.zero & overlay.size,
+      ),
+      items: _menuItems(entry),
+    );
+    if (action != null && mounted) _menuSelected(entry, action, locale);
   }
 
   String _displayName(String name, {required bool folder}) {
@@ -676,61 +937,99 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
     return dot > 0 ? name.substring(0, dot) : name;
   }
 
-  Future<void> _showDetails(
-    Entry entry,
-    String? locale,
-  ) async => showModalBottomSheet<void>(
-    context: context,
-    builder: (context) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: FutureBuilder<Media?>(
-          future: entry.mediaId == null
-              ? Future.value(null)
-              : requireActiveApi(ref)
-                    .getMediaApi()
-                    .getMedia(id: entry.mediaId!)
-                    .then((r) => r.data),
-          builder: (context, snapshot) {
-            final media = snapshot.data;
-            return Column(
+  Future<void> _showDetails(Entry entry, String? locale) async {
+    final api = requireActiveApi(ref);
+    final openable =
+        entry.mediaId != null &&
+        (entry.kind == EntryKindEnum.video ||
+            entry.kind == EntryKindEnum.photo);
+    Widget details(BuildContext sheetContext) =>
+        _EntryDetails(entry: entry, api: api, locale: locale);
+    void open(BuildContext sheetContext) {
+      Navigator.of(sheetContext).pop();
+      _open(entry, locale);
+    }
+
+    Widget actions(BuildContext sheetContext, {bool closeButton = true}) => Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (closeButton)
+          TextButton(
+            onPressed: () => Navigator.of(sheetContext).pop(),
+            child: const Text('Close'),
+          ),
+        if (openable) ...[
+          const SizedBox(width: 8),
+          FilledButton.tonalIcon(
+            onPressed: () => open(sheetContext),
+            icon: Icon(
+              entry.kind == EntryKindEnum.video
+                  ? Icons.play_arrow_rounded
+                  : Icons.photo_outlined,
+            ),
+            label: Text(entry.kind == EntryKindEnum.video ? 'Play' : 'Open'),
+          ),
+        ],
+      ],
+    );
+
+    if (isTelevision(context)) {
+      return TvFocusPanel.show<void>(
+        context: context,
+        title: 'Details',
+        builder: (sheetContext) => SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              details(sheetContext),
+              const SizedBox(height: 16),
+              actions(sheetContext, closeButton: false),
+            ],
+          ),
+        ),
+      );
+    }
+    if (WindowSize.of(context).isCompact) {
+      return showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (sheetContext) => SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              details(sheetContext),
+              const SizedBox(height: 16),
+              actions(sheetContext),
+            ],
+          ),
+        ),
+      );
+    }
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(entry.name, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 10),
-                Text('Type: ${entry.kind.name}'),
-                if (entry.sizeBytes != null)
-                  Text('Size: ${formatBytes(entry.sizeBytes, locale: locale)}'),
-                if (entry.modifiedAt != null)
-                  Text(
-                    'Modified: ${formatDateTime(entry.modifiedAt!, locale: locale)}',
-                  ),
-                if (snapshot.connectionState == ConnectionState.waiting)
-                  const LinearProgressIndicator(),
-                if (snapshot.hasError) Text(clientError(snapshot.error!)),
-                if (media != null) ...[
-                  Text('Format: ${media.mimeType}'),
-                  if (media.durationMs != null)
-                    Text('Duration: ${_duration(media.durationMs!)}'),
-                  if (media.width != null && media.height != null)
-                    Text('Dimensions: ${media.width} × ${media.height}'),
-                  if (media.probeState == MediaProbeStateEnum.unsupported)
-                    const Text(
-                      'This file format is not supported for playback.',
-                    ),
-                  if (media.probeState == MediaProbeStateEnum.pending)
-                    const Text('Media details are still being checked.'),
-                  if (media.probeState == MediaProbeStateEnum.failed)
-                    const Text('Media details could not be read.'),
-                ],
+                details(dialogContext),
+                const SizedBox(height: 20),
+                actions(dialogContext),
               ],
-            );
-          },
+            ),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Future<void> _action(Entry entry, String action) async {
     final api = requireActiveApi(ref).getMediaApi();
@@ -758,7 +1057,9 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
           context: context,
           builder: (context) => _FolderMovePicker(
             libraryId: widget.libraryId,
+            libraryName: _library?.name ?? 'Library',
             currentFolderId: entry.parentId,
+            fileName: entry.name,
           ),
         );
         if (!mounted || target == null) return;
@@ -774,20 +1075,7 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
       } else if (action == 'trash') {
         final confirm = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Move to trash?'),
-            content: Text('“${entry.name}” will be moved to the server trash.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Move to trash'),
-              ),
-            ],
-          ),
+          builder: (context) => _TrashConfirmDialog(name: entry.name),
         );
         if (confirm != true) return;
         final response = await api.deleteMedia(
@@ -844,278 +1132,13 @@ class _FolderScreenState extends ConsumerState<FolderScreen> {
   }
 
   String _operationProblem(Problem? problem) =>
-      serverMessage(problem) ?? 'The server did not explain why this change failed.';
-
+      serverMessage(problem) ??
+      'The server did not explain why this change failed.';
 }
 
 class _MutationFailure implements Exception {
   const _MutationFailure(this.message);
   final String message;
-}
-
-@immutable
-class _MoveTarget {
-  const _MoveTarget(this.folderId);
-  final String? folderId;
-}
-
-class _FolderMovePicker extends ConsumerStatefulWidget {
-  const _FolderMovePicker({
-    required this.libraryId,
-    required this.currentFolderId,
-  });
-  final String libraryId;
-  final String? currentFolderId;
-
-  @override
-  ConsumerState<_FolderMovePicker> createState() => _FolderMovePickerState();
-}
-
-class _FolderMovePickerState extends ConsumerState<_FolderMovePicker> {
-  final List<Entry> _stack = [];
-  final List<Entry> _folders = [];
-  String? _cursor;
-  String? _error;
-  bool _loading = true;
-  bool _loadingMore = false;
-  int _requestGeneration = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _load(reset: true);
-  }
-
-  Future<void> _load({required bool reset}) async {
-    final generation = reset ? ++_requestGeneration : _requestGeneration;
-    if (reset) {
-      setState(() {
-        _loading = true;
-        _loadingMore = false;
-        _error = null;
-        _cursor = null;
-        _folders.clear();
-      });
-    } else {
-      if (_cursor == null || _loadingMore) return;
-      setState(() => _loadingMore = true);
-    }
-    try {
-      final page = await requireActiveApi(ref).getLibrariesApi().listEntries(
-        id: widget.libraryId,
-        folderId: _stack.isEmpty ? null : _stack.last.id,
-        kind: 'folder',
-        limit: 50,
-        cursor: reset ? null : _cursor,
-        sort: 'name',
-        order: 'asc',
-      );
-      if (!mounted) return;
-      if (generation != _requestGeneration) return;
-      setState(() {
-        _folders.addAll(page.data!.items);
-        _cursor = page.data!.nextCursor;
-        _error = null;
-        _loading = false;
-        _loadingMore = false;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      if (generation != _requestGeneration) return;
-      setState(() {
-        _error = clientError(error);
-        _loading = false;
-        _loadingMore = false;
-      });
-    }
-  }
-
-  void _open(Entry folder) {
-    _requestGeneration++;
-    setState(() => _stack.add(folder));
-    _load(reset: true);
-  }
-
-  void _goUp() {
-    if (_stack.isEmpty) return;
-    _requestGeneration++;
-    setState(() => _stack.removeLast());
-    _load(reset: true);
-  }
-
-  void _chooseRoot() => Navigator.pop(context, const _MoveTarget(null));
-
-  @override
-  Widget build(BuildContext context) => Dialog(
-    child: SizedBox(
-      width: 520,
-      height: 480,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 8, 0),
-            child: Row(
-              children: [
-                IconButton(
-                  tooltip: _stack.isEmpty ? 'Cancel' : 'Parent folder',
-                  onPressed: _stack.isEmpty
-                      ? () => Navigator.pop(context)
-                      : _goUp,
-                  icon: Icon(_stack.isEmpty ? Icons.close : Icons.arrow_back),
-                ),
-                Expanded(
-                  child: Text(
-                    'Move to folder',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                TextButton.icon(
-                  onPressed: _chooseRoot,
-                  icon: const Icon(Icons.home_outlined),
-                  label: const Text('Select library root'),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    ['Library', ..._stack.map((e) => e.name)].join('  ›  '),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: _loading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(_error!),
-                        TextButton(
-                          onPressed: () => _load(reset: true),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                : _folders.isEmpty
-                ? const Center(child: Text('No subfolders here.'))
-                : ListView.builder(
-                    itemCount: _folders.length,
-                    itemBuilder: (context, index) {
-                      final folder = _folders[index];
-                      final current = folder.id == widget.currentFolderId;
-                      return ListTile(
-                        leading: const Icon(Icons.folder_outlined),
-                        title: Text(folder.name),
-                        subtitle: current ? const Text('Current folder') : null,
-                        onTap: () => _open(folder),
-                        trailing: TextButton(
-                          onPressed: current
-                              ? null
-                              : () => Navigator.pop(
-                                  context,
-                                  _MoveTarget(folder.id),
-                                ),
-                          child: const Text('Select'),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          if (_cursor != null)
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: OutlinedButton.icon(
-                onPressed: _loadingMore ? null : () => _load(reset: false),
-                icon: _loadingMore
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.expand_more),
-                label: const Text('Load more folders'),
-              ),
-            ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _AuthorizedThumbnail extends ConsumerStatefulWidget {
-  const _AuthorizedThumbnail({
-    super.key,
-    required this.mediaId,
-    this.grid = false,
-  });
-  final String mediaId;
-  final bool grid;
-  @override
-  ConsumerState<_AuthorizedThumbnail> createState() =>
-      _AuthorizedThumbnailState();
-}
-
-class _AuthorizedThumbnailState extends ConsumerState<_AuthorizedThumbnail> {
-  Future<Uint8List>? _future;
-  BrianiApi? _api;
-  String? _mediaId;
-  CancelToken? _token;
-
-  @override
-  void dispose() {
-    _token?.cancel('Thumbnail left the viewport');
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final api = ref.watch(activeApiProvider);
-    if (!identical(api, _api) || _mediaId != widget.mediaId) {
-      _token?.cancel('Thumbnail identity changed');
-      _api = api;
-      _mediaId = widget.mediaId;
-      final token = _token = CancelToken();
-      _future = api
-          ?.getMediaApi()
-          .getThumbnail(id: widget.mediaId, cancelToken: token)
-          .then((r) => r.data!);
-    }
-    return FutureBuilder<Uint8List>(
-      key: ValueKey((api, widget.mediaId)),
-      future: _future,
-      builder: (context, snapshot) => snapshot.hasData
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.memory(
-                snapshot.data!,
-                fit: BoxFit.cover,
-                width: widget.grid ? double.infinity : 48,
-                height: widget.grid ? double.infinity : 48,
-                cacheWidth: widget.grid ? 440 : 96,
-                errorBuilder: (_, _, _) =>
-                    const Icon(Icons.broken_image_outlined),
-              ),
-            )
-          : const Icon(Icons.image_outlined, size: 30),
-    );
-  }
 }
 
 String _duration(int ms) {

@@ -62,7 +62,7 @@ The same local-test APK supports a TV launcher and remote controls; you do not n
 2. Launch **Briani Player** from the TV's app launcher.
 3. Use the remote to add the same server address you used on your desktop or phone. For the LAN example, enter `http://192.168.1.50:8088` and enable the trusted-network HTTP option.
 4. At sign-in, select **Link using another signed-in device**, name the TV, and choose **Request device code**.
-5. On a phone or desktop already signed in to that same server, open **Account → Link a device**. Enter the code, choose **Check device**, verify the account/server/device shown, then choose **Approve device**.
+5. On a phone or desktop already signed in to that same server, open the account menu (your avatar) and choose **Link a device**. Enter the code, choose **Check device**, verify the account/server/device shown, then choose **Approve device**.
 6. Leave the TV on its waiting screen until it signs in. A code expires after five minutes; request a new one if needed.
 
 Pairing signs the TV into the account that approves it. Use a member account with the intended library access if the TV is shared. Pairing does not create the first administrator; complete that server setup first. **Use username and password** is available if you prefer direct sign-in.

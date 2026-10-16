@@ -265,7 +265,8 @@ void main() {
       );
       expect(entriesRequest.queryParameters['sort'], 'size');
       expect(entriesRequest.queryParameters['order'], 'desc');
-      expect(find.byType(GridView), findsOneWidget);
+      // The saved grid layout renders files in a lazily built sliver grid.
+      expect(find.byType(SliverGrid), findsOneWidget);
       expect(find.text('Example'), findsOneWidget);
       expect(find.text('Example.mkv'), findsNothing);
     },

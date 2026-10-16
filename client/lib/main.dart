@@ -11,6 +11,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
+    // Below this size the adaptive layouts would have to clip content.
+    await windowManager.setMinimumSize(const Size(400, 520));
   }
   final preferences = await SharedPreferences.getInstance();
   runApp(

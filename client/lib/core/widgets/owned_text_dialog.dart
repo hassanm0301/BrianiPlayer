@@ -28,18 +28,17 @@ class OwnedTextDialog extends StatefulWidget {
     String initialText = '',
     String? hintText,
     int? maxLength,
-  }) =>
-      showDialog<String>(
-        context: context,
-        builder: (_) => OwnedTextDialog(
-          title: title,
-          label: label,
-          confirmLabel: confirmLabel,
-          initialText: initialText,
-          hintText: hintText,
-          maxLength: maxLength,
-        ),
-      );
+  }) => showDialog<String>(
+    context: context,
+    builder: (_) => OwnedTextDialog(
+      title: title,
+      label: label,
+      confirmLabel: confirmLabel,
+      initialText: initialText,
+      hintText: hintText,
+      maxLength: maxLength,
+    ),
+  );
 
   @override
   State<OwnedTextDialog> createState() => _OwnedTextDialogState();
@@ -64,25 +63,29 @@ class _OwnedTextDialogState extends State<OwnedTextDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        title: Text(widget.title),
-        content: TextField(
-          controller: _controller,
-          autofocus: true,
-          maxLength: widget.maxLength,
-          decoration: InputDecoration(
-            labelText: widget.label,
-            hintText: widget.hintText,
-          ),
+    title: Text(widget.title),
+    content: SizedBox(
+      width: 480,
+      child: TextField(
+        controller: _controller,
+        autofocus: true,
+        maxLength: widget.maxLength,
+        textInputAction: TextInputAction.done,
+        decoration: InputDecoration(
+          labelText: widget.label,
+          hintText: widget.hintText,
+          // Long limits (for example magnet links) make a counter noise.
+          counterText: (widget.maxLength ?? 0) > 1000 ? '' : null,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: _submit,
-            child: Text(widget.confirmLabel),
-          ),
-        ],
-      );
+        onSubmitted: (_) => _submit(),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: const Text('Cancel'),
+      ),
+      FilledButton(onPressed: _submit, child: Text(widget.confirmLabel)),
+    ],
+  );
 }

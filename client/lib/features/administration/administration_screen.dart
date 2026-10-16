@@ -8,6 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/session/client_session.dart';
 import '../../core/preferences/preferences_providers.dart';
 import '../../core/formatting/locale_formatters.dart';
+import '../../app/theme.dart';
+import '../../core/widgets/adaptive.dart';
+import '../../core/widgets/section_jump.dart';
+import '../../core/widgets/states.dart';
 
 final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
   final session = ref.watch(clientSessionProvider);
@@ -121,6 +125,15 @@ class _AdminSnapshot {
   final Set<String> failures;
 }
 
+const _topics = [
+  JumpSection('Server', Icons.tune),
+  JumpSection('Discovery', Icons.travel_explore_outlined),
+  JumpSection('Users', Icons.group_outlined),
+  JumpSection('Libraries', Icons.video_library_outlined),
+  JumpSection('Health', Icons.monitor_heart_outlined),
+  JumpSection('Maintenance', Icons.build_outlined),
+];
+
 class AdministrationScreen extends ConsumerWidget {
   const AdministrationScreen({super.key});
 
@@ -130,26 +143,32 @@ class AdministrationScreen extends ConsumerWidget {
     if (session?.administrator != true) {
       return Scaffold(
         appBar: AppBar(title: const Text('Administration')),
-        body: const Center(child: Text('Administrator access is required.')),
+        body: const EmptyState(
+          icon: Icons.admin_panel_settings_outlined,
+          title: 'Administrators only',
+          message: 'Administrator access is required.',
+        ),
       );
     }
     final data = ref.watch(_adminSnapshotProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Administration')),
+      appBar: AppBar(
+        title: const Text('Administration'),
+        actions: [
+          IconButton(
+            tooltip: 'Refresh administration',
+            onPressed: () => ref.invalidate(_adminSnapshotProvider),
+            icon: const Icon(Icons.refresh),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: data.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Administration data is unavailable.'),
-              const SizedBox(height: 8),
-              FilledButton(
-                onPressed: () => ref.invalidate(_adminSnapshotProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
+        error: (error, _) => EmptyState.error(
+          title: 'Administration is unavailable',
+          message: 'Administration data is unavailable.',
+          onRetry: () => ref.invalidate(_adminSnapshotProvider),
         ),
         data: (snapshot) => _AdminContent(
           snapshot: snapshot,
@@ -160,40 +179,102 @@ class AdministrationScreen extends ConsumerWidget {
   }
 }
 
-class _AdminContent extends ConsumerWidget {
+class _AdminContent extends ConsumerStatefulWidget {
   const _AdminContent({required this.snapshot, required this.retry});
   final _AdminSnapshot snapshot;
   final VoidCallback retry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AdminContent> createState() => _AdminContentState();
+}
+
+class _AdminContentState extends ConsumerState<_AdminContent>
+    with SectionScrollSpy {
+  @override
+  int get sectionCount => _topics.length;
+
+  @override
+  Widget build(BuildContext context) {
+    final snapshot = widget.snapshot;
+    final retry = widget.retry;
     final locale = ref.watch(userPreferencesProvider).asData?.value.locale;
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (snapshot.settings == null)
-          _UnavailableSection(
-            title: 'Server and transfer settings',
-            retry: retry,
-          )
-        else
-          _ServerSettings(snapshot.settings!),
-        if (snapshot.settings == null)
-          _UnavailableSection(title: 'Discovery scope', retry: retry)
-        else
-          _DiscoveryScope(
-            snapshot.settings!,
-            snapshot.providers,
-            unavailable: snapshot.failures.contains('providers'),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final sidebar = !isTelevision(context) && constraints.maxWidth >= 960;
+        final sections = <Widget>[
+          KeyedSubtree(
+            key: sectionKeys[0],
+            child: snapshot.settings == null
+                ? _UnavailableSection(
+                    title: 'Server and transfer settings',
+                    retry: retry,
+                  )
+                : _ServerSettings(snapshot.settings!),
           ),
-        if (snapshot.failures.contains('users'))
-          _UnavailableSection(title: 'Users and access', retry: retry)
-        else
-          _UserManagement(snapshot.users),
-        _LibraryManagement(snapshot, locale: locale, retry: retry),
-        _HealthAndIntegrations(snapshot, retry: retry),
-        _Operations(snapshot, locale: locale, retry: retry),
-      ],
+          KeyedSubtree(
+            key: sectionKeys[1],
+            child: snapshot.settings == null
+                ? _UnavailableSection(title: 'Discovery scope', retry: retry)
+                : _DiscoveryScope(
+                    snapshot.settings!,
+                    snapshot.providers,
+                    unavailable: snapshot.failures.contains('providers'),
+                  ),
+          ),
+          KeyedSubtree(
+            key: sectionKeys[2],
+            child: snapshot.failures.contains('users')
+                ? _UnavailableSection(title: 'Users and access', retry: retry)
+                : _UserManagement(snapshot.users),
+          ),
+          KeyedSubtree(
+            key: sectionKeys[3],
+            child: _LibraryManagement(snapshot, locale: locale, retry: retry),
+          ),
+          KeyedSubtree(
+            key: sectionKeys[4],
+            child: _HealthAndIntegrations(snapshot, retry: retry),
+          ),
+          KeyedSubtree(
+            key: sectionKeys[5],
+            child: _Operations(snapshot, locale: locale, retry: retry),
+          ),
+        ];
+        // All sections live in one child so every section stays mounted:
+        // the jump list measures and scrolls to them.
+        final list = ListView(
+          controller: scrollController,
+          padding:
+              (sidebar
+                      ? const EdgeInsets.only(left: 8, right: 28)
+                      : pageGutters(context))
+                  .add(const EdgeInsets.only(top: 4, bottom: 40)),
+          children: [
+            Align(
+              alignment: sidebar ? Alignment.topLeft : Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 920),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: sections,
+                ),
+              ),
+            ),
+          ],
+        );
+        if (!sidebar) return list;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionJumpList(
+              sections: _topics,
+              current: currentSection,
+              onSelected: jumpToSection,
+            ),
+            Expanded(child: list),
+          ],
+        );
+      },
     );
   }
 }
@@ -203,215 +284,216 @@ class _ServerSettings extends StatelessWidget {
   final AdminSettings settings;
 
   @override
-  Widget build(BuildContext context) => _AdminSection(
-    title: 'Server and transfer settings',
-    children: [
-      _saveText(
-        context,
-        'Server name',
-        settings.serverName ?? '',
-        (value) => _putSettings(
-          context,
-          settings.rebuild((b) => b.serverName = value.trim()),
-        ),
-      ),
-      _saveText(
-        context,
-        'Public base URL (optional)',
-        settings.publicBaseUrl ?? '',
-        (value) {
-          final text = value.trim();
-          _putSettings(
-            context,
-            settings.rebuild(
-              (b) => b.publicBaseUrl = text.isEmpty ? null : text,
+  Widget build(BuildContext context) {
+    void put(AdminSettings updated) => _putSettings(context, updated);
+    return _AdminSection(
+      title: 'Server and transfer settings',
+      subtitle: 'Press Enter or the check button to save a field.',
+      children: [
+        const _GroupLabel('General'),
+        _FieldGrid(
+          children: [
+            _saveText(
+              context,
+              'Server name',
+              settings.serverName ?? '',
+              (value) =>
+                  put(settings.rebuild((b) => b.serverName = value.trim())),
             ),
-          );
-        },
-      ),
-      _saveInt(
-        context,
-        'Concurrent downloads',
-        settings.activeDownloads ?? 2,
-        1,
-        20,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.activeDownloads = v),
+            _saveText(
+              context,
+              'Public base URL',
+              settings.publicBaseUrl ?? '',
+              (value) {
+                final text = value.trim();
+                put(
+                  settings.rebuild(
+                    (b) => b.publicBaseUrl = text.isEmpty ? null : text,
+                  ),
+                );
+              },
+              hint: 'Optional, for example https://media.example.com',
+            ),
+          ],
         ),
-      ),
-      _saveInt(
-        context,
-        'Downloads per user',
-        settings.activeDownloadsPerUser ?? 1,
-        1,
-        20,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.activeDownloadsPerUser = v),
+        const _GroupLabel('Transfers'),
+        _FieldGrid(
+          children: [
+            _saveInt(
+              context,
+              'Concurrent downloads',
+              settings.activeDownloads ?? 2,
+              1,
+              20,
+              (v) => put(settings.rebuild((b) => b.activeDownloads = v)),
+            ),
+            _saveInt(
+              context,
+              'Downloads per user',
+              settings.activeDownloadsPerUser ?? 1,
+              1,
+              20,
+              (v) => put(settings.rebuild((b) => b.activeDownloadsPerUser = v)),
+            ),
+            _saveInt(
+              context,
+              'Active seed jobs',
+              settings.activeSeeds ?? 2,
+              0,
+              50,
+              (v) => put(settings.rebuild((b) => b.activeSeeds = v)),
+            ),
+            _saveInt(
+              context,
+              'Global connections',
+              settings.globalConnections ?? 100,
+              1,
+              5000,
+              (v) => put(settings.rebuild((b) => b.globalConnections = v)),
+            ),
+            _saveInt(
+              context,
+              'Connections per torrent',
+              settings.connectionsPerTorrent ?? 40,
+              1,
+              1000,
+              (v) => put(settings.rebuild((b) => b.connectionsPerTorrent = v)),
+            ),
+            _saveOptionalUnit(
+              context,
+              'Download limit',
+              settings.downloadLimitBytesPerSecond,
+              1048576,
+              1073741824,
+              (v) => put(
+                settings.rebuild((b) => b.downloadLimitBytesPerSecond = v),
+              ),
+              suffix: 'MiB/s',
+              hint: 'Leave blank for unlimited',
+            ),
+            _saveOptionalUnit(
+              context,
+              'Upload limit',
+              settings.uploadLimitBytesPerSecond,
+              1048576,
+              1073741824,
+              (v) =>
+                  put(settings.rebuild((b) => b.uploadLimitBytesPerSecond = v)),
+              suffix: 'MiB/s',
+              hint: 'Leave blank for unlimited',
+            ),
+          ],
         ),
-      ),
-      _saveInt(
-        context,
-        'Active seed jobs',
-        settings.activeSeeds ?? 2,
-        0,
-        50,
-        (v) =>
-            _putSettings(context, settings.rebuild((b) => b.activeSeeds = v)),
-      ),
-      _saveInt(
-        context,
-        'Global connections',
-        settings.globalConnections ?? 100,
-        1,
-        5000,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.globalConnections = v),
+        const _GroupLabel('Seeding and quotas'),
+        _FieldGrid(
+          children: [
+            _saveNullableDouble(
+              context,
+              'Default seed ratio',
+              settings.defaultRatioLimit,
+              (v) => put(settings.rebuild((b) => b.defaultRatioLimit = v)),
+              hint: 'Leave blank for unlimited',
+            ),
+            _saveNullableInt(
+              context,
+              'Default seed time',
+              settings.defaultSeedTimeMinutes,
+              (v) => put(settings.rebuild((b) => b.defaultSeedTimeMinutes = v)),
+              suffix: 'min',
+              hint: 'Leave blank for unlimited',
+            ),
+            _saveOptionalUnit(
+              context,
+              'Default user quota',
+              settings.defaultUserQuotaBytes,
+              1073741824,
+              9007199254740991,
+              (v) => put(settings.rebuild((b) => b.defaultUserQuotaBytes = v)),
+              suffix: 'GiB',
+              hint: 'Leave blank for unlimited',
+            ),
+          ],
         ),
-      ),
-      _saveInt(
-        context,
-        'Connections per torrent',
-        settings.connectionsPerTorrent ?? 40,
-        1,
-        1000,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.connectionsPerTorrent = v),
+        const _GroupLabel('Storage and cache'),
+        _FieldGrid(
+          children: [
+            _saveUnit(
+              context,
+              'Low disk floor',
+              settings.lowDiskFloorBytes ?? 5368709120,
+              1073741824,
+              9007199254740991,
+              (v) => put(settings.rebuild((b) => b.lowDiskFloorBytes = v)),
+              suffix: 'GiB',
+            ),
+            _saveDouble(
+              context,
+              'Low disk floor fraction',
+              settings.lowDiskFloorFraction ?? .05,
+              0,
+              .5,
+              (v) => put(settings.rebuild((b) => b.lowDiskFloorFraction = v)),
+            ),
+            _saveUnit(
+              context,
+              'Thumbnail cache limit',
+              settings.thumbnailCacheMaxBytes ?? 536870912,
+              1048576,
+              8589934592,
+              (v) => put(settings.rebuild((b) => b.thumbnailCacheMaxBytes = v)),
+              suffix: 'MiB',
+            ),
+          ],
         ),
-      ),
-      _saveOptionalUnit(
-        context,
-        'Download limit (MiB/s; blank = unlimited)',
-        settings.downloadLimitBytesPerSecond,
-        1048576,
-        1073741824,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.downloadLimitBytesPerSecond = v),
+        const _GroupLabel('Schedules and retention'),
+        _FieldGrid(
+          children: [
+            _saveInt(
+              context,
+              'Audit retention',
+              settings.auditRetentionDays ?? 30,
+              1,
+              3650,
+              (v) => put(settings.rebuild((b) => b.auditRetentionDays = v)),
+              suffix: 'days',
+            ),
+            _saveInt(
+              context,
+              'Library scan interval',
+              settings.libraryScanIntervalSeconds ?? 3600,
+              60,
+              31536000,
+              (v) => put(
+                settings.rebuild((b) => b.libraryScanIntervalSeconds = v),
+              ),
+              suffix: 'seconds',
+            ),
+            _saveInt(
+              context,
+              'Discovery cache',
+              settings.discoveryCacheSeconds ?? 300,
+              30,
+              86400,
+              (v) => put(settings.rebuild((b) => b.discoveryCacheSeconds = v)),
+              suffix: 'seconds',
+            ),
+            _saveInt(
+              context,
+              'Recent refresh',
+              settings.discoveryRecentRefreshSeconds ?? 900,
+              60,
+              86400,
+              (v) => put(
+                settings.rebuild((b) => b.discoveryRecentRefreshSeconds = v),
+              ),
+              suffix: 'seconds',
+            ),
+          ],
         ),
-      ),
-      _saveOptionalUnit(
-        context,
-        'Upload limit (MiB/s; blank = unlimited)',
-        settings.uploadLimitBytesPerSecond,
-        1048576,
-        1073741824,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.uploadLimitBytesPerSecond = v),
-        ),
-      ),
-      _saveNullableDouble(
-        context,
-        'Default seed ratio (blank = unlimited)',
-        settings.defaultRatioLimit,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.defaultRatioLimit = v),
-        ),
-      ),
-      _saveNullableInt(
-        context,
-        'Default seed minutes (blank = unlimited)',
-        settings.defaultSeedTimeMinutes,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.defaultSeedTimeMinutes = v),
-        ),
-      ),
-      _saveOptionalUnit(
-        context,
-        'Default user quota (GiB; blank = unlimited)',
-        settings.defaultUserQuotaBytes,
-        1073741824,
-        9007199254740991,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.defaultUserQuotaBytes = v),
-        ),
-      ),
-      _saveUnit(
-        context,
-        'Low disk floor (GiB)',
-        settings.lowDiskFloorBytes ?? 5368709120,
-        1073741824,
-        9007199254740991,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.lowDiskFloorBytes = v),
-        ),
-      ),
-      _saveDouble(
-        context,
-        'Low disk floor fraction',
-        settings.lowDiskFloorFraction ?? .05,
-        0,
-        .5,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.lowDiskFloorFraction = v),
-        ),
-      ),
-      _saveUnit(
-        context,
-        'Thumbnail cache limit (MiB)',
-        settings.thumbnailCacheMaxBytes ?? 536870912,
-        1048576,
-        8589934592,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.thumbnailCacheMaxBytes = v),
-        ),
-      ),
-      _saveInt(
-        context,
-        'Audit retention (days)',
-        settings.auditRetentionDays ?? 30,
-        1,
-        3650,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.auditRetentionDays = v),
-        ),
-      ),
-      _saveInt(
-        context,
-        'Library scan interval (seconds)',
-        settings.libraryScanIntervalSeconds ?? 3600,
-        60,
-        31536000,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.libraryScanIntervalSeconds = v),
-        ),
-      ),
-      _saveInt(
-        context,
-        'Discovery cache (seconds)',
-        settings.discoveryCacheSeconds ?? 300,
-        30,
-        86400,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.discoveryCacheSeconds = v),
-        ),
-      ),
-      _saveInt(
-        context,
-        'Recent refresh (seconds)',
-        settings.discoveryRecentRefreshSeconds ?? 900,
-        60,
-        86400,
-        (v) => _putSettings(
-          context,
-          settings.rebuild((b) => b.discoveryRecentRefreshSeconds = v),
-        ),
-      ),
-    ],
-  );
+        const SizedBox(height: 12),
+      ],
+    );
+  }
 }
 
 class _DiscoveryScope extends ConsumerStatefulWidget {
@@ -462,91 +544,115 @@ class _DiscoveryScopeState extends ConsumerState<_DiscoveryScope> {
   @override
   Widget build(BuildContext context) => _AdminSection(
     title: 'Discovery scope',
+    subtitle: 'Choose which configured providers and category IDs can appear in discovery. The server enforces this scope for every user.',
+    trailing: FilledButton.tonal(
+      onPressed: _saving ? null : _save,
+      child: Text(_saving ? 'Saving…' : 'Save discovery scope'),
+    ),
     children: [
-      const Text(
-        'Choose which configured providers and category IDs can appear in discovery. The server enforces this scope for every user.',
-      ),
       if (widget.unavailable)
-        const Text(
-          'Configured provider names are unavailable; provider IDs can still be entered manually.',
+        const NoticeBanner(
+          tone: NoticeTone.warning,
+          message: 'Configured provider names are unavailable; provider IDs can still be entered manually.',
+          margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
         ),
-      const SizedBox(height: 8),
-      _scopeMode(
-        'Providers',
-        _providerMode,
-        (value) => setState(() => _providerMode = value),
-      ),
-      if (_providerMode == 'selected')
-        TextField(
-          controller: _providers,
-          minLines: 1,
-          maxLines: 4,
-          decoration: InputDecoration(
-            labelText: 'Provider IDs',
-            helperText: 'One ID per line. Maximum 100 IDs; each ID is at most 128 characters.',
-            border: const OutlineInputBorder(),
-            suffixIcon: PopupMenuButton<String>(
-              tooltip: 'Choose configured provider IDs',
-              icon: const Icon(Icons.list_alt),
-              itemBuilder: (_) => widget.providers
-                  .map(
-                    (provider) => PopupMenuItem(
-                      value: provider.id,
-                      child: Text('${provider.name} · ${provider.id}'),
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: _FieldGrid(
+          padding: EdgeInsets.zero,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _scopeMode(
+                  'Providers',
+                  _providerMode,
+                  (value) => setState(() => _providerMode = value),
+                ),
+                if (_providerMode == 'selected') ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _providers,
+                    minLines: 1,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      labelText: 'Provider IDs',
+                      helperText: 'One ID per line. Maximum 100 IDs; each ID is at most 128 characters.',
+                      helperMaxLines: 2,
+                      suffixIcon: PopupMenuButton<String>(
+                        tooltip: 'Choose configured provider IDs',
+                        icon: const Icon(Icons.list_alt),
+                        itemBuilder: (_) => widget.providers
+                            .map(
+                              (provider) => PopupMenuItem(
+                                value: provider.id,
+                                child: Text(
+                                  '${provider.name} · ${provider.id}',
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onSelected: (id) {
+                          final ids = _parseTokens(_providers.text);
+                          if (!ids.contains(id)) ids.add(id);
+                          _providers.text = ids.join('\n');
+                        },
+                      ),
                     ),
-                  )
-                  .toList(),
-              onSelected: (id) {
-                final ids = _parseTokens(_providers.text);
-                if (!ids.contains(id)) ids.add(id);
-                _providers.text = ids.join('\n');
-              },
+                  ),
+                ],
+              ],
             ),
-          ),
-        ),
-      const SizedBox(height: 8),
-      _scopeMode(
-        'Categories',
-        _categoryMode,
-        (value) => setState(() => _categoryMode = value),
-      ),
-      if (_categoryMode == 'selected')
-        TextField(
-          controller: _categories,
-          minLines: 1,
-          maxLines: 4,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: 'Category IDs',
-            helperText: 'Enter non-negative numeric IDs separated by commas or lines. Maximum 100 IDs.',
-            border: const OutlineInputBorder(),
-            suffixIcon: PopupMenuButton<int>(
-              tooltip: 'Choose configured category IDs',
-              icon: const Icon(Icons.list_alt),
-              itemBuilder: (_) {
-                final ids =
-                    widget.providers
-                        .expand((provider) => provider.categories)
-                        .toSet()
-                        .toList()
-                      ..sort();
-                return ids
-                    .map((id) => PopupMenuItem(value: id, child: Text('$id')))
-                    .toList();
-              },
-              onSelected: (id) {
-                final ids = _parseTokens(_categories.text);
-                if (!ids.contains('$id')) ids.add('$id');
-                _categories.text = ids.join('\n');
-              },
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _scopeMode(
+                  'Categories',
+                  _categoryMode,
+                  (value) => setState(() => _categoryMode = value),
+                ),
+                if (_categoryMode == 'selected') ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _categories,
+                    minLines: 1,
+                    maxLines: 4,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Category IDs',
+                      helperText: 'Enter non-negative numeric IDs separated by commas or lines. Maximum 100 IDs.',
+                      helperMaxLines: 2,
+                      suffixIcon: PopupMenuButton<int>(
+                        tooltip: 'Choose configured category IDs',
+                        icon: const Icon(Icons.list_alt),
+                        itemBuilder: (_) {
+                          final ids =
+                              widget.providers
+                                  .expand((provider) => provider.categories)
+                                  .toSet()
+                                  .toList()
+                                ..sort();
+                          return ids
+                              .map(
+                                (id) => PopupMenuItem(
+                                  value: id,
+                                  child: Text('$id'),
+                                ),
+                              )
+                              .toList();
+                        },
+                        onSelected: (id) {
+                          final ids = _parseTokens(_categories.text);
+                          if (!ids.contains('$id')) ids.add('$id');
+                          _categories.text = ids.join('\n');
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ),
-        ),
-      Align(
-        alignment: Alignment.centerRight,
-        child: FilledButton(
-          onPressed: _saving ? null : _save,
-          child: Text(_saving ? 'Saving…' : 'Save discovery scope'),
+          ],
         ),
       ),
     ],
@@ -558,6 +664,7 @@ class _DiscoveryScopeState extends ConsumerState<_DiscoveryScope> {
     ValueChanged<String> onChanged,
   ) => DropdownButtonFormField<String>(
     initialValue: value,
+    isExpanded: true,
     decoration: InputDecoration(labelText: '$label scope'),
     items: const [
       DropdownMenuItem(value: 'all', child: Text('All (no restriction)')),
@@ -616,45 +723,108 @@ class _UserManagement extends ConsumerWidget {
   final List<User> users;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
-    title: 'Users and access',
-    trailing: FilledButton.icon(
-      onPressed: () => _createUser(context, ref),
-      icon: const Icon(Icons.person_add_alt_1),
-      label: const Text('Create user'),
-    ),
-    children: [
-      for (final user in users)
-        ListTile(
-          title: Text(user.displayName),
-          subtitle: Text('${user.username} · ${user.role.name}'),
-          leading: Icon(
-            user.role == UserRoleEnum.administrator
-                ? Icons.admin_panel_settings
-                : Icons.person_outline,
-          ),
-          trailing: Wrap(
-            spacing: 4,
-            children: [
-              Semantics(
-                label: 'Enable ${user.displayName}',
-                child: Switch(
-                  value: user.enabled,
-                  onChanged: (enabled) =>
-                      _editUser(context, ref, user, enabled: enabled),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return _AdminSection(
+      title: 'Users and access',
+      trailing: FilledButton.icon(
+        onPressed: () => _createUser(context, ref),
+        icon: const Icon(Icons.person_add_alt_1),
+        label: const Text('Create user'),
+      ),
+      children: [
+        for (var i = 0; i < users.length; i++) ...[
+          if (i > 0) const Divider(indent: 72, endIndent: 16),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: users[i].role == UserRoleEnum.administrator
+                      ? scheme.primaryContainer
+                      : scheme.secondaryContainer,
+                  foregroundColor: users[i].role == UserRoleEnum.administrator
+                      ? scheme.onPrimaryContainer
+                      : scheme.onSecondaryContainer,
+                  child: Text(
+                    users[i].displayName.trim().isEmpty
+                        ? '?'
+                        : users[i].displayName
+                              .trim()
+                              .characters
+                              .first
+                              .toUpperCase(),
+                  ),
                 ),
-              ),
-              IconButton(
-                tooltip: 'Reset ${user.displayName} password',
-                icon: const Icon(Icons.password),
-                onPressed: () => _resetPassword(context, ref, user),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            users[i].displayName,
+                            style: theme.textTheme.titleSmall,
+                          ),
+                          StatusPill(
+                            dense: true,
+                            tone: users[i].role == UserRoleEnum.administrator
+                                ? PillTone.active
+                                : PillTone.neutral,
+                            label: users[i].role == UserRoleEnum.administrator
+                                ? 'Administrator'
+                                : 'Member',
+                          ),
+                          if (!users[i].enabled)
+                            const StatusPill(
+                              dense: true,
+                              tone: PillTone.warning,
+                              label: 'Disabled',
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '@${users[i].username}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Semantics(
+                  label: 'Enable ${users[i].displayName}',
+                  child: Switch(
+                    value: users[i].enabled,
+                    onChanged: (enabled) =>
+                        _editUser(context, ref, users[i], enabled: enabled),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  tooltip: 'Reset ${users[i].displayName} password',
+                  icon: const Icon(Icons.password),
+                  onPressed: () => _resetPassword(context, ref, users[i]),
+                ),
+              ],
+            ),
           ),
-        ),
-      if (users.isEmpty) const ListTile(title: Text('No users returned.')),
-    ],
-  );
+        ],
+        if (users.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Text('No users returned.'),
+          ),
+      ],
+    );
+  }
 }
 
 class _LibraryManagement extends ConsumerStatefulWidget {
@@ -708,6 +878,8 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final snapshot = widget.snapshot;
     final selected = snapshot.libraries
         .where((l) => l.id == _selectedLibrary)
@@ -731,30 +903,102 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
             'User list is unavailable; access changes are disabled.',
             widget.retry,
           ),
+        if (snapshot.roots.isNotEmpty) const _GroupLabel('Mounted storage'),
         for (final root in snapshot.roots)
-          ListTile(
-            leading: Icon(
-              root.available && root.writable
-                  ? Icons.storage
-                  : Icons.storage_outlined,
-            ),
-            title: Text(root.label),
-            subtitle: Text(
-              '${root.available ? 'Available' : 'Unavailable'} · ${root.writable ? 'Writable' : 'Read-only'}'
-              '${root.freeBytes == null ? '' : ' · ${_bytes(root.freeBytes!, locale: widget.locale)} free'}',
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            child: Row(
+              children: [
+                Icon(
+                  root.available && root.writable
+                      ? Icons.storage
+                      : Icons.storage_outlined,
+                  color: root.available ? scheme.primary : scheme.error,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              root.label,
+                              style: theme.textTheme.titleSmall,
+                            ),
+                          ),
+                          StatusPill(
+                            dense: true,
+                            tone: root.available
+                                ? PillTone.success
+                                : PillTone.error,
+                            label:
+                                '${root.available ? 'Available' : 'Unavailable'} · ${root.writable ? 'Writable' : 'Read-only'}',
+                          ),
+                        ],
+                      ),
+                      if (root.freeBytes != null &&
+                          (root.totalBytes ?? 0) > 0) ...[
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: (1 - root.freeBytes! / root.totalBytes!).clamp(
+                            0.0,
+                            1.0,
+                          ),
+                          minHeight: 6,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                      if (root.freeBytes != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          root.totalBytes == null
+                              ? '${_bytes(root.freeBytes!, locale: widget.locale)} free'
+                              : '${_bytes(root.freeBytes!, locale: widget.locale)} free of ${_bytes(root.totalBytes!, locale: widget.locale)}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
+        const _GroupLabel('Libraries'),
         for (final library in snapshot.libraries)
-          ListTile(
-            title: Text(library.name),
-            subtitle: Text(
-              '${library.enabled ? 'Enabled' : 'Disabled'} · ${library.readOnly ? 'Read-only' : 'Writable'}',
-            ),
-            trailing: Wrap(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 6, 8, 6),
+            child: Row(
               children: [
+                Icon(
+                  library.enabled
+                      ? Icons.video_library_outlined
+                      : Icons.folder_off_outlined,
+                  color: scheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(library.name, style: theme.textTheme.titleSmall),
+                      Text(
+                        '${library.enabled ? 'Enabled' : 'Disabled'} · ${library.readOnly ? 'Read-only' : 'Writable'}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 IconButton(
                   tooltip: 'Manage ${library.name} access',
+                  isSelected: _selectedLibrary == library.id,
                   icon: const Icon(Icons.group_outlined),
+                  selectedIcon: const Icon(Icons.group),
                   onPressed: snapshot.failures.contains('users')
                       ? null
                       : () => _loadGrants(library.id),
@@ -768,29 +1012,51 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
             ),
           ),
         if (snapshot.libraries.isEmpty)
-          const ListTile(title: Text('No libraries are configured.')),
-        if (_selectedLibrary != null) ...[
-          const Divider(),
-          Text(
-            'Access for ${selected?.name ?? 'library'}',
-            style: Theme.of(context).textTheme.titleMedium,
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Text('No libraries are configured.'),
           ),
+        if (_selectedLibrary != null) ...[
+          _GroupLabel('Access for ${selected?.name ?? 'library'}'),
           if (_loadingGrants) const LinearProgressIndicator(),
-          if (_grants != null)
+          if (_grants != null) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text('Member', style: theme.textTheme.labelLarge),
+                  ),
+                  for (final label in const ['Read', 'Download', 'Manage'])
+                    SizedBox(
+                      width: 88,
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.labelLarge,
+                      ),
+                    ),
+                ],
+              ),
+            ),
             for (final user in snapshot.users.where(
               (u) => u.role != UserRoleEnum.administrator,
             ))
               _grantRow(context, ref, user, _grants!),
-          if (_grants != null)
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton(
-                onPressed: () =>
-                    _saveGrants(context, ref, _selectedLibrary!, _grants!),
-                child: const Text('Save access'),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FilledButton(
+                  onPressed: () =>
+                      _saveGrants(context, ref, _selectedLibrary!, _grants!),
+                  child: const Text('Save access'),
+                ),
               ),
             ),
+          ],
         ],
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -829,47 +1095,33 @@ class _LibraryManagementState extends ConsumerState<_LibraryManagement> {
           );
         }
 
-        return Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            SizedBox(width: 140, child: Text(user.displayName)),
+        Widget box(String label, bool value, ValueChanged<bool> changed) =>
             SizedBox(
-              width: 150,
-              child: CheckboxListTile(
-                dense: true,
-                title: const Text('Read'),
-                value: read,
-                onChanged: (v) => setLocal(() {
-                  read = v == true;
-                  store();
-                }),
+              width: 88,
+              child: Center(
+                child: Checkbox(
+                  semanticLabel: '$label for ${user.displayName}',
+                  value: value,
+                  onChanged: (v) => setLocal(() {
+                    changed(v == true);
+                    store();
+                  }),
+                ),
               ),
-            ),
-            SizedBox(
-              width: 170,
-              child: CheckboxListTile(
-                dense: true,
-                title: const Text('Download'),
-                value: download,
-                onChanged: (v) => setLocal(() {
-                  download = v == true;
-                  store();
-                }),
+            );
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(user.displayName, overflow: TextOverflow.ellipsis),
               ),
-            ),
-            SizedBox(
-              width: 150,
-              child: CheckboxListTile(
-                dense: true,
-                title: const Text('Manage'),
-                value: manage,
-                onChanged: (v) => setLocal(() {
-                  manage = v == true;
-                  store();
-                }),
-              ),
-            ),
-          ],
+              box('Read', read, (v) => read = v),
+              box('Download', download, (v) => download = v),
+              box('Manage', manage, (v) => manage = v),
+            ],
+          ),
         );
       },
     );
@@ -881,50 +1133,127 @@ class _HealthAndIntegrations extends ConsumerWidget {
   final _AdminSnapshot snapshot;
   final VoidCallback retry;
   @override
-  Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
-    title: 'Service health and integrations',
-    children: [
-      if (snapshot.failures.contains('health'))
-        _retryNotice('Service health is unavailable.', retry),
-      if (snapshot.failures.contains('integrations'))
-        _retryNotice('Integrations are unavailable.', retry),
-      for (final health in snapshot.health)
-        ListTile(
-          leading: Icon(
-            health.state == ServiceHealthStateEnum.healthy
-                ? Icons.check_circle_outline
-                : Icons.warning_amber,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    PillTone tone(String state) => switch (state) {
+      'healthy' => PillTone.success,
+      'degraded' => PillTone.warning,
+      'unavailable' => PillTone.error,
+      _ => PillTone.neutral,
+    };
+    return _AdminSection(
+      title: 'Service health and integrations',
+      children: [
+        if (snapshot.failures.contains('health'))
+          _retryNotice('Service health is unavailable.', retry),
+        if (snapshot.failures.contains('integrations'))
+          _retryNotice('Integrations are unavailable.', retry),
+        if (snapshot.health.isNotEmpty) const _GroupLabel('Services'),
+        for (final health in snapshot.health)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+            child: Row(
+              children: [
+                Icon(
+                  health.state == ServiceHealthStateEnum.healthy
+                      ? Icons.check_circle_outline
+                      : Icons.warning_amber,
+                  color: health.state == ServiceHealthStateEnum.healthy
+                      ? StatusColors.of(context).success
+                      : scheme.error,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _integrationName(health.service),
+                        style: theme.textTheme.titleSmall,
+                      ),
+                      if (health.detail != null)
+                        Text(
+                          health.detail!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                StatusPill(
+                  dense: true,
+                  tone: tone(health.state.name),
+                  label: _humanize(health.state.name),
+                ),
+              ],
+            ),
           ),
-          title: Text(health.service),
-          subtitle: Text(
-            '${health.state.name}${health.detail == null ? '' : ' · ${health.detail}'}',
+        const _GroupLabel('Integrations'),
+        for (final item in snapshot.integrations)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 8, 10),
+            child: Row(
+              children: [
+                Icon(
+                  item.kind.name == 'prowlarr'
+                      ? Icons.travel_explore_outlined
+                      : Icons.download_outlined,
+                  color: scheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            _integrationName(item.kind.name),
+                            style: theme.textTheme.titleSmall,
+                          ),
+                          StatusPill(
+                            dense: true,
+                            tone: tone(item.health.state.name),
+                            label: _humanize(item.health.state.name),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '${item.baseUrl} · ${item.credentialConfigured ? 'Credential configured' : 'No credential configured'}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Test ${item.kind.name}',
+                  icon: const Icon(Icons.health_and_safety_outlined),
+                  onPressed: () =>
+                      _testIntegration(context, ref, item.kind.name),
+                ),
+                IconButton(
+                  tooltip: 'Configure ${item.kind.name}',
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => _editIntegration(context, ref, item),
+                ),
+              ],
+            ),
           ),
-        ),
-      for (final item in snapshot.integrations)
-        ListTile(
-          title: Text(item.kind.name),
-          subtitle: Text(
-            '${item.health.state.name} · ${item.credentialConfigured ? 'Credential configured' : 'No credential configured'}',
+        if (snapshot.integrations.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Text('No integration status is available.'),
           ),
-          trailing: Wrap(
-            children: [
-              IconButton(
-                tooltip: 'Test ${item.kind.name}',
-                icon: const Icon(Icons.health_and_safety_outlined),
-                onPressed: () => _testIntegration(context, ref, item.kind.name),
-              ),
-              IconButton(
-                tooltip: 'Configure ${item.kind.name}',
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: () => _editIntegration(context, ref, item),
-              ),
-            ],
-          ),
-        ),
-      if (snapshot.integrations.isEmpty)
-        const ListTile(title: Text('No integration status is available.')),
-    ],
-  );
+        const SizedBox(height: 8),
+      ],
+    );
+  }
 }
 
 class _Operations extends ConsumerWidget {
@@ -933,69 +1262,130 @@ class _Operations extends ConsumerWidget {
   final String? locale;
   final VoidCallback retry;
   @override
-  Widget build(BuildContext context, WidgetRef ref) => _AdminSection(
-    title: 'Maintenance and audit',
-    children: [
-      Wrap(
-        spacing: 8,
-        runSpacing: 8,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final names = {
+      for (final user in snapshot.users) user.id: user.displayName,
+    };
+    Widget job(
+      IconData icon,
+      String title,
+      String detail,
+      MaintenanceRequestActionEnum action,
+    ) => Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
+      child: Row(
         children: [
-          OutlinedButton.icon(
-            icon: const Icon(Icons.document_scanner_outlined),
-            label: const Text('Rescan libraries'),
-            onPressed: () => _maintenance(
-              context,
-              ref,
-              MaintenanceRequestActionEnum.rescanLibraries,
+          Icon(icon, color: scheme.onSurfaceVariant),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: theme.textTheme.titleSmall),
+                Text(
+                  detail,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.cleaning_services_outlined),
-            label: const Text('Clean thumbnail cache'),
-            onPressed: () => _maintenance(
-              context,
-              ref,
-              MaintenanceRequestActionEnum.pruneThumbnailCache,
-            ),
-          ),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('Database snapshot'),
-            onPressed: () => _maintenance(
-              context,
-              ref,
-              MaintenanceRequestActionEnum.databaseSnapshot,
-            ),
+          const SizedBox(width: 12),
+          OutlinedButton(
+            onPressed: () => _maintenance(context, ref, action),
+            child: Text(title),
           ),
         ],
       ),
-      const SizedBox(height: 12),
-      const Text('Recent audit activity (server-redacted)'),
-      if (snapshot.failures.contains('audit'))
-        _retryNotice('Audit activity is unavailable.', retry),
-      if (snapshot.audit != null)
-        for (final item in snapshot.audit!.items)
-          ListTile(
-            dense: true,
-            title: Text(item.action),
-            subtitle: Text(
-              '${formatDateTime(item.occurredAt, locale: locale)} · ${item.actorId ?? 'System'}',
+    );
+    return _AdminSection(
+      title: 'Maintenance and audit',
+      children: [
+        job(
+          Icons.document_scanner_outlined,
+          'Rescan libraries',
+          'Queue a scan of every library directory.',
+          MaintenanceRequestActionEnum.rescanLibraries,
+        ),
+        job(
+          Icons.cleaning_services_outlined,
+          'Clean thumbnail cache',
+          'Remove cached thumbnails beyond the configured limit.',
+          MaintenanceRequestActionEnum.pruneThumbnailCache,
+        ),
+        job(
+          Icons.save_outlined,
+          'Database snapshot',
+          'Snapshot the application database (not media or Docker services).',
+          MaintenanceRequestActionEnum.databaseSnapshot,
+        ),
+        const _GroupLabel('Recent audit activity (server-redacted)'),
+        if (snapshot.failures.contains('audit'))
+          _retryNotice('Audit activity is unavailable.', retry),
+        if (snapshot.audit != null)
+          for (final item in snapshot.audit!.items)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+              child: Row(
+                children: [
+                  Icon(
+                    item.outcome == 'success'
+                        ? Icons.check_circle_outline
+                        : Icons.error_outline,
+                    size: 20,
+                    color: item.outcome == 'success'
+                        ? StatusColors.of(context).success
+                        : scheme.error,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      _humanize(item.action),
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                  Text(
+                    '${names[item.actorId] ?? item.actorId ?? 'System'} · ${formatDateTime(item.occurredAt, locale: locale)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
             ),
+        if (snapshot.audit?.truncated == true)
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 4, 20, 8),
+            child: Text('More audit records are available.'),
           ),
-      if (snapshot.audit?.truncated == true)
-        const Text('More audit records are available.'),
-    ],
-  );
+        const SizedBox(height: 8),
+      ],
+    );
+  }
 }
 
-Widget _retryNotice(String text, VoidCallback retry) => Padding(
-  padding: const EdgeInsets.symmetric(vertical: 8),
-  child: Row(
-    children: [
-      Expanded(child: Text(text)),
-      TextButton(onPressed: retry, child: const Text('Retry')),
-    ],
-  ),
+String _humanize(String value) {
+  final spaced = value
+      .replaceAll(RegExp(r'[_.]'), ' ')
+      .replaceAllMapped(RegExp(r'([a-z])([A-Z])'), (m) => '${m[1]} ${m[2]}')
+      .toLowerCase();
+  return spaced.isEmpty ? value : spaced[0].toUpperCase() + spaced.substring(1);
+}
+
+String _integrationName(String kind) => switch (kind) {
+  'prowlarr' => 'Prowlarr',
+  'qbittorrent' => 'qBittorrent',
+  _ => _humanize(kind),
+};
+
+Widget _retryNotice(String text, VoidCallback retry) => NoticeBanner(
+  tone: NoticeTone.warning,
+  message: text,
+  margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+  action: TextButton(onPressed: retry, child: const Text('Retry')),
 );
 
 class _UnavailableSection extends StatelessWidget {
@@ -1006,71 +1396,202 @@ class _UnavailableSection extends StatelessWidget {
   Widget build(BuildContext context) => _AdminSection(
     title: title,
     children: [
-      const Text(
-        "This information could not be loaded. Other administration sections remain available.",
-      ),
-      Align(
-        alignment: Alignment.centerRight,
-        child: TextButton(onPressed: retry, child: const Text("Retry")),
+      NoticeBanner(
+        tone: NoticeTone.warning,
+        message: "This information could not be loaded. Other administration sections remain available.",
+        margin: const EdgeInsets.all(12),
+        action: TextButton(onPressed: retry, child: const Text("Retry")),
       ),
     ],
   );
 }
 
+/// A titled administration area: heading row with an optional action, then
+/// one tonal card holding the section's content.
 class _AdminSection extends StatelessWidget {
   const _AdminSection({
     required this.title,
     required this.children,
     this.trailing,
+    this.subtitle,
   });
   final String title;
+  final String? subtitle;
   final List<Widget> children;
   final Widget? trailing;
   @override
-  Widget build(BuildContext context) => Card(
-    margin: const EdgeInsets.only(bottom: 16),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge,
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                        header: true,
+                        child: Text(title, style: theme.textTheme.titleLarge),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-              ?trailing,
-            ],
+                if (trailing != null) ...[const SizedBox(width: 12), trailing!],
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          ...children,
+          Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _GroupLabel extends StatelessWidget {
+  const _GroupLabel(this.label);
+  final String label;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 4),
+      child: Text(
+        label,
+        style: theme.textTheme.labelLarge?.copyWith(
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+/// Lays fields out in two columns on wide cards and one column on narrow.
+class _FieldGrid extends StatelessWidget {
+  const _FieldGrid({
+    required this.children,
+    this.padding = const EdgeInsets.fromLTRB(20, 8, 20, 4),
+  });
+  final List<Widget> children;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: padding,
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 640 ? 2 : 1;
+        final width = (constraints.maxWidth - (columns - 1) * 16) / columns;
+        return Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          children: [
+            for (final child in children) SizedBox(width: width, child: child),
+          ],
+        );
+      },
     ),
   );
+}
+
+/// A field that saves explicitly (Enter or the check button) so partially
+/// typed values are never sent to the server.
+class _SaveField extends StatefulWidget {
+  const _SaveField({
+    required this.label,
+    required this.value,
+    required this.save,
+    this.suffix,
+    this.hint,
+  });
+  final String label;
+  final String value;
+  final ValueChanged<String> save;
+  final String? suffix;
+  final String? hint;
+
+  @override
+  State<_SaveField> createState() => _SaveFieldState();
+}
+
+class _SaveFieldState extends State<_SaveField> {
+  late final _controller = TextEditingController(text: widget.value);
+
+  @override
+  void didUpdateWidget(covariant _SaveField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) _controller.text = widget.value;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<TextEditingValue>(
+        valueListenable: _controller,
+        builder: (context, current, _) => TextField(
+          controller: _controller,
+          maxLength: 200,
+          decoration: InputDecoration(
+            labelText: widget.label,
+            // Guidance sits under the field so it never reads like a value.
+            helperText: widget.hint,
+            suffixText: widget.suffix,
+            counterText: '',
+            suffixIcon: current.text == widget.value
+                ? null
+                : IconButton(
+                    tooltip: 'Save ${widget.label}',
+                    icon: const Icon(Icons.check),
+                    onPressed: () => widget.save(_controller.text),
+                  ),
+          ),
+          onSubmitted: widget.save,
+        ),
+      );
 }
 
 Widget _saveText(
   BuildContext context,
   String label,
   String value,
-  ValueChanged<String> save,
-) => Padding(
-  padding: const EdgeInsets.symmetric(vertical: 4),
-  child: TextFormField(
-    key: ValueKey('$label:$value'),
-    initialValue: value,
-    maxLength: 200,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-    onFieldSubmitted: save,
-  ),
+  ValueChanged<String> save, {
+  String? suffix,
+  String? hint,
+}) => _SaveField(
+  label: label,
+  value: value,
+  save: save,
+  suffix: suffix,
+  hint: hint,
 );
+
+/// Shows stored fractional unit values without trailing zeros.
+String _unitText(int value, int multiplier) =>
+    (value / multiplier).toStringAsFixed(9).replaceFirst(RegExp(r'\.?0+$'), '');
 
 Widget _saveOptionalUnit(
   BuildContext context,
@@ -1078,11 +1599,13 @@ Widget _saveOptionalUnit(
   int? value,
   int multiplier,
   int max,
-  ValueChanged<int?> save,
-) => _saveText(
+  ValueChanged<int?> save, {
+  String? suffix,
+  String? hint,
+}) => _saveText(
   context,
   label,
-  value == null ? '' : (value / multiplier).toStringAsFixed(9),
+  value == null ? '' : _unitText(value, multiplier),
   (raw) {
     final text = raw.trim();
     final parsed = text.isEmpty ? null : double.tryParse(text);
@@ -1092,6 +1615,8 @@ Widget _saveOptionalUnit(
     }
     save(parsed == null ? null : (parsed * multiplier).round());
   },
+  suffix: suffix,
+  hint: hint,
 );
 
 Widget _saveUnit(
@@ -1100,15 +1625,24 @@ Widget _saveUnit(
   int value,
   int multiplier,
   int max,
-  ValueChanged<int> save,
-) => _saveText(context, label, (value / multiplier).toStringAsFixed(9), (raw) {
-  final parsed = double.tryParse(raw.trim());
-  if (parsed == null || !parsed.isFinite) {
-    _toast(context, '$label must be a number.');
-    return;
-  }
-  save((parsed * multiplier).round());
-});
+  ValueChanged<int> save, {
+  String? suffix,
+  String? hint,
+}) => _saveText(
+  context,
+  label,
+  _unitText(value, multiplier),
+  (raw) {
+    final parsed = double.tryParse(raw.trim());
+    if (parsed == null || !parsed.isFinite) {
+      _toast(context, '$label must be a number.');
+      return;
+    }
+    save((parsed * multiplier).round());
+  },
+  suffix: suffix,
+  hint: hint,
+);
 
 Widget _saveInt(
   BuildContext context,
@@ -1116,15 +1650,24 @@ Widget _saveInt(
   int value,
   int min,
   int max,
-  ValueChanged<int> save,
-) => _saveText(context, label, '$value', (raw) {
-  final parsed = int.tryParse(raw.trim());
-  if (parsed == null) {
-    _toast(context, '$label must be a whole number.');
-    return;
-  }
-  save(parsed);
-});
+  ValueChanged<int> save, {
+  String? suffix,
+  String? hint,
+}) => _saveText(
+  context,
+  label,
+  '$value',
+  (raw) {
+    final parsed = int.tryParse(raw.trim());
+    if (parsed == null) {
+      _toast(context, '$label must be a whole number.');
+      return;
+    }
+    save(parsed);
+  },
+  suffix: suffix,
+  hint: hint,
+);
 
 Widget _saveDouble(
   BuildContext context,
@@ -1132,45 +1675,72 @@ Widget _saveDouble(
   double value,
   double min,
   double max,
-  ValueChanged<double> save,
-) => _saveText(context, label, '$value', (raw) {
-  final parsed = double.tryParse(raw.trim());
-  if (parsed == null || !parsed.isFinite) {
-    _toast(context, '$label must be a number.');
-    return;
-  }
-  save(parsed);
-});
+  ValueChanged<double> save, {
+  String? suffix,
+  String? hint,
+}) => _saveText(
+  context,
+  label,
+  '$value',
+  (raw) {
+    final parsed = double.tryParse(raw.trim());
+    if (parsed == null || !parsed.isFinite) {
+      _toast(context, '$label must be a number.');
+      return;
+    }
+    save(parsed);
+  },
+  suffix: suffix,
+  hint: hint,
+);
 
 Widget _saveNullableInt(
   BuildContext context,
   String label,
   int? value,
-  ValueChanged<int?> save,
-) => _saveText(context, label, value?.toString() ?? '', (raw) {
-  final text = raw.trim();
-  final parsed = text.isEmpty ? null : int.tryParse(text);
-  if (text.isNotEmpty && parsed == null) {
-    _toast(context, '$label must be a whole number, or blank.');
-    return;
-  }
-  save(parsed);
-});
+  ValueChanged<int?> save, {
+  String? suffix,
+  String? hint,
+}) => _saveText(
+  context,
+  label,
+  value?.toString() ?? '',
+  (raw) {
+    final text = raw.trim();
+    final parsed = text.isEmpty ? null : int.tryParse(text);
+    if (text.isNotEmpty && parsed == null) {
+      _toast(context, '$label must be a whole number, or blank.');
+      return;
+    }
+    save(parsed);
+  },
+  suffix: suffix,
+  hint: hint,
+);
 
 Widget _saveNullableDouble(
   BuildContext context,
   String label,
   double? value,
-  ValueChanged<double?> save,
-) => _saveText(context, label, value?.toString() ?? '', (raw) {
-  final text = raw.trim();
-  final parsed = text.isEmpty ? null : double.tryParse(text);
-  if (text.isNotEmpty && (parsed == null || !parsed.isFinite)) {
-    _toast(context, '$label must be a number, or blank.');
-    return;
-  }
-  save(parsed);
-});
+  ValueChanged<double?> save, {
+  String? suffix,
+  String? hint,
+}) => _saveText(
+  context,
+  label,
+  value?.toString() ?? '',
+  (raw) {
+    final text = raw.trim();
+    final parsed = text.isEmpty ? null : double.tryParse(text);
+    if (text.isNotEmpty && (parsed == null || !parsed.isFinite)) {
+      _toast(context, '$label must be a number, or blank.');
+      return;
+    }
+    save(parsed);
+  },
+  suffix: suffix,
+  hint: hint,
+);
 
 Future<void> _putSettings(BuildContext context, AdminSettings settings) async {
   final container = ProviderScope.containerOf(context, listen: false);
@@ -1257,10 +1827,7 @@ class _CreateUserDialogState extends ConsumerState<_CreateUserDialog> {
       Navigator.pop(context);
     } catch (error) {
       if (mounted) {
-        setState(
-          () => _error =
-              clientError(error),
-        );
+        setState(() => _error = clientError(error));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -1621,10 +2188,7 @@ Future<void> _saveGrants(
     }
   } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(
-        context,
-        clientError(error),
-      );
+      _toast(context, clientError(error));
     }
   }
 }
@@ -1649,10 +2213,7 @@ Future<void> _testIntegration(
     if (_sameAdminSession(ref, session)) ref.invalidate(_adminSnapshotProvider);
   } catch (error) {
     if (context.mounted && _sameAdminSession(ref, session)) {
-      _toast(
-        context,
-        clientError(error),
-      );
+      _toast(context, clientError(error));
     }
   }
 }

@@ -234,6 +234,71 @@ void main() {
   );
 
   testWidgets(
+    'photo viewer arrow keys browse with wrap-around and Space toggles slideshow',
+    (tester) async {
+      final bytes = File('test/fixtures/exif_orientation_6.jpg')
+          .readAsBytesSync();
+      final imageRequests = <String>[];
+      final adapter = _InteractionAdapter((options) {
+        final components = options.path.split('/');
+        final image = components.last == 'image';
+        final id = image ? components[components.length - 2] : components.last;
+        if (image) {
+          imageRequests.add(id);
+          return ResponseBody.fromBytes(
+            bytes,
+            200,
+            headers: {
+              Headers.contentTypeHeader: ['image/jpeg'],
+            },
+          );
+        }
+        return _json({
+          'id': id,
+          'libraryId': 'library-1',
+          'entryId': 'entry-$id',
+          'name': '$id.jpg',
+          'kind': 'photo',
+          'mimeType': 'image/jpeg',
+          'sizeBytes': bytes.length,
+          'complete': true,
+          'probeState': 'ready',
+          'version': 1,
+        });
+      });
+      await tester.pumpWidget(
+        _app(
+          const PhotoViewerScreen(
+            mediaId: 'a',
+            adjacentMediaIds: ['a', 'b', 'c'],
+          ),
+          adapter,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('1 / 3'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(find.text('b.jpg'), findsOneWidget);
+      expect(find.text('2 / 3'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(find.text('c.jpg'), findsOneWidget);
+      expect(find.text('3 / 3'), findsOneWidget);
+      expect(imageRequests.last, 'c');
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(find.byTooltip('Stop slideshow'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+      expect(find.byTooltip('Start slideshow'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+
+  testWidgets(
     'quiet download refresh reconciles the loaded window without rewinding pagination',
     (tester) async {
       final cursors = <Object?>[];

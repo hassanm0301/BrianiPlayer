@@ -37,8 +37,11 @@ void main() {
     await tester.pumpWidget(_app(const DiscoverScreen(), adapter));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Add magnet'));
+    await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Magnet link…'));
+    await tester.pumpAndSettle();
+    expect(find.text('Add magnet link'), findsOneWidget);
     await tester.enterText(find.byType(TextField).last, 'magnet:?xt=test');
     await tester.tap(find.text('Cancel').last);
 

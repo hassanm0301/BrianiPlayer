@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:briani_api/briani_api.dart' hide Provider;
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../../app/theme.dart';
 import '../../core/preferences/preferences_providers.dart';
 import '../../core/playback/playback_adapter.dart';
 import '../../core/playback/external_player.dart';
@@ -20,6 +22,7 @@ import '../../core/input/remote_navigation.dart';
 import '../../core/input/tv_auto_hide_controls.dart';
 import '../../core/widgets/playback_seek_bar.dart';
 import '../../core/platform/platform_capabilities.dart';
+import 'immersive.dart';
 
 final playbackAdapterFactoryProvider = Provider<PlaybackAdapter Function()>(
   (ref) => () {
@@ -49,7 +52,7 @@ class PlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayerScreenState extends ConsumerState<PlayerScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, AutoHideChrome {
   PlaybackAdapter? _player;
   PlaybackSession? _session;
   BrianiApi? _api;
@@ -76,6 +79,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Duration _lastPosition = Duration.zero;
   String? _progressMediaId;
   bool _foreground = true, _audioAllowed = true, _preferExternal = false;
+  // Presentation state only.
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _pageFocus = FocusNode(debugLabel: 'player', skipTraversal: true);
+  bool _television = false;
+  bool? _observedMayHide;
+  double? _volumeBeforeMute;
+
+  /// A context below the player's dark theme, so dialogs and sheets opened
+  /// from playback match it.
+  BuildContext get _themed => _scaffoldKey.currentContext ?? context;
+
   @override
   void initState() {
     super.initState();
@@ -115,20 +129,25 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _preferExternal = mode == UserPreferencesPlaybackModeEnum.external_;
       if (mode == UserPreferencesPlaybackModeEnum.ask) {
         final external = await showDialog<bool>(
-          context: context,
+          context: _themed,
           builder: (context) => AlertDialog(
+            scrollable: true,
+            icon: const Icon(Icons.play_circle_outline),
             title: const Text('Choose playback'),
             content: const Text(
-              'Use the embedded player or choose an installed video application.',
+              'Play in the built-in player, or open the file in another video app on this device.',
             ),
             actions: [
               TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Play with…'),
+              ),
+              // The built-in player is the default: it is the primary
+              // action and takes initial focus, so Enter/Select plays it.
+              FilledButton(
+                autofocus: true,
                 onPressed: () => Navigator.pop(context, false),
                 child: const Text('Embedded player'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Play with'),
               ),
             ],
           ),
@@ -174,11 +193,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           final resume = policy == UserPreferencesResumePolicyEnum.always
               ? true
               : await showDialog<bool>(
-                  context: context,
+                  context: _themed,
                   builder: (context) => AlertDialog(
+                    scrollable: true,
+                    icon: const Icon(Icons.history),
                     title: const Text('Resume playback?'),
                     content: Text(
-                      'Continue from ${_time(Duration(milliseconds: progress.positionMs))}?',
+                      'You stopped at ${_time(Duration(milliseconds: progress.positionMs))}. Continue from there, or start again.',
                     ),
                     actions: [
                       TextButton(
@@ -441,7 +462,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   void _notice(String value) {
     if (mounted) {
-      ScaffoldMessenger.of(context)
+      ScaffoldMessenger.of(_themed)
           .showSnackBar(SnackBar(content: Text(value)));
     }
   }
@@ -493,23 +514,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         }
         final preferred = preferences.preferredPlayer;
         final chosen = await showDialog<AndroidVideoHandler>(
-          context: context,
+          context: _themed,
           builder: (context) => SimpleDialog(
             title: const Text('Play with'),
             children: [
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'External playback does not report progress automatically.',
-                ),
-              ),
               for (final handler in handlers)
-                SimpleDialogOption(
+                _ChooserOption(
+                  icon: Icons.smart_display_outlined,
                   onPressed: () => Navigator.pop(context, handler),
-                  child: Text(
-                    '${handler.name}${handler.package == preferred ? ' (preferred)' : ''}',
-                  ),
+                  label:
+                      '${handler.name}${handler.package == preferred ? ' (preferred)' : ''}',
                 ),
+              const _ChooserNote(
+                'External playback does not report progress automatically.',
+              ),
             ],
           ),
         );
@@ -549,21 +567,25 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           );
     final choices = service.installed();
     final chosen = await showDialog<ExternalPlayerProfile>(
-      context: context,
+      context: _themed,
       builder: (context) => SimpleDialog(
         title: const Text('Play with'),
         children: [
           if (preferred != null)
-            SimpleDialogOption(
+            _ChooserOption(
+              icon: Icons.star_outline,
               onPressed: () => Navigator.pop(context, preferred),
-              child: Text('Preferred: ${preferred.name}'),
+              label: 'Preferred: ${preferred.name}',
             ),
           for (final choice in choices)
-            SimpleDialogOption(
+            _ChooserOption(
+              icon: Icons.smart_display_outlined,
               onPressed: () => Navigator.pop(context, choice),
-              child: Text(choice.name),
+              label: choice.name,
             ),
-          SimpleDialogOption(
+          _ChooserOption(
+            icon: Icons.folder_open_outlined,
+            label: 'Choose installed player…',
             onPressed: () async {
               final result = await FilePicker.pickFiles(
                 type: Platform.isWindows ? FileType.custom : FileType.any,
@@ -581,13 +603,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 );
               }
             },
-            child: const Text('Choose installed player…'),
           ),
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'External players may handle buffering differently. Playback progress is not reported automatically.',
-            ),
+          const _ChooserNote(
+            'External players may handle buffering differently. Playback progress is not reported automatically.',
           ),
         ],
       ),
@@ -621,8 +639,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Future<void> _copyUrl() async {
     if (_source == null) return;
     final copy = await showDialog<bool>(
-      context: context,
+      context: _themed,
       builder: (context) => AlertDialog(
+        scrollable: true,
+        icon: const Icon(Icons.link),
         title: const Text('Copy playback URL?'),
         content: const Text(
           'Anyone holding this URL can play this file until the session expires or is revoked. It grants access only to this file.',
@@ -694,122 +714,308 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
     }
     WidgetsBinding.instance.removeObserver(this);
+    _pageFocus.dispose();
     super.dispose();
+  }
+
+  // ---------------------------------------------------------------------
+  // Presentation
+  // ---------------------------------------------------------------------
+
+  static String _time(Duration d) => formatPlaybackTime(d);
+
+  /// Desktop and phone controls hide after a quiet period only while video
+  /// is actually playing; TV uses [TvAutoHideControls] instead.
+  @override
+  bool get chromeMayHide =>
+      !_television &&
+      _state.playing &&
+      !_state.buffering &&
+      !_busy &&
+      _error == null;
+
+  Future<void> _seekBy(Duration delta) {
+    final s = _state;
+    return _control(
+      () => _player!.seek(
+        Duration(
+          milliseconds: (s.position + delta).inMilliseconds.clamp(
+            0,
+            s.duration.inMilliseconds > 0
+                ? s.duration.inMilliseconds
+                : 0x7fffffff,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _setVolume(double value) =>
+      _control(() => _player!.setVolume(value.clamp(0, 100).toDouble()));
+
+  Future<void> _toggleMute() {
+    final volume = _state.volume;
+    if (volume > 0) {
+      _volumeBeforeMute = volume;
+      return _setVolume(0);
+    }
+    return _setVolume(_volumeBeforeMute ?? 100);
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is KeyUpEvent) return KeyEventResult.ignored;
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.goBack ||
+        key == LogicalKeyboardKey.browserBack) {
+      return KeyEventResult.ignored;
+    }
+    showChrome();
+    // Keys that also operate a focused control (Space, arrows) act on the
+    // player only while the player surface itself has focus.
+    final surface = node.hasPrimaryFocus;
+    final repeat = event is KeyRepeatEvent;
+    final letters =
+        ref
+            .read(userPreferencesProvider)
+            .asData
+            ?.value
+            .keyboardShortcutPreset !=
+        UserPreferencesKeyboardShortcutPresetEnum.minimal;
+    bool handled(void Function() action) {
+      action();
+      return true;
+    }
+
+    final done = switch (key) {
+      LogicalKeyboardKey.space when surface && !repeat => handled(_playPause),
+      LogicalKeyboardKey.keyK when letters && !repeat => handled(_playPause),
+      LogicalKeyboardKey.arrowLeft when surface => handled(
+        () => _seekBy(const Duration(seconds: -10)),
+      ),
+      LogicalKeyboardKey.keyJ when letters => handled(
+        () => _seekBy(const Duration(seconds: -10)),
+      ),
+      LogicalKeyboardKey.arrowRight when surface => handled(
+        () => _seekBy(const Duration(seconds: 10)),
+      ),
+      LogicalKeyboardKey.keyL when letters => handled(
+        () => _seekBy(const Duration(seconds: 10)),
+      ),
+      LogicalKeyboardKey.arrowUp when surface => handled(
+        () => _setVolume(_state.volume + 5),
+      ),
+      LogicalKeyboardKey.arrowDown when surface => handled(
+        () => _setVolume(_state.volume - 5),
+      ),
+      LogicalKeyboardKey.keyM when letters && !repeat => handled(_toggleMute),
+      LogicalKeyboardKey.keyF when letters && !repeat => handled(
+        _toggleFullscreen,
+      ),
+      LogicalKeyboardKey.escape when _fullscreen && !repeat => handled(
+        _toggleFullscreen,
+      ),
+      _ => false,
+    };
+    return done ? KeyEventResult.handled : KeyEventResult.ignored;
+  }
+
+  void _onSurfaceTap(PointerDeviceKind? kind) {
+    _pageFocus.requestFocus();
+    if (kind == PointerDeviceKind.mouse) {
+      showChrome();
+      if (_player != null && _error == null) _playPause();
+    } else {
+      toggleChrome();
+    }
   }
 
   Future<void> _tvTracks() => _controlsPanel(
     title: 'Tracks',
-    builder: (context) => ListView(
-      shrinkWrap: true,
-      children: [
-        for (final track in _state.audio)
-          ListTile(
-            title: Text('Audio: ${track.label}'),
-            onTap: () {
-              Navigator.pop(context);
-              _control(() => _player!.selectAudioTrack(track.id));
-            },
-          ),
-        for (final track in _state.subtitles)
-          ListTile(
-            title: Text('Subtitles: ${track.label}'),
-            onTap: () {
-              Navigator.pop(context);
-              _control(() => _player!.selectSubtitleTrack(track.id));
-            },
-          ),
-        for (final sidecar in _session?.sidecars ?? <PlaybackSidecar>[])
-          ListTile(
-            title: Text(sidecar.name),
-            onTap: () {
-              Navigator.pop(context);
-              _control(
-                () => _player!.selectSidecar(
-                  sidecar.url,
-                  title: sidecar.name,
-                  language: sidecar.language,
-                ),
-              );
-            },
-          ),
-      ],
-    ),
+    builder: (context) {
+      final s = _state;
+      final sidecars = _session?.sidecars ?? <PlaybackSidecar>[];
+      if (s.audio.isEmpty && s.subtitles.isEmpty && sidecars.isEmpty) {
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(24, 8, 24, 24),
+          child: Text('No audio or subtitle tracks are reported yet.'),
+        );
+      }
+      return ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(bottom: 16),
+        children: [
+          if (s.audio.isNotEmpty) ...[
+            const _PanelSection('Audio'),
+            for (final track in s.audio)
+              _ChoiceRow(
+                label: track.label,
+                selected: track.id == s.audioId,
+                onTap: () {
+                  Navigator.pop(context);
+                  _control(() => _player!.selectAudioTrack(track.id));
+                },
+              ),
+          ],
+          if (s.subtitles.isNotEmpty) ...[
+            const _PanelSection('Subtitles'),
+            for (final track in s.subtitles)
+              _ChoiceRow(
+                label: track.label,
+                selected: track.id == s.subtitleId,
+                onTap: () {
+                  Navigator.pop(context);
+                  _control(() => _player!.selectSubtitleTrack(track.id));
+                },
+              ),
+          ],
+          if (sidecars.isNotEmpty) ...[
+            const _PanelSection('Subtitle files'),
+            for (final sidecar in sidecars)
+              _ChoiceRow(
+                label: sidecar.name,
+                detail: sidecar.language,
+                selected: false,
+                onTap: () {
+                  Navigator.pop(context);
+                  _control(
+                    () => _player!.selectSidecar(
+                      sidecar.url,
+                      title: sidecar.name,
+                      language: sidecar.language,
+                    ),
+                  );
+                },
+              ),
+          ],
+        ],
+      );
+    },
   );
+
   Future<void> _tvOptions() => _controlsPanel(
     title: 'Playback options',
-    builder: (context) => ListView(
-      shrinkWrap: true,
-      children: [
-        for (final speed in [.5, .75, 1.0, 1.25, 1.5, 2.0, 3.0])
-          ListTile(
-            title: Text('Speed $speed×'),
-            onTap: () {
-              Navigator.pop(context);
-              _control(() => _player!.setSpeed(speed));
-            },
-          ),
-        for (final volume in [0.0, 25.0, 50.0, 75.0, 100.0])
-          ListTile(
-            title: Text('Volume ${volume.round()}%'),
-            onTap: () {
-              Navigator.pop(context);
-              _control(() => _player!.setVolume(volume));
-            },
-          ),
-        for (final entry in {
-          'Fit': BoxFit.contain,
-          'Fill': BoxFit.cover,
-          'Stretch': BoxFit.fill,
-        }.entries)
-          ListTile(
-            title: Text(entry.key),
-            onTap: () {
-              Navigator.pop(context);
-              setState(() => _fit = entry.value);
-            },
-          ),
-        for (final ms in [-2000, -1000, -500, 0, 500, 1000, 2000])
-          ListTile(
-            title: Text('Subtitle delay ${ms / 1000}s'),
-            onTap: () {
-              Navigator.pop(context);
-              _control(
-                () => _player!.setSubtitleDelay(Duration(milliseconds: ms)),
-              );
-            },
-          ),
-        ListTile(
-          title: Text(_fullscreen ? 'Exit fullscreen' : 'Fullscreen'),
-          onTap: () {
-            Navigator.pop(context);
-            _toggleFullscreen();
-          },
-        ),
-        ListTile(
-          title: const Text('Play with'),
-          onTap: _source == null
-              ? null
-              : () {
+    builder: (context) {
+      final s = _state;
+      Widget chips<T>(
+        List<(String, T)> options, {
+        required bool Function(T value) selected,
+        required void Function(T value) onSelected,
+      }) => Padding(
+        padding: EdgeInsets.fromLTRB(_panelInset(context), 0, 20, 0),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final (label, value) in options)
+              ChoiceChip(
+                label: Text(label),
+                selected: selected(value),
+                onSelected: (_) {
                   Navigator.pop(context);
-                  _external();
+                  onSelected(value);
                 },
+              ),
+          ],
         ),
-        ListTile(
-          title: const Text('Copy playback URL'),
-          onTap: _source == null
-              ? null
-              : () {
-                  Navigator.pop(context);
-                  _copyUrl();
-                },
-        ),
-      ],
-    ),
+      );
+      return ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(bottom: 16),
+        children: [
+          const _PanelSection('Speed'),
+          chips<double>(
+            [
+              for (final speed in [.5, .75, 1.0, 1.25, 1.5, 2.0, 3.0])
+                (speed == 1 ? 'Normal' : '${_number(speed)}×', speed),
+            ],
+            selected: (speed) => (s.speed - speed).abs() < .001,
+            onSelected: (speed) => _control(() => _player!.setSpeed(speed)),
+          ),
+          const _PanelSection('Aspect'),
+          chips<BoxFit>(
+            const [
+              ('Fit', BoxFit.contain),
+              ('Fill', BoxFit.cover),
+              ('Stretch', BoxFit.fill),
+            ],
+            selected: (fit) => fit == _fit,
+            onSelected: (fit) => setState(() => _fit = fit),
+          ),
+          const _PanelSection('Subtitle delay'),
+          chips<int>(
+            [
+              for (final ms in [-2000, -1000, -500, 0, 500, 1000, 2000])
+                (
+                  ms == 0
+                      ? 'None'
+                      : '${ms > 0 ? '+' : '−'}${_number(ms.abs() / 1000)} s',
+                  ms,
+                ),
+            ],
+            selected: (_) => false,
+            onSelected: (ms) => _control(
+              () => _player!.setSubtitleDelay(Duration(milliseconds: ms)),
+            ),
+          ),
+          const _PanelSection('Volume'),
+          chips<double>(
+            [
+              for (final volume in [0.0, 25.0, 50.0, 75.0, 100.0])
+                (volume == 0 ? 'Mute' : '${volume.round()}%', volume),
+            ],
+            selected: (volume) => (s.volume - volume).abs() < .5,
+            onSelected: (volume) => _control(() => _player!.setVolume(volume)),
+          ),
+          const SizedBox(height: 12),
+          Divider(indent: _panelInset(context), endIndent: 20),
+          const SizedBox(height: 4),
+          ListTile(
+            leading: Icon(
+              _fullscreen
+                  ? Icons.fullscreen_exit_rounded
+                  : Icons.fullscreen_rounded,
+            ),
+            title: Text(_fullscreen ? 'Exit fullscreen' : 'Fullscreen'),
+            onTap: () {
+              Navigator.pop(context);
+              _toggleFullscreen();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.open_in_new),
+            title: const Text('Play with'),
+            onTap: _source == null
+                ? null
+                : () {
+                    Navigator.pop(context);
+                    _external();
+                  },
+          ),
+          ListTile(
+            leading: const Icon(Icons.link),
+            title: const Text('Copy playback URL'),
+            onTap: _source == null
+                ? null
+                : () {
+                    Navigator.pop(context);
+                    _copyUrl();
+                  },
+          ),
+        ],
+      );
+    },
   );
+
+  static String _number(double value) =>
+      value == value.roundToDouble() ? value.toStringAsFixed(0) : '$value';
+
+  /// TV gets a focus-preserving panel, wide windows a side sheet and phones
+  /// a bottom sheet.
   Future<void> _controlsPanel({
     required String title,
     required WidgetBuilder builder,
   }) {
+    final context = _themed;
     if (ref.read(deviceCapabilitiesProvider).value?.television == true) {
       return TvFocusPanel.show<void>(
         context: context,
@@ -817,31 +1023,99 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         builder: builder,
       );
     }
+    Widget header(BuildContext context) => Padding(
+      padding: EdgeInsets.fromLTRB(_panelInset(context), 4, 8, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+          ),
+          IconButton(
+            tooltip: 'Close $title',
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.close),
+          ),
+        ],
+      ),
+    );
+    if (MediaQuery.sizeOf(context).width >= 840) {
+      // General dialogs do not capture the caller's theme like showDialog.
+      final theme = Theme.of(context);
+      return showGeneralDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: 'Close $title',
+        barrierColor: Colors.black26,
+        transitionDuration: const Duration(milliseconds: 220),
+        pageBuilder: (_, _, _) => Theme(
+          data: theme,
+          child: Builder(
+            builder: (context) => Align(
+              alignment: Alignment.centerRight,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Material(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(24),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      width: 380,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 12),
+                          header(context),
+                          Flexible(child: builder(context)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        transitionBuilder: (context, animation, _, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: SlideTransition(
+              position: Tween(
+                begin: const Offset(.08, 0),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
+            ),
+          );
+        },
+      );
+    }
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => SafeArea(
-        child: SizedBox(
-          height: MediaQuery.sizeOf(context).height * .7,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              Expanded(child: builder(context)),
-            ],
-          ),
+      useSafeArea: true,
+      builder: (context) => ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * .75,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            header(context),
+            Flexible(child: builder(context)),
+          ],
         ),
       ),
     );
   }
 
   Widget _video() {
-    if (_player == null) return const CircularProgressIndicator();
+    if (_player == null) return const SizedBox.shrink();
     if (_videoView == null ||
         !identical(_viewPlayer, _player) ||
         _viewFit != _fit) {
@@ -852,8 +1126,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return _videoView!;
   }
 
-  static String _time(Duration d) =>
-      '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
   @override
   Widget build(BuildContext context) {
     ref.listen(clientSessionProvider, (old, current) {
@@ -861,8 +1133,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
     final television =
         ref.watch(deviceCapabilitiesProvider).value?.television == true;
+    _television = television;
+    final preferences = ref.watch(userPreferencesProvider).asData?.value;
+    final mayHide = chromeMayHide;
+    if (mayHide != _observedMayHide) {
+      _observedMayHide = mayHide;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) chromeConditionsChanged();
+      });
+    }
     final s = _state;
-    final max = s.duration.inMilliseconds.toDouble();
     return PopScope(
       canPop: !_fullscreen,
       onPopInvokedWithResult: (didPop, result) {
@@ -873,150 +1153,509 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         onMediaPlayPause: () => _playPause(),
         onMediaPlay: () => _playPause(play: true),
         onMediaPause: () => _playPause(play: false),
-        child: Scaffold(
-          appBar: _fullscreen
-              ? null
-              : AppBar(
-                  title: Text(_session?.fileName ?? 'Playback'),
-                  actions: [
-                    IconButton(
-                      tooltip: 'Play with',
-                      onPressed: _source == null ? null : _external,
-                      icon: const Icon(Icons.open_in_new),
+        child: Theme(
+          data: immersiveTheme(
+            seed: accentSeed(preferences?.accentPreset),
+            density: Theme.of(context).visualDensity,
+            television: television,
+          ),
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.light,
+            child: Scaffold(
+              key: _scaffoldKey,
+              backgroundColor: Colors.black,
+              body: Builder(
+                builder: (context) => television
+                    ? _televisionLayout(context, s)
+                    : _overlayLayout(s),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _televisionLayout(BuildContext context, PlaybackState s) => Stack(
+    fit: StackFit.expand,
+    children: [
+      Center(child: _video()),
+      _centerStatus(context, s),
+      Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: TvAutoHideControls(
+          playing: s.playing,
+          child: TvPlayerControls(
+            playing: s.playing,
+            position: s.position,
+            duration: s.duration,
+            title: _session?.fileName,
+            onPlayPause: () => _playPause(),
+            onSeekBack: () => _seekBy(const Duration(seconds: -10)),
+            onSeekForward: () => _seekBy(const Duration(seconds: 10)),
+            onTracks: () => _tvTracks(),
+            onOptions: () => _tvOptions(),
+          ),
+        ),
+      ),
+    ],
+  );
+
+  Widget _overlayLayout(PlaybackState s) => LayoutBuilder(
+    builder: (context, constraints) {
+      final compact = constraints.maxWidth < 600;
+      return Focus(
+        focusNode: _pageFocus,
+        autofocus: true,
+        onKeyEvent: _onKey,
+        child: MouseRegion(
+          onHover: (_) => showChrome(),
+          cursor: chromeVisible || !pointerPlatform
+              ? MouseCursor.defer
+              : SystemMouseCursors.none,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapUp: (details) => _onSurfaceTap(details.kind),
+                onDoubleTap: pointerPlatform ? _toggleFullscreen : null,
+                child: Center(child: _video()),
+              ),
+              _centerStatus(context, s),
+              _chrome(Alignment.topCenter, _topBar(context)),
+              _chrome(
+                Alignment.bottomCenter,
+                _bottomBar(context, s, compact: compact),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  /// Wraps overlay chrome so it fades as one. Hidden controls ignore touch
+  /// (the first tap reveals them); a mouse reveals them by hovering.
+  Widget _chrome(Alignment alignment, Widget child) => Align(
+    alignment: alignment,
+    child: IgnorePointer(
+      ignoring: !chromeVisible && !pointerPlatform,
+      child: AnimatedOpacity(
+        opacity: chromeVisible ? 1 : 0,
+        duration: const Duration(milliseconds: 200),
+        child: Listener(
+          onPointerDown: (_) => holdChrome(true),
+          onPointerUp: (_) => holdChrome(false),
+          onPointerCancel: (_) => holdChrome(false),
+          child: MouseRegion(
+            onEnter: (_) => hoverChrome(true),
+            onExit: (_) => hoverChrome(false),
+            child: child,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _topBar(BuildContext context) {
+    final theme = Theme.of(context);
+    return ImmersiveScrim(
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 40),
+          child: Row(
+            children: [
+              const BackButton(color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _session?.fileName ?? 'Playback',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              OverlayIconButton(
+                tooltip: 'Play with',
+                onPressed: _source == null ? null : _external,
+                icon: Icons.open_in_new,
+              ),
+              PopupMenuButton<String>(
+                tooltip: 'More options',
+                iconColor: Colors.white,
+                position: PopupMenuPosition.under,
+                onSelected: (value) {
+                  if (value == 'copy') _copyUrl();
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'copy',
+                    enabled: _source != null,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.link, size: 20),
+                        SizedBox(width: 12),
+                        Text('Copy playback URL'),
+                      ],
                     ),
-                    IconButton(
-                      tooltip: 'Copy playback URL',
-                      onPressed: _source == null ? null : _copyUrl,
-                      icon: const Icon(Icons.copy),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomBar(
+    BuildContext context,
+    PlaybackState s, {
+    required bool compact,
+  }) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final enabled = _player != null;
+    final timeStyle = theme.textTheme.labelLarge?.copyWith(
+      color: Colors.white,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    final sliderTheme = SliderTheme.of(context).copyWith(
+      trackHeight: 4,
+      activeTrackColor: scheme.primary,
+      inactiveTrackColor: Colors.white.withValues(alpha: .28),
+      thumbColor: scheme.primary,
+      overlayColor: Colors.white.withValues(alpha: .14),
+      trackShape: const RoundedRectSliderTrackShape(),
+      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+      overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+    );
+    final volume = s.volume;
+    return ImmersiveScrim(
+      fromTop: false,
+      opacity: .8,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            compact ? 8 : 20,
+            56,
+            compact ? 8 : 20,
+            compact ? 4 : 12,
+          ),
+          child: SliderTheme(
+            data: sliderTheme,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (s.duration > Duration.zero)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: PlaybackSeekBar(
+                      position: s.position,
+                      duration: s.duration,
+                      showTimes: true,
+                      timeStyle: timeStyle,
+                      onSeek: _player == null
+                          ? null
+                          : (position) =>
+                                _control(() => _player!.seek(position)),
+                    ),
+                  ),
+                Row(
+                  children: [
+                    OverlayIconButton(
+                      tooltip: s.playing ? 'Pause' : 'Play',
+                      onPressed: enabled ? () => _playPause() : null,
+                      icon: s.playing
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      size: 32,
+                    ),
+                    SizedBox(width: compact ? 0 : 4),
+                    OverlayIconButton(
+                      tooltip: 'Back 10 seconds',
+                      onPressed: enabled
+                          ? () => _seekBy(const Duration(seconds: -10))
+                          : null,
+                      icon: Icons.replay_10_rounded,
+                    ),
+                    OverlayIconButton(
+                      tooltip: 'Forward 10 seconds',
+                      onPressed: enabled
+                          ? () => _seekBy(const Duration(seconds: 10))
+                          : null,
+                      icon: Icons.forward_10_rounded,
+                    ),
+                    if (!compact) ...[
+                      const SizedBox(width: 12),
+                      OverlayIconButton(
+                        tooltip: volume == 0 ? 'Unmute' : 'Mute',
+                        onPressed: enabled ? _toggleMute : null,
+                        icon: volume == 0
+                            ? Icons.volume_off_rounded
+                            : volume < 50
+                            ? Icons.volume_down_rounded
+                            : Icons.volume_up_rounded,
+                      ),
+                      SizedBox(
+                        width: 112,
+                        child: Slider(
+                          value: volume.clamp(0, 100),
+                          max: 100,
+                          label: 'Volume',
+                          semanticFormatterCallback: (v) =>
+                              'Volume ${v.round()}%',
+                          onChanged: (v) => _player?.setVolume(v),
+                        ),
+                      ),
+                    ],
+                    if (s.duration <= Duration.zero &&
+                        s.position > Duration.zero)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Text(_time(s.position), style: timeStyle),
+                      ),
+                    const Spacer(),
+                    OverlayIconButton(
+                      tooltip: 'Tracks',
+                      onPressed: enabled ? _tvTracks : null,
+                      icon: Icons.subtitles_outlined,
+                    ),
+                    SizedBox(width: compact ? 0 : 4),
+                    OverlayIconButton(
+                      tooltip: 'Playback options',
+                      onPressed: enabled ? _tvOptions : null,
+                      icon: Icons.settings_outlined,
+                    ),
+                    SizedBox(width: compact ? 0 : 4),
+                    OverlayIconButton(
+                      tooltip: _fullscreen ? 'Exit fullscreen' : 'Fullscreen',
+                      onPressed: _toggleFullscreen,
+                      icon: _fullscreen
+                          ? Icons.fullscreen_exit_rounded
+                          : Icons.fullscreen_rounded,
                     ),
                   ],
                 ),
-          body: Column(
-            children: [
-              Expanded(
-                child: ColoredBox(
-                  color: Colors.black,
-                  child: Center(child: _video()),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Opening/buffering progress and playback errors, kept visible even when
+  /// the rest of the chrome is hidden.
+  Widget _centerStatus(BuildContext context, PlaybackState s) {
+    final theme = Theme.of(context);
+    if (_error != null) {
+      // On TV the card sits above the bottom controls it would otherwise meet.
+      return Align(
+        alignment: _television ? const Alignment(0, -.45) : Alignment.center,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: Card(
+              color: theme.colorScheme.surfaceContainerHigh,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 36,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: [
+                        if (_source != null)
+                          OutlinedButton.icon(
+                            onPressed: _external,
+                            icon: const Icon(Icons.open_in_new),
+                            label: const Text('Play with'),
+                          ),
+                        FilledButton.icon(
+                          autofocus: _television,
+                          onPressed: _busy
+                              ? null
+                              : () {
+                                  _retryCount = 0;
+                                  _open(_lastPosition);
+                                },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              if (_busy || s.buffering)
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    _busy
+            ),
+          ),
+        ),
+      );
+    }
+    final retrying = _retryTimer != null;
+    final waiting = _player == null || _busy || retrying || s.buffering;
+    if (!waiting) return const SizedBox.shrink();
+    return IgnorePointer(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: .62),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    _busy || retrying || _player == null
                         ? _status
                         : 'Buffering… Waiting for more downloaded data.',
-                  ),
-                ),
-              if (_error != null)
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(_error!)),
-                      TextButton(
-                        onPressed: _busy
-                            ? null
-                            : () {
-                                _retryCount = 0;
-                                _open(_lastPosition);
-                              },
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                ),
-              if (television)
-                TvAutoHideControls(
-                  playing: s.playing,
-                  child: TvPlayerControls(
-                    playing: s.playing,
-                    position: s.position,
-                    duration: s.duration,
-                    title: _session?.fileName,
-                    onPlayPause: () => _playPause(),
-                    onSeekBack: () => _control(
-                      () => _player!.seek(
-                        Duration(
-                          milliseconds: (s.position.inMilliseconds - 10000)
-                              .clamp(
-                                0,
-                                s.duration.inMilliseconds > 0
-                                    ? s.duration.inMilliseconds
-                                    : 0x7fffffff,
-                              ),
-                        ),
-                      ),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
                     ),
-                    onSeekForward: () => _control(
-                      () => _player!.seek(
-                        Duration(
-                          milliseconds: (s.position.inMilliseconds + 10000)
-                              .clamp(
-                                0,
-                                s.duration.inMilliseconds > 0
-                                    ? s.duration.inMilliseconds
-                                    : 0x7fffffff,
-                              ),
-                        ),
-                      ),
-                    ),
-                    onTracks: () => _tvTracks(),
-                    onOptions: () => _tvOptions(),
                   ),
-                ),
-              if (!television && max > 0)
-                PlaybackSeekBar(
-                  position: s.position,
-                  duration: s.duration,
-                  onSeek: _player == null
-                      ? null
-                      : (position) => _control(() => _player!.seek(position)),
-                ),
-              if (!television)
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 8,
-                    children: [
-                      IconButton(
-                        tooltip: s.playing ? 'Pause' : 'Play',
-                        onPressed: _player == null ? null : () => _playPause(),
-                        icon: Icon(s.playing ? Icons.pause : Icons.play_arrow),
-                      ),
-                      Text('${_time(s.position)} / ${_time(s.duration)}'),
-                      if (MediaQuery.sizeOf(context).width >= 600)
-                        SizedBox(
-                          width: 140,
-                          child: Slider(
-                            value: s.volume.clamp(0, 100),
-                            max: 100,
-                            label: 'Volume',
-                            onChanged: (v) => _player?.setVolume(v),
-                          ),
-                        ),
-                      IconButton(
-                        tooltip: 'Tracks',
-                        onPressed: _player == null ? null : _tvTracks,
-                        icon: const Icon(Icons.subtitles),
-                      ),
-                      IconButton(
-                        tooltip: 'Playback options',
-                        onPressed: _player == null ? null : _tvOptions,
-                        icon: const Icon(Icons.tune),
-                      ),
-                      IconButton(
-                        tooltip: _fullscreen ? 'Exit fullscreen' : 'Fullscreen',
-                        onPressed: _toggleFullscreen,
-                        icon: const Icon(Icons.fullscreen),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Left inset that lines panel headings and chips up with list tile text.
+double _panelInset(BuildContext context) =>
+    8 +
+    (ListTileTheme.of(context).contentPadding
+            ?.resolve(TextDirection.ltr)
+            .left ??
+        16);
+
+class _PanelSection extends StatelessWidget {
+  const _PanelSection(this.title);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(_panelInset(context), 16, 20, 8),
+      child: Semantics(
+        header: true,
+        child: Text(
+          title,
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChoiceRow extends StatelessWidget {
+  const _ChoiceRow({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.detail,
+  });
+
+  final String label;
+  final String? detail;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    child: ListTile(
+      selected: selected,
+      title: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: detail == null ? null : Text(detail!),
+      trailing: selected ? const Icon(Icons.check) : null,
+      onTap: onTap,
+    ),
+  );
+}
+
+class _ChooserOption extends StatelessWidget {
+  const _ChooserOption({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => SimpleDialogOption(
+    onPressed: onPressed,
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    child: Row(
+      children: [
+        Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant),
+        const SizedBox(width: 16),
+        Expanded(child: Text(label)),
+      ],
+    ),
+  );
+}
+
+class _ChooserNote extends StatelessWidget {
+  const _ChooserNote(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
     );

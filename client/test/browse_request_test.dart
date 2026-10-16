@@ -100,6 +100,12 @@ Widget app(
   );
 }
 
+/// A Discover mode segment (Latest / Most seeded / Search).
+Finder _discoveryMode(String label) => find.descendant(
+  of: find.byType(SegmentedButton<String>),
+  matching: find.text(label),
+);
+
 void main() {
   for (final option in {
     'Recently changed': 'date',
@@ -259,7 +265,7 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.text('Load next page'));
     await t.pump();
-    await t.tap(find.widgetWithText(ChoiceChip, 'Search'));
+    await t.tap(_discoveryMode('Search'));
     await t.pump();
     expect(find.text('Enter a torrent name to search.'), findsOneWidget);
     pending.complete(jsonResponse(snapshot('initial', 'Outdated page')));
@@ -286,15 +292,17 @@ void main() {
         ),
       );
       await t.pumpAndSettle();
-      await t.tap(find.widgetWithText(ChoiceChip, 'Search'));
+      await t.tap(_discoveryMode('Search'));
       await t.pump();
       _delayedPreferences.complete(defaultUserPreferences());
       await t.pumpAndSettle();
       expect(
         t
-            .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Search'))
+            .widget<SegmentedButton<String>>(
+              find.byType(SegmentedButton<String>),
+            )
             .selected,
-        isTrue,
+        {'search'},
       );
       expect(find.text('Enter a torrent name to search.'), findsOneWidget);
       expect(find.text('Initial'), findsNothing);

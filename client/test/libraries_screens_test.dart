@@ -104,7 +104,9 @@ class _MoveAdapter implements HttpClientAdapter {
             {
               'id': 'entry-1',
               'libraryId': 'lib-1',
-              'parentId': null,
+              // The file lives in a subfolder, so the library root is a real
+              // move target (the picker disables its own current folder).
+              'parentId': 'folder-source',
               'kind': 'video',
               'name': 'Example.mkv',
               'sizeBytes': 100,
@@ -181,6 +183,67 @@ class _PathAdapter implements HttpClientAdapter {
             'warnings': [],
           }
         : libraries;
+    return ResponseBody.fromString(
+      jsonEncode(data),
+      200,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+/// Two pages of video entries; records the cursor of every entries request.
+class _PagedAdapter implements HttpClientAdapter {
+  final cursors = <Object?>[];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    Object data;
+    if (options.path.endsWith('/entries')) {
+      final cursor = options.queryParameters['cursor'];
+      cursors.add(cursor);
+      final start = cursor == null ? 0 : 50;
+      data = {
+        'items': [
+          for (var i = start; i < start + 50; i++)
+            {
+              'id': 'entry-$i',
+              'libraryId': 'lib-1',
+              'parentId': null,
+              'kind': 'video',
+              'name': 'Video ${i.toString().padLeft(3, '0')}.mkv',
+              'sizeBytes': 100,
+              'mediaId': 'media-$i',
+              'thumbnailAvailable': false,
+              'version': 1,
+            },
+        ],
+        'nextCursor': cursor == null ? 'page-2' : null,
+        'totalKnown': 100,
+        'truncated': false,
+        'warnings': [],
+      };
+    } else {
+      data = [
+        {
+          'id': 'lib-1',
+          'name': 'Films',
+          'description': '',
+          'readOnly': true,
+          'enabled': true,
+          'version': 1,
+          'capabilities': {'read': true, 'download': false, 'manage': false},
+        },
+      ];
+    }
     return ResponseBody.fromString(
       jsonEncode(data),
       200,
@@ -349,6 +412,9 @@ void main() {
     expect(find.text('Season 1'), findsOneWidget);
     expect(find.text('Extras'), findsOneWidget);
     expect(find.text('Behind the scenes'), findsOneWidget);
+    // Ancestors navigate; the current folder is not a link.
+    expect(find.widgetWithText(TextButton, 'Season 1'), findsOneWidget);
+    expect(find.widgetWithText(TextButton, 'Behind the scenes'), findsNothing);
   });
 
   testWidgets('read-only library entries do not offer mutation controls', (
@@ -392,7 +458,14 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Example.mkv'), findsOneWidget);
-    expect(find.byTooltip('File actions'), findsNothing);
+    // Every file keeps one overflow menu for Details; a read-only library
+    // must not offer any mutation in it.
+    await tester.tap(find.byTooltip('File actions'));
+    await tester.pumpAndSettle();
+    expect(find.text('Details'), findsOneWidget);
+    expect(find.text('Rename'), findsNothing);
+    expect(find.text('Move'), findsNothing);
+    expect(find.text('Move to trash'), findsNothing);
   });
 
   testWidgets('cancelling a move never sends a mutation request', (
@@ -428,7 +501,13 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [activeApiProvider.overrideWithValue(api)],
-        child: const MaterialApp(home: FolderScreen(libraryId: 'lib-1')),
+        child: const MaterialApp(
+          home: FolderScreen(
+            libraryId: 'lib-1',
+            folderId: 'folder-source',
+            folderName: 'Source',
+          ),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -436,7 +515,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Move').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Select library root'));
+    // The picker opens at the library root; "Move here" chooses it.
+    await tester.tap(find.text('Move here'));
     await tester.pumpAndSettle();
     expect(adapter.moveRequests, hasLength(1));
     expect(adapter.moveRequests.single, containsPair('version', 1));
@@ -477,6 +557,46 @@ void main() {
     expect(find.text('Nested destination'), findsOneWidget);
     expect(adapter.folderPageCursors, contains('next-page'));
     expect(adapter.nestedFolderRequests, contains('folder-later'));
+  });
+
+  testWidgets('folder fetches the next page when scrolled near the end', (
+    tester,
+  ) async {
+    final adapter = _PagedAdapter();
+    final api = BrianiApi(
+      dio: Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
+        ..httpClientAdapter = adapter,
+    )..setBearerAuth('AccessToken', 'token');
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [activeApiProvider.overrideWithValue(api)],
+        child: const MaterialApp(home: FolderScreen(libraryId: 'lib-1')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(adapter.cursors, [null]);
+    final list = find
+        .descendant(
+          of: find.byType(CustomScrollView),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+    await tester.scrollUntilVisible(
+      find.text('Video 049.mkv'),
+      600,
+      scrollable: list,
+    );
+    await tester.pumpAndSettle();
+    // The next page arrives without pressing Load more, exactly once.
+    expect(adapter.cursors, [null, 'page-2']);
+    await tester.scrollUntilVisible(
+      find.text('Video 099.mkv'),
+      600,
+      scrollable: list,
+    );
+    expect(find.text('Video 099.mkv'), findsOneWidget);
+    expect(find.text('Load more'), findsNothing);
+    expect(adapter.cursors, [null, 'page-2']);
   });
 
   testWidgets(

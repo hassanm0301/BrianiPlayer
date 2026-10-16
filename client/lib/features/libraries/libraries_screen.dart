@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../core/session/client_session.dart';
 import '../../core/input/route_activity.dart';
 import '../../core/preferences/preferences_providers.dart';
+import '../../core/widgets/adaptive.dart';
+import '../../core/widgets/media_tile.dart';
+import '../../core/widgets/states.dart';
 
 class LibrariesScreen extends ConsumerStatefulWidget {
   const LibrariesScreen({super.key});
@@ -61,6 +64,7 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
       );
     }
     final preferences = ref.watch(userPreferencesProvider).asData?.value;
+    final gutters = pageGutters(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Libraries'),
@@ -70,6 +74,8 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
             onPressed: () => _refresh(api),
             icon: const Icon(Icons.refresh),
           ),
+          ?ShellLayout.headerAccountButton(context),
+          const SizedBox(width: 8),
         ],
       ),
       body: FutureBuilder<List<ModelLibrary>>(
@@ -81,7 +87,8 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError && _lastLibraries == null) {
-            return _LoadError(
+            return EmptyState.error(
+              title: 'Libraries are unavailable',
               message: clientError(snapshot.error!),
               onRetry: () => _refresh(api),
             );
@@ -113,63 +120,60 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting)
                   const SliverToBoxAdapter(child: LinearProgressIndicator()),
                 if (snapshot.hasError)
-                  SliverToBoxAdapter(
-                    child: MaterialBanner(
-                      content: Text(clientError(snapshot.error!)),
-                      actions: [
-                        TextButton(
+                  SliverPadding(
+                    padding: gutters.add(const EdgeInsets.only(top: 8)),
+                    sliver: SliverToBoxAdapter(
+                      child: NoticeBanner(
+                        tone: NoticeTone.error,
+                        message: clientError(snapshot.error!),
+                        action: TextButton(
                           onPressed: () => _refresh(api),
                           child: const Text('Retry'),
                         ),
-                      ],
-                    ),
-                  ),
-                if (preferences?.showContinueWatching != false)
-                  SliverPadding(
-                    padding: const EdgeInsets.all(16),
-                    sliver: SliverToBoxAdapter(
-                      child: _ContinueWatching(
-                        key: ValueKey(api),
-                        refreshGeneration: _refreshGeneration,
                       ),
                     ),
                   ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  sliver: SliverToBoxAdapter(
-                    child: Text(
-                      'Your libraries',
-                      style: Theme.of(context).textTheme.titleLarge,
+                if (preferences?.showContinueWatching != false)
+                  SliverToBoxAdapter(
+                    child: _ContinueWatching(
+                      key: ValueKey(api),
+                      refreshGeneration: _refreshGeneration,
+                      padding: gutters,
                     ),
+                  ),
+                SliverPadding(
+                  padding: gutters.add(const EdgeInsets.only(top: 12)),
+                  sliver: const SliverToBoxAdapter(
+                    child: SectionHeader(title: 'Your libraries'),
                   ),
                 ),
                 if (libraries.isEmpty)
                   const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Text(
-                        'No libraries are available to this account.',
-                      ),
+                    child: EmptyState(
+                      icon: Icons.video_library_outlined,
+                      title: 'No libraries yet',
+                      message: 'No libraries are available to this account.',
                     ),
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: gutters.add(const EdgeInsets.only(bottom: 24)),
                     sliver: grid
                         ? SliverLayoutBuilder(
                             builder: (context, constraints) {
                               final columns =
-                                  (constraints.crossAxisExtent / 280)
+                                  (constraints.crossAxisExtent / 300)
                                       .floor()
                                       .clamp(1, 6);
                               return SliverGrid(
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: columns,
-                                      mainAxisSpacing: 8,
-                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 12,
+                                      crossAxisSpacing: 12,
                                       mainAxisExtent:
-                                          140 *
+                                          96 *
                                           MediaQuery.textScalerOf(context)
                                               .scale(1)
                                               .clamp(1, 2),
@@ -178,6 +182,9 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
                                   (context, index) => _libraryTile(
                                     orderedLibraries[index],
                                     grid: true,
+                                    pinned: pinnedIds.contains(
+                                      orderedLibraries[index].id,
+                                    ),
                                   ),
                                   childCount: orderedLibraries.length,
                                   findChildIndexCallback: (key) =>
@@ -188,8 +195,20 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
                           )
                         : SliverList(
                             delegate: SliverChildBuilderDelegate(
-                              (context, index) =>
-                                  _libraryTile(orderedLibraries[index]),
+                              (context, index) => Padding(
+                                // The row carries the identity key so
+                                // findChildIndexCallback can match it.
+                                key: ValueKey(
+                                  'library-${orderedLibraries[index].id}',
+                                ),
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: _libraryTile(
+                                  orderedLibraries[index],
+                                  pinned: pinnedIds.contains(
+                                    orderedLibraries[index].id,
+                                  ),
+                                ),
+                              ),
                               childCount: orderedLibraries.length,
                               findChildIndexCallback: (key) =>
                                   _libraryIndex(orderedLibraries, key),
@@ -211,54 +230,123 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
     return index < 0 ? null : index;
   }
 
-  Widget _libraryTile(ModelLibrary library, {bool grid = false}) => Card(
-    key: ValueKey('library-${library.id}'),
-    child: InkWell(
-      onTap: () =>
-          context.push('/libraries/${Uri.encodeComponent(library.id)}'),
-      child: grid
-          ? Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.video_library_outlined),
-                  const SizedBox(height: 8),
-                  Text(
-                    library.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+  Widget _libraryTile(
+    ModelLibrary library, {
+    bool grid = false,
+    bool pinned = false,
+  }) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final (background, foreground) = _libraryColors(scheme, library.name);
+    final description = library.description.isEmpty
+        ? 'Browse media'
+        : library.description;
+    final icon = Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Icon(_libraryIcon(library.name), color: foreground),
+    );
+    return FocusOutline(
+      key: grid ? ValueKey('library-${library.id}') : null,
+      child: Card(
+        child: InkWell(
+          onTap: () =>
+              context.push('/libraries/${Uri.encodeComponent(library.id)}'),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                icon,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              library.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleMedium,
+                            ),
+                          ),
+                          if (pinned) ...[
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.push_pin,
+                              size: 16,
+                              semanticLabel: 'Pinned',
+                              color: scheme.primary,
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        library.readOnly
+                            ? '$description · Read-only'
+                            : description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Expanded(
-                    child: Text(
-                      library.description.isEmpty
-                          ? 'Browse media'
-                          : library.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : ListTile(
-              leading: const Icon(Icons.video_library_outlined),
-              title: Text(library.name),
-              subtitle: Text(
-                library.description.isEmpty
-                    ? 'Browse media'
-                    : library.description,
-              ),
-              trailing: const Icon(Icons.chevron_right),
+                ),
+                Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+              ],
             ),
-    ),
-  );
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Picks a stable tonal color pair per library so libraries are easy to tell
+/// apart at a glance without relying on artwork.
+(Color, Color) _libraryColors(ColorScheme scheme, String name) {
+  final pairs = [
+    (scheme.primaryContainer, scheme.onPrimaryContainer),
+    (scheme.tertiaryContainer, scheme.onTertiaryContainer),
+    (scheme.secondaryContainer, scheme.onSecondaryContainer),
+  ];
+  final hash = name.codeUnits.fold<int>(0, (a, b) => (a * 31 + b) & 0x7fffffff);
+  return pairs[hash % pairs.length];
+}
+
+IconData _libraryIcon(String name) {
+  final lower = name.toLowerCase();
+  if (RegExp(r'photo|picture|image|camera|album').hasMatch(lower)) {
+    return Icons.photo_library_outlined;
+  }
+  if (RegExp(r'show|series|tv|episode').hasMatch(lower)) {
+    return Icons.live_tv_outlined;
+  }
+  if (RegExp(r'music|audio|song').hasMatch(lower)) {
+    return Icons.library_music_outlined;
+  }
+  if (RegExp(r'download').hasMatch(lower)) return Icons.download_done_outlined;
+  return Icons.movie_outlined;
 }
 
 class _ContinueWatching extends ConsumerStatefulWidget {
-  const _ContinueWatching({super.key, required this.refreshGeneration});
+  const _ContinueWatching({
+    super.key,
+    required this.refreshGeneration,
+    required this.padding,
+  });
   final int refreshGeneration;
+  final EdgeInsets padding;
   @override
   ConsumerState<_ContinueWatching> createState() => _ContinueWatchingState();
 }
@@ -287,16 +375,14 @@ class _ContinueWatchingState extends ConsumerState<_ContinueWatching> {
   Widget build(BuildContext context) => FutureBuilder<ContinueWatchingPage?>(
     future: _future,
     builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting &&
-          _lastPage == null) {
-        return const LinearProgressIndicator();
-      }
-      final errorCard = snapshot.hasError
-          ? Card(
-              child: ListTile(
-                title: const Text('Continue watching'),
-                subtitle: Text(clientError(snapshot.error!)),
-                trailing: IconButton(
+      final errorNotice = snapshot.hasError
+          ? Padding(
+              padding: widget.padding.add(const EdgeInsets.only(top: 12)),
+              child: NoticeBanner(
+                tone: NoticeTone.warning,
+                message:
+                    'Continue watching is unavailable. ${clientError(snapshot.error!)}',
+                action: IconButton(
                   tooltip: 'Retry Continue watching',
                   icon: const Icon(Icons.refresh),
                   onPressed: () => setState(_load),
@@ -311,28 +397,31 @@ class _ContinueWatchingState extends ConsumerState<_ContinueWatching> {
       final items = _lastPage?.items.toList() ?? <ContinueWatching>[];
       if (items.isEmpty) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LinearProgressIndicator();
+          return const LinearProgressIndicator(minHeight: 2);
         }
-        return errorCard ?? const SizedBox.shrink();
+        return errorNotice ?? const SizedBox.shrink();
       }
+      final television = isTelevision(context);
+      final tileWidth = television ? 300.0 : 280.0;
+      final textScale = MediaQuery.textScalerOf(context)
+          .scale(1)
+          .clamp(1.0, 2.0);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (snapshot.connectionState == ConnectionState.waiting)
-            const LinearProgressIndicator(),
-          ?errorCard,
-          Text(
-            'Continue watching',
-            style: Theme.of(context).textTheme.titleLarge,
+          ?errorNotice,
+          Padding(
+            padding: widget.padding.add(const EdgeInsets.only(top: 16)),
+            child: const SectionHeader(title: 'Continue watching'),
           ),
-          const SizedBox(height: 8),
           SizedBox(
-            height: 180 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 2),
+            height: (tileWidth - 8) * 9 / 16 + 8 + 64 * textScale,
             child: ListView.separated(
               key: const PageStorageKey('continue-watching'),
               scrollDirection: Axis.horizontal,
+              padding: widget.padding.copyWith(left: widget.padding.left - 4),
               itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final item = items[index];
                 final media = item.media;
@@ -345,68 +434,40 @@ class _ContinueWatchingState extends ConsumerState<_ContinueWatching> {
                           .toDouble();
                 return SizedBox(
                   key: ValueKey('continue-${media.id}'),
-                  width: 260,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () async {
-                                      await context.push(
-                                        '/play/media/${Uri.encodeComponent(media.id)}',
-                                      );
-                                    },
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.play_circle_outline,
-                                          size: 36,
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            media.name,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                PopupMenuButton<String>(
-                                  tooltip: 'Progress options',
-                                  onSelected: (action) =>
-                                      _updateProgress(media, progress, action),
-                                  itemBuilder: (_) => const [
-                                    PopupMenuItem(
-                                      value: 'watched',
-                                      child: Text('Mark watched'),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 'clear',
-                                      child: Text('Clear progress'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          LinearProgressIndicator(value: fraction),
-                          const SizedBox(height: 6),
-                          Text(
-                            duration == null
-                                ? 'Resume'
-                                : '${_time(progress.positionMs)} of ${_time(duration)}',
-                          ),
-                        ],
+                  width: tileWidth,
+                  child: MediaTile(
+                    artwork: AuthorizedThumbnail(
+                      mediaId: media.id,
+                      cacheWidth: 600,
+                      placeholder: const ArtworkPlaceholder(
+                        icon: Icons.movie_outlined,
                       ),
+                    ),
+                    title: media.name,
+                    subtitle: duration == null
+                        ? 'Resume'
+                        : '${_time(duration - progress.positionMs)} left',
+                    progress: fraction,
+                    showPlayOnHover: true,
+                    semanticLabel: 'Resume ${media.name}',
+                    onTap: () => context.push(
+                      '/play/media/${Uri.encodeComponent(media.id)}',
+                    ),
+                    menu: PopupMenuButton<String>(
+                      tooltip: 'Progress options',
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (action) =>
+                          _updateProgress(media, progress, action),
+                      itemBuilder: (_) => const [
+                        PopupMenuItem(
+                          value: 'watched',
+                          child: Text('Mark watched'),
+                        ),
+                        PopupMenuItem(
+                          value: 'clear',
+                          child: Text('Clear progress'),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -447,27 +508,11 @@ class _ContinueWatchingState extends ConsumerState<_ContinueWatching> {
 }
 
 String _time(int ms) {
-  final seconds = ms ~/ 1000;
-  return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
-}
-
-class _LoadError extends StatelessWidget {
-  const _LoadError({required this.message, required this.onRetry});
-  final String message;
-  final VoidCallback onRetry;
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(message),
-        const SizedBox(height: 8),
-        FilledButton.icon(
-          onPressed: onRetry,
-          icon: const Icon(Icons.refresh),
-          label: const Text('Retry'),
-        ),
-      ],
-    ),
-  );
+  final seconds = (ms < 0 ? 0 : ms) ~/ 1000;
+  final hours = seconds ~/ 3600;
+  final minutes = (seconds % 3600) ~/ 60;
+  final rest = (seconds % 60).toString().padLeft(2, '0');
+  return hours > 0
+      ? '$hours:${minutes.toString().padLeft(2, '0')}:$rest'
+      : '$minutes:$rest';
 }

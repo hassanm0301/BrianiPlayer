@@ -160,7 +160,10 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Request device code'));
-    await tester.pumpAndSettle();
+    // The approval wait shows an indeterminate indicator, so settle by time.
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(find.text(_PairingAdapter.userCode), findsOneWidget);
     expect(find.textContaining(_PairingAdapter.deviceSecret), findsNothing);

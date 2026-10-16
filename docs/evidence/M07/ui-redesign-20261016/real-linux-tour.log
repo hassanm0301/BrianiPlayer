@@ -1,0 +1,6 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/client/integration_test/zz_scratch_real_app_test.dart
+✓ Built build/linux/x64/debug/bundle/briani_player
+00:00 +0: real app tour
+00:38 +1: (tearDownAll)
+00:38 +1: All tests passed!
+exit=0

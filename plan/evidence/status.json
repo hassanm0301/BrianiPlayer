@@ -526,6 +526,38 @@
         "Production startup still blocked by Docker memory-limit enforcement; no kernel or boot setting changed.",
         "No Pi workload benchmark, full-stack startup, client check or release certification claimed."
       ]
+    },
+    {
+      "date": "2026-10-16",
+      "scope": "Client UI redesign: Material 3 theme, adaptive navigation shell (desktop rail, phone bottom bar, TV top tabs) and redesigned screens; presentation only",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_linux_desktop_android_tv_unverified",
+      "report": "docs/evidence/M07/ui-redesign-20261016/report.md",
+      "checks": {
+        "flutterAnalyze": {
+          "exitCode": 0,
+          "issues": 0
+        },
+        "flutterTest": {
+          "exitCode": 0,
+          "passed": 133
+        },
+        "linuxDebugBuild": {
+          "exitCode": 0
+        },
+        "realLinuxAppTour": {
+          "exitCode": 0,
+          "passed": 1,
+          "server": "isolated native dev server"
+        },
+        "offscreenScreenshotScenarios": 43,
+        "independentReview": "one_blocking_three_should_fix_and_seven_minor_findings_fixed_with_regression_tests"
+      },
+      "limitations": [
+        "Android APK, Android TV and physical devices not built or exercised; phone/TV layouts verified only offscreen and with D-pad widget tests.",
+        "Desktop full-stack E2E blocked at preflight: runner expects briani-server:m10 but images.lock.json names the v1.1.0 image; images and lock unchanged.",
+        "Windows/macOS builds not run; desktop and Android integration-test finders updated but not run."
+      ]
     }
   ],
   "deploymentAttempts": [

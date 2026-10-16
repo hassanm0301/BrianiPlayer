@@ -17,7 +17,11 @@ import 'package:uuid/uuid.dart';
 import '../../core/session/client_session.dart';
 import '../../core/preferences/preferences_providers.dart';
 import '../../core/formatting/locale_formatters.dart';
-import '../../core/widgets/owned_text_dialog.dart';
+import '../../core/widgets/adaptive.dart';
+import '../../core/widgets/states.dart';
+import 'add_download_dialog.dart';
+import 'discover_filters.dart';
+import 'discover_results.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
@@ -33,6 +37,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   final _minSizeController = TextEditingController();
   final _maxSizeController = TextEditingController();
   final _minSeedersController = TextEditingController();
+  final _searchFocus = FocusNode(debugLabel: 'Discovery search');
   final _uuid = const Uuid();
   final List<DiscoveryResult> _items = [];
   List<Provider> _providers = [];
@@ -97,6 +102,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     _minSizeController.dispose();
     _maxSizeController.dispose();
     _minSeedersController.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -201,9 +207,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   Future<void> _runQuery() async {
     _initialQueryStarted = true;
     _cancelQuery();
-    final categories = _parseCategories(_categoryController.text);
-    final minSize = _parseGib(_minSizeController.text);
-    final maxSize = _parseGib(_maxSizeController.text);
+    final categories = parseCategoryIds(_categoryController.text);
+    final minSize = parseGib(_minSizeController.text);
+    final maxSize = parseGib(_maxSizeController.text);
     final minSeeders = int.tryParse(_minSeedersController.text.trim());
     if ((_categoryController.text.trim().isNotEmpty && categories == null) ||
         (_minSizeController.text.trim().isNotEmpty && minSize == null) ||
@@ -450,56 +456,22 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       _showMessage('No download-capable library is available to this account.');
       return;
     }
-    ModelLibrary? destination = libraries.first;
-    final accepted = await showDialog<bool>(
+    final locale = _currentLocale;
+    final choice = await AddDownloadDialog.show(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Add download'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(result.title),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<ModelLibrary>(
-                initialValue: destination,
-                decoration: const InputDecoration(
-                  labelText: 'Destination library',
-                ),
-                items: libraries
-                    .map(
-                      (library) => DropdownMenuItem(
-                        value: library,
-                        child: Text(library.name),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setDialogState(() => destination = value),
-              ),
-              if (result.stale) ...[
-                const SizedBox(height: 12),
-                const Text(
-                  'This result is stale. The server will re-resolve it before adding.',
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () =>
-                  Navigator.pop(dialogContext, destination != null),
-              child: const Text('Continue'),
-            ),
-          ],
-        ),
-      ),
+      title: 'Add download',
+      libraries: libraries,
+      confirmLabel: 'Continue',
+      subject: result.title,
+      details: [
+        formatBytes(result.sizeBytes, locale: locale),
+        '${formatCount(result.seeders, locale: locale)} seeders',
+        result.providerName,
+      ].join(' · '),
+      stale: result.stale,
     );
-    if (accepted != true || destination == null || !mounted) return;
+    final destination = choice?.library;
+    if (destination == null || !mounted) return;
     setState(() => _submitting = true);
     try {
       final source = DownloadSource(
@@ -521,7 +493,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           .createDownload(
             downloadCreate: DownloadCreate(
               (b) => b
-                ..libraryId = destination!.id
+                ..libraryId = destination.id
                 ..source_ = source.toBuilder(),
             ),
             idempotencyKey: _uuid.v4(),
@@ -566,51 +538,17 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       _showMessage('No download-capable library is available to this account.');
       return;
     }
-    ModelLibrary? destination = libraries.first;
-    final accepted = await showDialog<bool>(
+    final choice = await AddDownloadDialog.show(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Add torrent file'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(file.name),
-              Text(formatBytes(size, locale: _currentLocale)),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<ModelLibrary>(
-                initialValue: destination,
-                decoration: const InputDecoration(
-                  labelText: 'Destination library',
-                ),
-                items: libraries
-                    .map(
-                      (library) => DropdownMenuItem(
-                        value: library,
-                        child: Text(library.name),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setDialogState(() => destination = value),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () =>
-                  Navigator.pop(dialogContext, destination != null),
-              child: const Text('Upload'),
-            ),
-          ],
-        ),
-      ),
+      title: 'Add torrent file',
+      libraries: libraries,
+      confirmLabel: 'Upload',
+      subject: file.name,
+      details: formatBytes(size, locale: _currentLocale),
+      subjectIcon: Icons.description_outlined,
     );
-    if (accepted != true || destination == null || !mounted) return;
+    final destination = choice?.library;
+    if (destination == null || !mounted) return;
     setState(() => _submitting = true);
     try {
       final multipart = path != null
@@ -645,7 +583,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           .createDownload(
             downloadCreate: DownloadCreate(
               (b) => b
-                ..libraryId = destination!.id
+                ..libraryId = destination.id
                 ..source_ = source.toBuilder(),
             ),
             idempotencyKey: _uuid.v4(),
@@ -683,399 +621,613 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final latestAvailable = _providers.any(
       (p) => p.enabled && p.supportsRecent,
     );
+    final gutters = pageGutters(context);
+    final television = isTelevision(context);
+    final notices = _notices();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Discover'),
         actions: [
+          Builder(
+            builder: (buttonContext) => FilledButton.tonalIcon(
+              onPressed: () => _showAddMenu(buttonContext),
+              icon: const Icon(Icons.add),
+              label: const Text('Add'),
+            ),
+          ),
+          const SizedBox(width: 4),
           IconButton(
             tooltip: 'Refresh discovery',
             onPressed: _loading ? null : _runQuery,
             icon: const Icon(Icons.refresh),
           ),
-          IconButton(
-            tooltip: 'Upload .torrent file',
-            onPressed: _submitting ? null : _uploadTorrent,
-            icon: const Icon(Icons.upload_file),
-          ),
+          ?ShellLayout.headerAccountButton(context),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _modeControls(latestAvailable),
-          _filters(),
-          if (_providerError != null)
-            MaterialBanner(
-              content: Text(
-                _discoveryForbidden
-                    ? _providerError!
-                    : 'Provider details are unavailable: $_providerError',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: _discoveryForbidden
-                      ? _retryDiscoveryAccess
-                      : _loadProviders,
-                  child: Text(
-                    _discoveryForbidden ? 'Retry' : 'Retry providers',
-                  ),
-                ),
-              ],
-            ),
-          if (_snapshot?.state == DiscoverySnapshotStateEnum.partial ||
-              (_snapshot?.warnings.isNotEmpty ?? false))
-            MaterialBanner(
-              content: Text(
-                _snapshot!.warnings.isEmpty
-                    ? 'Some sources did not respond.'
-                    : _snapshot!.warnings.join('\n'),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: _loading ? null : _runQuery,
-                  child: const Text('Retry sources'),
-                ),
-              ],
-            ),
-          if (_error != null &&
-              !_loading &&
-              !(_discoveryForbidden && _error == _providerError))
-            MaterialBanner(
-              content: Text(_error!),
-              actions: [
-                TextButton(
-                  onPressed: _failedPage ? _loadMore : _runQuery,
-                  child: Text(_failedPage ? 'Retry page' : 'Retry'),
-                ),
-              ],
-            ),
-          if (_truncated)
-            const MaterialBanner(
-              content: Text(
-                'Showing a bounded result snapshot. Refine your search for more matches.',
-              ),
-              actions: [],
-            ),
-          if (_snapshot != null)
+          if (!_discoveryForbidden)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  _mode == 'mostSeeded'
-                      ? 'Most seeded among fetched results · ${formatCount(_items.length, locale: locale)}${_snapshot!.totalKnown == null ? '' : ' of ${formatCount(_snapshot!.totalKnown, locale: locale)}'}'
-                      : '${formatCount(_items.length, locale: locale)}${_snapshot!.totalKnown == null ? '' : ' of ${formatCount(_snapshot!.totalKnown, locale: locale)}'} results · ${_snapshot!.state.name}',
-                ),
-              ),
+              padding: gutters.add(const EdgeInsets.only(top: 4, bottom: 8)),
+              child: _toolbar(latestAvailable, television),
             ),
-          if (_loading && _items.isNotEmpty) const LinearProgressIndicator(),
-          Expanded(
-            child: _loading && _items.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null && _items.isEmpty
-                ? Center(child: Text(_error!, textAlign: TextAlign.center))
-                : _items.isEmpty
-                ? Center(
-                    child: Text(
-                      _mode == 'search'
-                          ? (_searchController.text.trim().isEmpty
-                                ? 'Enter a torrent name to search.'
-                                : 'No results in this fetched snapshot.')
-                          : 'No results are available for this view.',
-                    ),
-                  )
-                : ListView.builder(
-                    key: PageStorageKey('discovery-$_mode'),
-                    findChildIndexCallback: (key) {
-                      final index = _items.indexWhere(
-                        (result) => ValueKey('result-${result.id}') == key,
-                      );
-                      return index < 0 ? null : index;
-                    },
-                    itemCount: _items.length,
-                    itemBuilder: (context, index) =>
-                        _resultTile(_items[index], configuredColumns, locale),
-                  ),
+          SizedBox(
+            height: 4,
+            child: _loading && _items.isNotEmpty
+                ? const LinearProgressIndicator(minHeight: 2)
+                : null,
           ),
-          if (_snapshot?.nextCursor != null)
+          if (notices.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.all(12),
-              child: OutlinedButton.icon(
-                onPressed: _loadingMore || _loading ? null : _loadMore,
-                icon: _loadingMore
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.expand_more),
-                label: const Text('Load next page'),
+              padding: gutters.add(const EdgeInsets.only(top: 4, bottom: 4)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 8,
+                children: notices,
               ),
             ),
+          Expanded(
+            child: _content(configuredColumns, locale, gutters, television),
+          ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showMagnetEntry,
-        icon: const Icon(Icons.add_link),
-        label: const Text('Add magnet'),
       ),
     );
   }
 
-  Widget _modeControls(bool latestAvailable) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-    child: Wrap(
-      spacing: 8,
-      runSpacing: 4,
-      children: [
-        ChoiceChip(
-          label: const Text('Latest'),
-          selected: _mode == 'latest',
-          onSelected: (_) {
-            if (!latestAvailable) {
-              _showMessage(
-                'No enabled provider supports recent releases. Use Search instead.',
-              );
-              return;
-            }
-            _changeMode('latest', runQuery: true);
-          },
+  /// Opens the Add menu below its button. A route-based menu keeps system
+  /// Back and D-pad behavior consistent with the other overflow menus.
+  Future<void> _showAddMenu(BuildContext buttonContext) async {
+    final button = buttonContext.findRenderObject()! as RenderBox;
+    final overlay =
+        Navigator.of(buttonContext).overlay!.context.findRenderObject()!
+            as RenderBox;
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(
+          Offset(0, button.size.height + 4),
+          ancestor: overlay,
         ),
-        ChoiceChip(
-          label: const Text('Most seeded'),
-          selected: _mode == 'mostSeeded',
-          onSelected: (_) {
-            _changeMode('mostSeeded', runQuery: true);
-          },
+        button.localToGlobal(
+          button.size.bottomRight(const Offset(0, 4)),
+          ancestor: overlay,
         ),
-        ChoiceChip(
-          label: const Text('Search'),
-          selected: _mode == 'search',
-          onSelected: (_) => _changeMode('search'),
+      ),
+      Offset.zero & overlay.size,
+    );
+    PopupMenuItem<String> item(
+      String value,
+      IconData icon,
+      String label, {
+      bool enabled = true,
+    }) => PopupMenuItem(
+      value: value,
+      enabled: enabled,
+      child: Row(
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(width: 12),
+          Text(label),
+        ],
+      ),
+    );
+    final choice = await showMenu<String>(
+      context: buttonContext,
+      position: position,
+      items: [
+        item('magnet', Icons.link, 'Magnet link…'),
+        item(
+          'torrent',
+          Icons.upload_file,
+          'Torrent file…',
+          enabled: !_submitting,
         ),
       ],
-    ),
-  );
+    );
+    if (!mounted) return;
+    switch (choice) {
+      case 'magnet':
+        await _showMagnetEntry();
+      case 'torrent':
+        await _uploadTorrent();
+    }
+  }
 
-  Widget _filters() => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-    child: Column(
-      children: [
-        if (_mode == 'search')
+  void _selectMode(String mode, bool latestAvailable) {
+    switch (mode) {
+      case 'latest':
+        if (!latestAvailable) {
+          _showMessage(
+            'No enabled provider supports recent releases. Use Search instead.',
+          );
+          return;
+        }
+        _changeMode('latest', runQuery: true);
+      case 'mostSeeded':
+        _changeMode('mostSeeded', runQuery: true);
+      case 'search':
+        _changeMode('search');
+        _searchFocus.requestFocus();
+    }
+  }
+
+  void _submitSearch() {
+    _viewEdited = true;
+    if (_mode == 'search') {
+      unawaited(_runQuery());
+    } else if (_searchController.text.trim().isNotEmpty) {
+      _changeMode('search', runQuery: true);
+    }
+  }
+
+  int get _activeFilterCount => [
+    _providerIds.isNotEmpty,
+    _categoryController.text.trim().isNotEmpty,
+    _minSizeController.text.trim().isNotEmpty ||
+        _maxSizeController.text.trim().isNotEmpty,
+    _minSeedersController.text.trim().isNotEmpty,
+  ].where((active) => active).length;
+
+  Future<void> _openFilters() async {
+    final values = await DiscoveryFiltersPanel.show(
+      context: context,
+      initial: DiscoveryFilterValues(
+        providerIds: {..._providerIds},
+        categories: _categoryController.text,
+        minSize: _minSizeController.text,
+        maxSize: _maxSizeController.text,
+        minSeeders: _minSeedersController.text,
+        sort: _sort,
+        order: _order,
+      ),
+      defaultSort: switch (_mode) {
+        'mostSeeded' => 'seeders',
+        'search' => 'title',
+        _ => 'publishedAt',
+      },
+      defaultOrder: _mode == 'search' ? 'asc' : 'desc',
+      providers: _providers.where((p) => p.enabled).toList(),
+    );
+    if (values == null || !mounted) return;
+    setState(() {
+      _viewEdited = true;
+      _providerIds
+        ..clear()
+        ..addAll(values.providerIds);
+      _categoryController.text = values.categories;
+      _minSizeController.text = values.minSize;
+      _maxSizeController.text = values.maxSize;
+      _minSeedersController.text = values.minSeeders;
+      _sort = values.sort;
+      _order = values.order;
+    });
+    await _runQuery();
+  }
+
+  void _sortBy(String sort) {
+    setState(() {
+      _viewEdited = true;
+      if (_sort == sort) {
+        _order = _order == 'asc' ? 'desc' : 'asc';
+      } else {
+        _sort = sort;
+        _order = sort == 'title' ? 'asc' : 'desc';
+      }
+    });
+    unawaited(_runQuery());
+  }
+
+  Widget _toolbar(bool latestAvailable, bool television) {
+    final compact = WindowSize.of(context).isCompact;
+    final filterCount = _activeFilterCount;
+    Widget modeLabel(String text) =>
+        Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
+    final modes = SegmentedButton<String>(
+      showSelectedIcon: false,
+      expandedInsets: compact ? EdgeInsets.zero : null,
+      // Matches the 48dp search field and filter button beside it.
+      style: const ButtonStyle(
+        visualDensity: VisualDensity(horizontal: 0, vertical: 2),
+      ),
+      segments: [
+        ButtonSegment(
+          value: 'latest',
+          label: modeLabel('Latest'),
+          icon: compact ? null : const Icon(Icons.schedule),
+        ),
+        ButtonSegment(
+          value: 'mostSeeded',
+          label: modeLabel('Most seeded'),
+          icon: compact ? null : const Icon(Icons.trending_up),
+        ),
+        ButtonSegment(
+          value: 'search',
+          label: modeLabel('Search'),
+          icon: compact ? null : const Icon(Icons.search),
+        ),
+      ],
+      selected: {_mode},
+      onSelectionChanged: (selection) =>
+          _selectMode(selection.single, latestAvailable),
+    );
+    // On TV a text field in the vertical path would open the on-screen
+    // keyboard during ordinary D-pad movement, so it appears only in Search.
+    final showSearch = !television || _mode == 'search';
+    final search = SearchBar(
+      controller: _searchController,
+      focusNode: _searchFocus,
+      hintText: 'Search torrent names',
+      textInputAction: TextInputAction.search,
+      constraints: const BoxConstraints(minHeight: 48, maxWidth: 720),
+      leading: const Icon(Icons.search),
+      trailing: [
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _searchController,
+          builder: (context, value, _) => value.text.isEmpty
+              ? const SizedBox.shrink()
+              : IconButton(
+                  tooltip: 'Clear search',
+                  onPressed: () {
+                    _viewEdited = true;
+                    _searchController.clear();
+                  },
+                  icon: const Icon(Icons.close),
+                ),
+        ),
+      ],
+      // Typing only edits the Search view; in Latest/Most seeded the query
+      // takes effect on submit (which switches to Search), so a late
+      // preference load can still apply the saved view for the current mode.
+      onChanged: (_) {
+        if (_mode == 'search') _viewEdited = true;
+      },
+      onSubmitted: (_) => _submitSearch(),
+    );
+    if (compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           Row(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  textInputAction: TextInputAction.search,
-                  decoration: const InputDecoration(
-                    labelText: 'Search torrent names',
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                  onChanged: (_) => _viewEdited = true,
-                  onSubmitted: (_) {
-                    _viewEdited = true;
-                    _runQuery();
-                  },
-                ),
-              ),
+              if (showSearch) Expanded(child: search) else const Spacer(),
               const SizedBox(width: 8),
-              FilledButton(
-                onPressed: _loading
-                    ? null
-                    : () {
-                        _viewEdited = true;
-                        _runQuery();
-                      },
-                child: const Text('Search'),
+              IconButton.filledTonal(
+                tooltip: filterCount == 0
+                    ? 'Filters'
+                    : 'Filters, $filterCount active',
+                onPressed: _openFilters,
+                icon: Badge.count(
+                  count: filterCount,
+                  isLabelVisible: filterCount > 0,
+                  child: const Icon(Icons.tune),
+                ),
               ),
             ],
           ),
-        ExpansionTile(
-          tilePadding: EdgeInsets.zero,
-          title: const Text('Filters and sort'),
+          const SizedBox(height: 12),
+          modes,
+        ],
+      );
+    }
+    final filters = FilledButton.tonalIcon(
+      style: const ButtonStyle(
+        minimumSize: WidgetStatePropertyAll(Size(0, 48)),
+      ),
+      onPressed: _openFilters,
+      icon: const Icon(Icons.tune),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Filters'),
+          if (filterCount > 0) ...[
+            const SizedBox(width: 8),
+            Badge.count(count: filterCount),
+          ],
+        ],
+      ),
+    );
+    final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 880 * scale) {
+          return Row(
+            children: [
+              modes,
+              const SizedBox(width: 12),
+              if (showSearch) Expanded(child: search) else const Spacer(),
+              const SizedBox(width: 12),
+              filters,
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
+            Row(
               children: [
-                SizedBox(
-                  width: 180,
-                  child: TextField(
-                    controller: _categoryController,
-                    onChanged: (_) => _viewEdited = true,
-                    decoration: const InputDecoration(
-                      labelText: 'Category IDs',
-                      hintText: 'Comma-separated',
-                    ),
-                  ),
+                Expanded(
+                  child: Align(alignment: Alignment.centerLeft, child: modes),
                 ),
-                SizedBox(
-                  width: 150,
-                  child: TextField(
-                    controller: _minSizeController,
-                    onChanged: (_) => _viewEdited = true,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Minimum GiB'),
-                  ),
-                ),
-                SizedBox(
-                  width: 150,
-                  child: TextField(
-                    controller: _maxSizeController,
-                    onChanged: (_) => _viewEdited = true,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Maximum GiB'),
-                  ),
-                ),
-                SizedBox(
-                  width: 150,
-                  child: TextField(
-                    controller: _minSeedersController,
-                    onChanged: (_) => _viewEdited = true,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Minimum seeders',
-                    ),
-                  ),
-                ),
-                DropdownButton<String>(
-                  value: _sort,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _viewEdited = true;
-                        _sort = value;
-                      });
-                    }
-                  },
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'publishedAt',
-                      child: Text('Publication date'),
-                    ),
-                    DropdownMenuItem(value: 'seeders', child: Text('Seeders')),
-                    DropdownMenuItem(
-                      value: 'leechers',
-                      child: Text('Leechers'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'peers',
-                      child: Text('Total peers'),
-                    ),
-                    DropdownMenuItem(value: 'sizeBytes', child: Text('Size')),
-                    DropdownMenuItem(value: 'title', child: Text('Title')),
-                  ],
-                ),
-                DropdownButton<String>(
-                  value: _order,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _viewEdited = true;
-                        _order = value;
-                      });
-                    }
-                  },
-                  items: const [
-                    DropdownMenuItem(value: 'desc', child: Text('Descending')),
-                    DropdownMenuItem(value: 'asc', child: Text('Ascending')),
-                  ],
-                ),
+                const SizedBox(width: 12),
+                filters,
               ],
             ),
-            if (_providers.isNotEmpty)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Wrap(
-                  spacing: 4,
-                  children: _providers
-                      .where((p) => p.enabled)
-                      .map(
-                        (provider) => FilterChip(
-                          label: Text(provider.name),
-                          selected: _providerIds.contains(provider.id),
-                          onSelected: (selected) => setState(() {
-                            _viewEdited = true;
-                            selected
-                                ? _providerIds.add(provider.id)
-                                : _providerIds.remove(provider.id);
-                          }),
-                        ),
-                      )
-                      .toList(),
+            if (showSearch) ...[const SizedBox(height: 12), search],
+          ],
+        );
+      },
+    );
+  }
+
+  List<Widget> _notices() {
+    final snapshot = _snapshot;
+    return [
+      if (_providerError != null && !_discoveryForbidden)
+        NoticeBanner(
+          tone: NoticeTone.warning,
+          message: 'Provider details are unavailable: $_providerError',
+          action: TextButton(
+            onPressed: _loadProviders,
+            child: const Text('Retry providers'),
+          ),
+        ),
+      if (snapshot != null &&
+          snapshot.state != DiscoverySnapshotStateEnum.failed &&
+          (snapshot.state == DiscoverySnapshotStateEnum.partial ||
+              snapshot.warnings.isNotEmpty))
+        NoticeBanner(
+          tone: NoticeTone.warning,
+          message: snapshot.warnings.isEmpty
+              ? 'Some sources did not respond.'
+              : snapshot.warnings.join('\n'),
+          action: TextButton(
+            onPressed: _loading ? null : _runQuery,
+            child: const Text('Retry sources'),
+          ),
+        ),
+      if (_error != null &&
+          !_loading &&
+          _items.isNotEmpty &&
+          !(_discoveryForbidden && _error == _providerError))
+        NoticeBanner(
+          tone: NoticeTone.error,
+          message: _error!,
+          action: TextButton(
+            onPressed: _failedPage ? _loadMore : _runQuery,
+            child: Text(_failedPage ? 'Retry page' : 'Retry'),
+          ),
+        ),
+      if (_truncated)
+        const NoticeBanner(
+          message: 'Showing a bounded result snapshot. Refine your search for more matches.',
+        ),
+    ];
+  }
+
+  Widget _content(
+    Set<String> configuredColumns,
+    String? locale,
+    EdgeInsets gutters,
+    bool television,
+  ) {
+    if (_loading && _items.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_discoveryForbidden) {
+      return EmptyState(
+        icon: Icons.travel_explore,
+        title: 'Discover is unavailable',
+        message: _providerError,
+        action: FilledButton.tonalIcon(
+          onPressed: _retryDiscoveryAccess,
+          icon: const Icon(Icons.refresh),
+          label: const Text('Retry'),
+        ),
+      );
+    }
+    if (_error != null && _items.isEmpty) {
+      return EmptyState.error(
+        title: _mode == 'search' ? 'Search failed' : 'Results are unavailable',
+        message: _error!,
+        retryLabel: _failedPage ? 'Retry page' : 'Retry',
+        onRetry: _failedPage ? _loadMore : _runQuery,
+      );
+    }
+    if (_items.isEmpty) {
+      if (_mode != 'search') {
+        return const EmptyState(
+          icon: Icons.inbox_outlined,
+          title: 'Nothing to show',
+          message: 'No results are available for this view.',
+        );
+      }
+      final query = _searchController.text.trim();
+      if (query.isEmpty) {
+        return const EmptyState(
+          icon: Icons.search,
+          title: 'Search your indexers',
+          message: 'Enter a torrent name to search.',
+        );
+      }
+      if (_snapshot == null) {
+        return EmptyState(
+          icon: Icons.search,
+          title: 'Ready to search',
+          message: 'Press Enter to search for “$query”.',
+        );
+      }
+      return const EmptyState(
+        icon: Icons.search_off,
+        title: 'No matches',
+        message: 'No results in this fetched snapshot.',
+      );
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+        final columns = visibleDiscoveryColumns(configuredColumns);
+        final table =
+            constraints.maxWidth >= 720 &&
+            constraints.maxWidth -
+                    gutters.horizontal -
+                    discoveryFixedWidth(columns, scale) >=
+                discoveryMinimumTitleWidth;
+        final snapshot = _snapshot;
+        return NotificationListener<ScrollNotification>(
+          onNotification: _autoLoad,
+          child: CustomScrollView(
+            key: PageStorageKey('discovery-$_mode'),
+            slivers: [
+              if (snapshot != null)
+                SliverPadding(
+                  padding: gutters.add(const EdgeInsets.fromLTRB(12, 4, 12, 8)),
+                  sliver: SliverToBoxAdapter(
+                    child: Text(
+                      _countLine(snapshot, locale),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              if (table)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: DiscoveryTableHeader(
+                    columns: columns,
+                    scale: scale,
+                    padding: gutters,
+                    sort: _sort,
+                    order: _order,
+                    onSort: _loading ? null : _sortBy,
+                    background: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                ),
+              SliverPadding(
+                padding: gutters,
+                sliver: SliverList.builder(
+                  findChildIndexCallback: (key) {
+                    final index = _items.indexWhere(
+                      (result) => ValueKey('result-${result.id}') == key,
+                    );
+                    return index < 0 ? null : index;
+                  },
+                  itemCount: _items.length,
+                  itemBuilder: (context, index) => _resultRow(
+                    _items[index],
+                    columns,
+                    locale,
+                    table: table,
+                    scale: scale,
+                    television: television,
+                    last: index == _items.length - 1,
+                  ),
                 ),
               ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: _runQuery,
-                icon: const Icon(Icons.filter_alt),
-                label: const Text('Apply filters'),
+              SliverToBoxAdapter(
+                child: _snapshot?.nextCursor == null
+                    ? const SizedBox(height: 24)
+                    : Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                        child: Center(
+                          child: FilledButton.tonalIcon(
+                            onPressed: _loadingMore || _loading
+                                ? null
+                                : _loadMore,
+                            icon: _loadingMore
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.expand_more),
+                            label: const Text('Load next page'),
+                          ),
+                        ),
+                      ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-  Widget _resultTile(
+  /// Loads the next snapshot page when the user scrolls near the end. A
+  /// failed page waits for an explicit retry instead of looping.
+  bool _autoLoad(ScrollNotification notification) {
+    if (notification.depth == 0 &&
+        notification is ScrollUpdateNotification &&
+        notification.metrics.axis == Axis.vertical &&
+        notification.metrics.extentAfter < 600 &&
+        _snapshot?.nextCursor != null &&
+        !_loadingMore &&
+        !_loading &&
+        !_failedPage) {
+      unawaited(_loadMore());
+    }
+    return false;
+  }
+
+  String _countLine(DiscoverySnapshot snapshot, String? locale) {
+    final total = snapshot.totalKnown;
+    final count = formatCount(_items.length, locale: locale);
+    final results = total == null || total == _items.length
+        ? '$count ${_items.length == 1 ? 'result' : 'results'}'
+        : '$count of ${formatCount(total, locale: locale)} results';
+    return _mode == 'mostSeeded'
+        ? 'Most seeded among fetched results · $results'
+        : results;
+  }
+
+  Widget _resultRow(
     DiscoveryResult result,
-    Set<String> visibleColumns,
-    String? locale,
-  ) => Card(
-    key: ValueKey('result-${result.id}'),
-    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-    child: ListTile(
-      title: Text(result.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 6),
-        child: Wrap(
-          spacing: 12,
-          runSpacing: 4,
-          children: [
-            if (visibleColumns.contains('size'))
-              Text(formatBytes(result.sizeBytes, locale: locale)),
-            if (visibleColumns.contains('seeders'))
-              Text('Seeders ${formatCount(result.seeders, locale: locale)}'),
-            if (visibleColumns.contains('leechers'))
-              Text('Leechers ${formatCount(result.leechers, locale: locale)}'),
-            if (visibleColumns.contains('peers'))
-              Text('Peers ${formatCount(result.peers, locale: locale)}'),
-            if (visibleColumns.contains('provider')) Text(result.providerName),
-            if (visibleColumns.contains('publishedAt'))
-              Text(_publishedLabel(result.publishedAt, locale)),
-            if (result.stale) const Chip(label: Text('Stale')),
-          ],
-        ),
-      ),
-      trailing: IconButton(
-        tooltip: 'Add to downloads',
-        onPressed: result.downloadable && !_submitting
-            ? () => _startDownload(result)
-            : null,
-        icon: const Icon(Icons.download_outlined),
-      ),
-    ),
-  );
-
-  String _publishedLabel(DateTime? value, String? locale) => value == null
-      ? 'Date unknown'
-      : 'Published ${formatDate(value, locale: locale)}';
+    List<DiscoveryColumn> columns,
+    String? locale, {
+    required bool table,
+    required double scale,
+    required bool television,
+    required bool last,
+  }) {
+    final key = ValueKey('result-${result.id}');
+    final onAdd = _submitting ? null : () => _startDownload(result);
+    final onTap = result.downloadable
+        ? onAdd
+        : () => _showMessage(
+            'This source does not offer a downloadable torrent for this result.',
+          );
+    return table
+        ? DiscoveryTableRow(
+            key: key,
+            result: result,
+            columns: columns,
+            scale: scale,
+            locale: locale,
+            onTap: onTap,
+            onAdd: onAdd,
+            television: television,
+            divider: !last,
+          )
+        : DiscoveryResultTile(
+            key: key,
+            result: result,
+            columns: columns,
+            locale: locale,
+            onTap: onTap,
+            onAdd: onAdd,
+            television: television,
+            divider: !last,
+          );
+  }
 
   String? get _currentLocale =>
       ref.read(userPreferencesProvider).asData?.value.locale;
 
   Future<void> _showMagnetEntry() async {
-    final magnet = await OwnedTextDialog.show(
-      context: context,
-      title: 'Add magnet link',
-      label: 'Magnet URI',
-      hintText: 'magnet:?xt=urn:btih:…',
-      confirmLabel: 'Continue',
-      maxLength: 65536,
-    );
-    if (magnet == null || magnet.isEmpty || !mounted) return;
     final libraries = _libraries
         .where((x) => x.enabled && x.capabilities.download)
         .toList();
@@ -1083,34 +1235,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       _showMessage('No download-capable library is available to this account.');
       return;
     }
-    ModelLibrary? destination = libraries.first;
-    final accepted = await showDialog<bool>(
+    final choice = await AddDownloadDialog.show(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Choose destination'),
-          content: DropdownButtonFormField<ModelLibrary>(
-            initialValue: destination,
-            items: libraries
-                .map((x) => DropdownMenuItem(value: x, child: Text(x.name)))
-                .toList(),
-            onChanged: (x) => setDialogState(() => destination = x),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () =>
-                  Navigator.pop(dialogContext, destination != null),
-              child: const Text('Add'),
-            ),
-          ],
-        ),
-      ),
+      title: 'Add magnet link',
+      libraries: libraries,
+      confirmLabel: 'Add',
+      askForMagnet: true,
     );
-    if (accepted != true || destination == null) return;
+    final magnet = choice?.magnet;
+    final destination = choice?.library;
+    if (magnet == null || magnet.isEmpty || destination == null || !mounted) {
+      return;
+    }
     setState(() => _submitting = true);
     try {
       final typedSource = DownloadSourceOneOf1(
@@ -1131,7 +1267,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           .createDownload(
             downloadCreate: DownloadCreate(
               (b) => b
-                ..libraryId = destination!.id
+                ..libraryId = destination.id
                 ..source_ = source.toBuilder(),
             ),
             idempotencyKey: _uuid.v4(),
@@ -1145,18 +1281,4 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       if (mounted) setState(() => _submitting = false);
     }
   }
-}
-
-List<int>? _parseCategories(String value) {
-  if (value.trim().isEmpty) return null;
-  final values = value.split(',').map((x) => int.tryParse(x.trim())).toList();
-  if (values.any((x) => x == null || x < 0)) return null;
-  return values.cast<int>();
-}
-
-int? _parseGib(String value) {
-  if (value.trim().isEmpty) return null;
-  final number = double.tryParse(value.trim());
-  if (number == null || number < 0 || number > 100000) return null;
-  return (number * 1024 * 1024 * 1024).round();
 }

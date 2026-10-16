@@ -281,13 +281,17 @@ void main() {
     await _until(tester, downloadsFolder, 'completed download folder in library',
         timeout: const Duration(seconds: 45));
     await tester.tap(downloadsFolder);
-    final importedFolder = find.textContaining(config['downloadName'] as String);
+    // Match folder entries only: the app bar breadcrumb also names the
+    // current folder, and it is not a link.
+    Finder folderEntry(String name) => find.descendant(
+      of: find.byType(CustomScrollView), matching: find.textContaining(name));
+    final importedFolder = folderEntry(config['downloadName'] as String);
     await _until(tester, importedFolder, 'imported download folder');
     await tester.tap(importedFolder.last);
     // The torrent metadata includes its root directory as a nested entry under
     // the per-job import directory. Walk that real library folder before
     // asserting the imported media item is browseable.
-    final torrentRoot = find.textContaining(config['downloadName'] as String);
+    final torrentRoot = folderEntry(config['downloadName'] as String);
     await _until(tester, torrentRoot, 'torrent root directory in imported folder',
         timeout: const Duration(seconds: 45));
     await tester.tap(torrentRoot.last);

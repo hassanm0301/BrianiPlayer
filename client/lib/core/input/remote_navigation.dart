@@ -111,7 +111,9 @@ class _MediaPauseIntent extends Intent {
   const _MediaPauseIntent();
 }
 
-/// Full-width, remote-friendly primary navigation for TV layouts.
+/// Compact, remote-friendly primary navigation for TV layouts: a single row
+/// of tabs across the top (the Google TV convention), leaving the rest of the
+/// 16:9 screen for content.
 class TvNavigationScaffold extends StatelessWidget {
   const TvNavigationScaffold({
     super.key,
@@ -121,8 +123,8 @@ class TvNavigationScaffold extends StatelessWidget {
     this.profile,
     this.account,
     this.destinations = const [
-      TvNavigationDestination(Icons.folder_outlined, 'Libraries'),
-      TvNavigationDestination(Icons.search, 'Discover'),
+      TvNavigationDestination(Icons.video_library_outlined, 'Libraries'),
+      TvNavigationDestination(Icons.travel_explore_outlined, 'Discover'),
       TvNavigationDestination(Icons.download_outlined, 'Downloads'),
     ],
   });
@@ -135,40 +137,61 @@ class TvNavigationScaffold extends StatelessWidget {
   final List<TvNavigationDestination> destinations;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: profile ?? const Text('Briani Player'),
-          actions: [?account],
-        ),
-        body: Column(
-          children: [
-            Material(
-              elevation: 1,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Scaffold(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: scheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.play_arrow_rounded, color: scheme.onPrimary, size: 28),
                 ),
-                child: Row(
-                  children: [
-                    for (var i = 0; i < destinations.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 12),
-                      Expanded(
-                        child: _TvNavigationButton(
-                          destination: destinations[i],
-                          selected: i == index,
-                          onPressed: () => onSelected(i),
+                const SizedBox(width: 20),
+                for (var i = 0; i < destinations.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  _TvNavigationButton(
+                    destination: destinations[i],
+                    selected: i == index,
+                    onPressed: () => onSelected(i),
+                  ),
+                ],
+                const SizedBox(width: 16),
+                // The server label takes only the space left by the tabs and
+                // ellipsizes, so long names or large text never overflow.
+                Expanded(
+                  child: profile == null
+                      ? const SizedBox.shrink()
+                      : Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: DefaultTextStyle.merge(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                            child: profile!,
+                          ),
                         ),
-                      ),
-                    ],
-                  ],
                 ),
-              ),
+                if (account != null) ...[const SizedBox(width: 12), account!],
+              ],
             ),
-            Expanded(child: child),
-          ],
-        ),
-      );
+          ),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
 }
 
 class TvNavigationDestination {
@@ -177,7 +200,7 @@ class TvNavigationDestination {
   final String label;
 }
 
-class _TvNavigationButton extends StatelessWidget {
+class _TvNavigationButton extends StatefulWidget {
   const _TvNavigationButton({
     required this.destination,
     required this.selected,
@@ -188,22 +211,100 @@ class _TvNavigationButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-        selected: selected,
-        button: true,
-        label: destination.label,
-        child: FilledButton.tonalIcon(
-          style: _tvButtonStyle(context),
-          autofocus: selected,
-          onPressed: onPressed,
-          icon: Icon(destination.icon),
-          label: Text(destination.label),
+  State<_TvNavigationButton> createState() => _TvNavigationButtonState();
+}
+
+class _TvNavigationButtonState extends State<_TvNavigationButton> {
+  final _focusNode = FocusNode(debugLabel: 'TV navigation tab');
+  bool _settled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selected) {
+      FocusManager.instance.addListener(_claimInitialFocus);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _claimInitialFocus());
+    } else {
+      _settled = true;
+    }
+  }
+
+  /// At launch the content route focuses its own empty scope, which wins
+  /// over `autofocus` and leaves nothing visibly focused. Until a real
+  /// control receives focus, the selected tab takes it so the first D-pad
+  /// press starts from a known place. Later route changes are untouched.
+  void _claimInitialFocus() {
+    if (_settled) return;
+    final primary = FocusManager.instance.primaryFocus;
+    if (!mounted || (primary != null && primary is! FocusScopeNode)) {
+      _stopClaiming();
+      return;
+    }
+    if (widget.selected && _focusNode.canRequestFocus) {
+      _focusNode.requestFocus();
+    }
+  }
+
+  void _stopClaiming() {
+    if (_settled) return;
+    _settled = true;
+    FocusManager.instance.removeListener(_claimInitialFocus);
+  }
+
+  @override
+  void dispose() {
+    _stopClaiming();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final destination = widget.destination;
+    final selected = widget.selected;
+    final onPressed = widget.onPressed;
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      selected: selected,
+      button: true,
+      label: destination.label,
+      child: FilledButton.icon(
+        style: _tvButtonStyle(context).copyWith(
+          minimumSize: const WidgetStatePropertyAll(Size(64, 48)),
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 20),
+          ),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.focused)
+                ? scheme.onSurface
+                : selected
+                ? scheme.secondaryContainer
+                : Colors.transparent,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.focused)
+                ? scheme.surface
+                : selected
+                ? scheme.onSecondaryContainer
+                : scheme.onSurfaceVariant,
+          ),
         ),
-      );
+        focusNode: _focusNode,
+        autofocus: selected,
+        onPressed: onPressed,
+        icon: Icon(destination.icon),
+        label: Text(destination.label),
+      ),
+    );
+  }
 }
 
 /// Pure presentation controls; the owning playback feature supplies every
 /// action and remains responsible for playback state and authorization.
+///
+/// Drawn as a bottom overlay on a gradient: title, progress with times and
+/// one row of large focusable buttons. Focus is shown by inverting the
+/// button and enlarging it, not by color alone.
 class TvPlayerControls extends StatelessWidget {
   const TvPlayerControls({
     super.key,
@@ -230,65 +331,122 @@ class TvPlayerControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final maximum = duration.inMilliseconds.clamp(0, 0x7fffffff);
     final value = position.inMilliseconds.clamp(0, maximum);
+    final timeStyle = theme.textTheme.titleSmall?.copyWith(
+      color: Colors.white.withValues(alpha: .85),
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
     return Material(
-      color: Colors.black.withValues(alpha: 0.82),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (title != null) ...[
-              Text(title!, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 12),
+      type: MaterialType.transparency,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [
+              Colors.black.withValues(alpha: .88),
+              Colors.black.withValues(alpha: .6),
+              Colors.black.withValues(alpha: 0),
             ],
-            Semantics(
-              label: 'Playback position',
-              value: '${_format(position)} of ${_format(duration)}',
-              child: LinearProgressIndicator(
-                value: maximum == 0 ? null : value / maximum,
-                minHeight: 6,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                if (onSeekBack != null)
-                  _control(context, Icons.replay_10, 'Back 10 seconds', onSeekBack!),
-                _control(
-                  context, playing ? Icons.pause : Icons.play_arrow,
-                  playing ? 'Pause' : 'Play',
-                  onPlayPause,
-                  autofocus: true,
+            stops: const [0, .55, 1],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(48, 64, 48, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (title != null) ...[
+                Text(
+                  title!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
-                if (onSeekForward != null)
-                  _control(context, Icons.forward_10, 'Forward 10 seconds', onSeekForward!),
-                if (onTracks != null)
-                  _control(context, Icons.subtitles_outlined, 'Tracks', onTracks!),
-                if (onOptions != null)
-                  _control(context, Icons.settings_outlined, 'Playback options', onOptions!),
+                const SizedBox(height: 16),
               ],
-            ),
-          ],
+              Row(
+                children: [
+                  ExcludeSemantics(
+                    child: Text(_format(position), style: timeStyle),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Semantics(
+                      label: 'Playback position',
+                      value: '${_format(position)} of ${_format(duration)}',
+                      child: LinearProgressIndicator(
+                        // Unknown duration shows an empty track; buffering
+                        // is reported separately by the player.
+                        value: maximum == 0 ? 0 : value / maximum,
+                        minHeight: 6,
+                        borderRadius: BorderRadius.circular(3),
+                        color: theme.colorScheme.primary,
+                        backgroundColor: Colors.white.withValues(alpha: .24),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ExcludeSemantics(
+                    child: Text(_format(duration), style: timeStyle),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  if (onSeekBack != null) ...[
+                    _TvPlayerButton(
+                      icon: Icons.replay_10_rounded,
+                      label: 'Back 10 seconds',
+                      iconOnly: true,
+                      onPressed: onSeekBack!,
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  _TvPlayerButton(
+                    icon: playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    label: playing ? 'Pause' : 'Play',
+                    autofocus: true,
+                    onPressed: onPlayPause,
+                  ),
+                  if (onSeekForward != null) ...[
+                    const SizedBox(width: 12),
+                    _TvPlayerButton(
+                      icon: Icons.forward_10_rounded,
+                      label: 'Forward 10 seconds',
+                      iconOnly: true,
+                      onPressed: onSeekForward!,
+                    ),
+                  ],
+                  const Spacer(),
+                  if (onTracks != null)
+                    _TvPlayerButton(
+                      icon: Icons.subtitles_outlined,
+                      label: 'Tracks',
+                      onPressed: onTracks!,
+                    ),
+                  if (onOptions != null) ...[
+                    const SizedBox(width: 12),
+                    _TvPlayerButton(
+                      icon: Icons.settings_outlined,
+                      label: 'Playback options',
+                      onPressed: onOptions!,
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
-  Widget _control(BuildContext context, IconData icon, String label, VoidCallback onPressed,
-          {bool autofocus = false}) =>
-      FilledButton.tonalIcon(
-        style: _tvButtonStyle(context),
-        autofocus: autofocus,
-        onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(label),
-      );
 
   static String _format(Duration value) {
     final seconds = value.inSeconds;
@@ -298,6 +456,93 @@ class TvPlayerControls extends StatelessWidget {
     return hours > 0
         ? '$hours:${minutes.toString().padLeft(2, '0')}:${remainder.toString().padLeft(2, '0')}'
         : '${seconds ~/ 60}:${remainder.toString().padLeft(2, '0')}';
+  }
+}
+
+/// A large pill (or round, for [iconOnly]) TV player button. Labelled
+/// buttons show their text; icon-only ones expose [label] to semantics.
+class _TvPlayerButton extends StatefulWidget {
+  const _TvPlayerButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.iconOnly = false,
+    this.autofocus = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final bool iconOnly;
+  final bool autofocus;
+
+  @override
+  State<_TvPlayerButton> createState() => _TvPlayerButtonState();
+}
+
+class _TvPlayerButtonState extends State<_TvPlayerButton> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final style = ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(56, 56)),
+      fixedSize: widget.iconOnly
+          ? const WidgetStatePropertyAll(Size(56, 56))
+          : null,
+      padding: WidgetStatePropertyAll(
+        widget.iconOnly
+            ? EdgeInsets.zero
+            : const EdgeInsets.symmetric(horizontal: 24),
+      ),
+      shape: WidgetStatePropertyAll(
+        widget.iconOnly ? const CircleBorder() : const StadiumBorder(),
+      ),
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.focused)
+            ? Colors.white
+            : Colors.white.withValues(alpha: .16),
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.focused)
+            ? Colors.black
+            : Colors.white,
+      ),
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      side: const WidgetStatePropertyAll(BorderSide.none),
+      elevation: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.focused) ? 6 : 0,
+      ),
+      iconSize: const WidgetStatePropertyAll(28),
+      textStyle: WidgetStatePropertyAll(
+        theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    );
+    final button = FilledButton(
+      style: style,
+      autofocus: widget.autofocus,
+      onPressed: widget.onPressed,
+      onFocusChange: (focused) => setState(() => _focused = focused),
+      child: widget.iconOnly
+          ? Icon(widget.icon, semanticLabel: widget.label)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(widget.icon),
+                const SizedBox(width: 10),
+                Text(widget.label),
+              ],
+            ),
+    );
+    return AnimatedScale(
+      scale: _focused ? 1.1 : 1,
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOutCubic,
+      child: widget.iconOnly
+          ? Tooltip(message: widget.label, child: button)
+          : button,
+    );
   }
 }
 
@@ -330,10 +575,11 @@ class TvFocusPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: width, maxHeight: 640),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(28, 20, 20, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -341,8 +587,13 @@ class TvFocusPanel extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(title,
-                          style: Theme.of(context).textTheme.headlineSmall),
+                      child: Semantics(
+                        header: true,
+                        child: Text(
+                          title,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ),
                     ),
                     IconButton(
                       tooltip: 'Close $title',
@@ -352,7 +603,7 @@ class TvFocusPanel extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Divider(),
+                const SizedBox(height: 8),
                 Flexible(child: child),
               ],
             ),
