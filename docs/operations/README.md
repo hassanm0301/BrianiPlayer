@@ -115,6 +115,8 @@ In the app, open **Administration → Add library**, select **Mounted storage** 
 
 For other people, use **Create user** and the library's access controls. **Read** allows browsing/playback; **Download** adds torrent downloads; **Manage** adds file-management actions. Download and Manage also require Read. Choose **Save access** after editing grants.
 
-To search for torrents, follow [Prowlarr setup](advanced.md#8-set-up-torrent-discovery-in-prowlarr). Existing files can be used without configuring indexers.
+## 6. Set up torrent search (optional)
+
+Discover stays empty until you add indexers in Prowlarr. Follow [Set up torrent search](indexers.md). It takes about ten minutes. Existing files can be used without configuring indexers.
 
 For daily app use, see the [user guide](../user-guide.md). Backups, upgrades, service controls, and recovery are in [advanced server setup and maintenance](advanced.md).

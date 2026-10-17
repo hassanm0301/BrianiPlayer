@@ -218,6 +218,8 @@ Grant each person only the access they need. A member with no library grants see
 
 Skip indexer setup if you only want to browse your existing files. For torrent search, add your chosen indexers in Prowlarr's own administration UI, then test the connections in Briani. Briani does not supply indexer accounts or configure Prowlarr as a download client; Briani controls qBittorrent itself.
 
+For a step-by-step walkthrough, including Prowlarr's first login and fixes for each Discover message, follow [Set up torrent search](indexers.md). This section is the reference version, using the `briani_compose` helper.
+
 ### Keep Compose commands attached to this deployment
 
 The operations tool gives each deployment a name based on its **absolute project directory**. A plain `docker compose up` uses a different name and can create a second stack. Define this helper in the same Bash terminal to use the tool's exact project name for status, maintenance, and the private admin overlay:
@@ -377,7 +379,7 @@ Do not forward qBittorrent/Prowlarr administration ports to the internet. Public
 | HTTP 400 when connecting | Check that the address's hostname/IP is in `BRIANI_HOSTS`; entries have no scheme or port. |
 | Bootstrap code expired | A restart does not renew it. Before any administrator exists, use the regeneration steps below. |
 | No libraries or media | Add a directory under the mounted data root, scan it, and check the user's Read grant. |
-| Discovery empty/unavailable | Test both integrations; check Prowlarr indexers, categories, credentials, and the user's Read + Download grant on a writable library. |
+| Discovery empty/unavailable | See [torrent search troubleshooting](indexers.md#if-something-doesnt-work). Test both integrations; check Prowlarr indexers, categories, credentials, and the user's Read + Download grant on a writable library. |
 | Playback keeps buffering | Check peers/download speed and available data. Seeking ahead waits for sequential transfer; it does not prioritize missing pieces. |
 | Video works on one device only | The client must decode the codec/container. Try a compatible external player; the server does not transcode. |
 | qBittorrent stays disconnected | Check service health first. Automatic reconnect remains a candidate limitation; controlled qBittorrent restart recovery has recorded evidence. |

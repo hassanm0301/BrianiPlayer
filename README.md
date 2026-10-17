@@ -6,7 +6,8 @@ Browse and play media from your own server on Linux, Android phones/tablets, and
 
 1. [Set up the Docker server](docs/operations/README.md).
 2. [Install the app](docs/client-installation.md).
-3. [Browse, download, and watch](docs/user-guide.md).
+3. [Set up torrent search](docs/operations/indexers.md) (optional).
+4. [Browse, download, and watch](docs/user-guide.md).
 
 The server runs on 64-bit Linux amd64 or ARM64, including a Pi 5 with a compatible host. Video decoding happens on your client device; the server does not transcode. There is no browser or iOS app.
 
