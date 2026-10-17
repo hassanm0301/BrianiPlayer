@@ -1,0 +1,12 @@
+{
+  "scope": "packaged-startup-Xvfb",
+  "sdkOnPath": false,
+  "playbackVerified": false,
+  "systemRuntimeDependencies": "linux-runtime-ldd.log",
+  "status": "passed",
+  "visibleWindow": true,
+  "renderedColors": 2488,
+  "freshProfile": true,
+  "screenshot": "linux-packaged-startup.png",
+  "shutdownExitCode": -15
+}

@@ -67,7 +67,7 @@ If a listed file is missing or a checksum fails, obtain the matching complete ca
 docker image load -i dist/images/briani-server-and-egress-linux-amd64.tar
 ```
 
-Use `briani-server:v1.2.0` as the server image in the next step.
+Use `briani-server:v1.3.0` as the server image in the next step.
 
 **On an ARM64 host**, load both:
 
@@ -76,7 +76,7 @@ docker image load -i dist/images/briani-server-linux-arm64.tar
 docker image load -i dist/images/briani-egress-linux-arm64.tar
 ```
 
-Use `briani-server:v1.2.0-arm64` in the next step. Loading these archives does not verify native Pi execution.
+Use `briani-server:v1.3.0-arm64` in the next step. Loading these archives does not verify native Pi execution.
 
 The operations tool selects the matching network guard image automatically and verifies both images against `images.lock.json`. qBittorrent and Prowlarr are pulled using the pinned references in Compose, so initial setup also needs access to their image registry. The private local tags above are supported only with `--local-image` and the exact supplied image identities.
 
@@ -101,9 +101,9 @@ BRIANI_PROJECT="/home/you/briani/ops"
 BRIANI_STATE_DIR="/mnt/briani-ssd/state"
 BRIANI_MEDIA_DIR="/mnt/briani-ssd/media"
 BRIANI_SERVER_IP="192.168.1.50"
-BRIANI_SERVER_IMAGE="briani-server:v1.2.0"
+BRIANI_SERVER_IMAGE="briani-server:v1.3.0"
 
-# On ARM64, change BRIANI_SERVER_IMAGE to briani-server:v1.2.0-arm64.
+# On ARM64, change BRIANI_SERVER_IMAGE to briani-server:v1.3.0-arm64.
 python3 "$BRIANI_PACKAGE/tools/operations/briani.py" init \
   --project "$BRIANI_PROJECT" \
   --data "$BRIANI_MEDIA_DIR" \

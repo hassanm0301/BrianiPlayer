@@ -3,23 +3,23 @@
   "services": {
     "briani": {
       "reference": null,
-      "localTag": "briani-server:v1.2.0",
-      "localImageId": "sha256:0c7a33229a8680f280bb4154ee72d9962abd070a6c03f3c856a1d075a10e5b02",
+      "localTag": "briani-server:v1.3.0",
+      "localImageId": "sha256:0a8ba6f9a88cdb36b36ab9b679d71d30110336450f0d6c5933fa8727e6e0e5e6",
       "observedArchitecture": "amd64",
       "publicRelease": false,
       "acceptedReferences": [],
       "nativeArm64": {
-        "localTag": "briani-server:v1.2.0-arm64",
-        "localImageId": "sha256:659aa94350caa849102bcc6c0619f48c6fc277677bbd87a7abda89a226d914de",
-        "runtimeConfigDigest": "sha256:87db6343fcf24342baced81c8259c065d6eb7c08042dcfa10c57d7f99311edf3",
+        "localTag": "briani-server:v1.3.0-arm64",
+        "localImageId": "sha256:6d854030f7823c10293c168d277490fb724d111a28194bfab074c57b7dc41701",
+        "runtimeConfigDigest": "sha256:e308e70c841d3dfbf4ec9807c7d32c0fe3d15267f679fbf141c7d48bd58e81f3",
         "verificationStatus": "portable_api_overlay_native_runtime_user_deferred",
         "nativeBuildEvidence": "docs/evidence/M10/pi-native.md",
         "observedArchitecture": "arm64",
-        "buildEvidence": "docs/evidence/release-v1.2.0/server-arm64-overlay.log",
+        "buildEvidence": "docs/evidence/release-v1.3.0/server-arm64-overlay.log",
         "buildMethod": "COPY-only portable .NET IL overlay over retained native ARM64 FFmpeg/runtime; no ARM64 execution"
       },
-      "runtimeConfigDigest": "sha256:cb3b9cee8de7cb8d453acf3d9189a9059e2fd056262f3681fd6577d2e2ff009e",
-      "buildEvidence": "docs/evidence/release-v1.2.0/server-amd64-build.log"
+      "runtimeConfigDigest": "sha256:15c5c31d44b547699a6d001509cd7969c6a4b23a4c0c1200c8956a760fb88d1c",
+      "buildEvidence": "docs/evidence/release-v1.3.0/server-amd64-build.log"
     },
     "qbittorrent": {
       "reference": "lscr.io/linuxserver/qbittorrent@sha256:97333cc1ccf903e0bbcd8eb67e3332e4970e9c1ecabe145e499e9c0847ebcaed",
