@@ -12,7 +12,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Briani.DiscoveryTests;
 
-public sealed class TestHost : WebApplicationFactory<Program>
+// Extra service registrations run after the application's own, so a test can wrap a dependency.
+public sealed class TestHost(Action<IServiceCollection>? extra = null) : WebApplicationFactory<Program>
 {
     public string Root { get; } = Path.Combine(Path.GetTempPath(), "briani-discovery-" + Guid.NewGuid());
     public ManualClock Clock { get; } = new(new DateTimeOffset(2026, 1, 2, 3, 4, 5, TimeSpan.Zero));
@@ -25,7 +26,7 @@ public sealed class TestHost : WebApplicationFactory<Program>
             ["MediaProcessing:BackgroundScansEnabled"]="false",["Briani:BackgroundMediaOperations"]="false",["Briani:BackgroundDiscovery"]="false",
             ["Briani:StateRoot"] = Path.Combine(Root, "state"), ["Briani:DataRoot"] = Path.Combine(Root, "data")
         }));
-        builder.ConfigureTestServices(services => services.RemoveAll<TimeProvider>().AddSingleton<TimeProvider>(Clock));
+        builder.ConfigureTestServices(services => { services.RemoveAll<TimeProvider>().AddSingleton<TimeProvider>(Clock); extra?.Invoke(services); });
     }
 
     public string BootstrapCode()

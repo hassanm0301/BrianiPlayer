@@ -28,6 +28,8 @@ public sealed record IndexerCreateRequest([property: JsonRequired] string Defini
     Dictionary<string, string>? Settings);
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record IndexerPatchRequest([property: JsonRequired] bool Enabled);
+// Prowlarr was sent a change but did not confirm it in time, so it may still apply it.
+public sealed class UnconfirmedIndexerChange() : Exception("indexer_timeout");
 
 /// <summary>
 /// Narrow administrator view of Prowlarr's torrent indexers: list, add from a definition,
@@ -50,6 +52,7 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
 
     private readonly SemaphoreSlim catalogGate = new(1, 1);
     // Upstream changes are serialized so an observe/compare/act toggle never interleaves with another change.
+    // Tests share it, so this page's slow Prowlarr calls hold at most one of SafeHttp's two connection slots.
     private readonly SemaphoreSlim mutations = new(1, 1);
     private Catalog? catalog;
 
@@ -85,7 +88,9 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
             summary.Addable ? rules.Values.Select(x => x.Field).ToArray() : []);
     }
 
-    public async Task<AdminIndexer> CreateAsync(IndexerCreateRequest request, CancellationToken ct = default)
+    // Each change takes an authorize callback, run once the change holds the lock and just before the
+    // write: a change can wait behind another one, and the administrator may be demoted meanwhile.
+    public async Task<AdminIndexer> CreateAsync(IndexerCreateRequest request, Func<CancellationToken, Task> authorize, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         var (summary, entry) = await EntryAsync(request.Definition ?? string.Empty, ct);
@@ -121,18 +126,19 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
         await mutations.WaitAsync(ct);
         try
         {
+            await authorize(ct);
             // Prowlarr tests an enabled indexer before saving it; a failed test saves nothing.
-            var reply = await SendAsync(ProwlarrCall.CreateIndexer(body), ct);
+            var reply = await ChangeAsync(ProwlarrCall.CreateIndexer(body));
             if (reply.Status == 400)
                 throw new ApiException(400, "indexer_rejected", "Prowlarr did not add this indexer: " + Reason(reply.Body, secrets));
             Expect(reply, 201, 200);
             using var created = Parse(reply.Body, 32);
-            return Summary(created.RootElement, await HealthAsync(ct)) ?? throw Invalid();
+            return Summary(created.RootElement, await HealthAsync(CancellationToken.None)) ?? throw Invalid();
         }
         finally { mutations.Release(); }
     }
 
-    public async Task<(AdminIndexer Indexer, bool Changed)> SetEnabledAsync(int id, bool enabled, CancellationToken ct = default)
+    public async Task<(AdminIndexer Indexer, bool Changed)> SetEnabledAsync(int id, bool enabled, Func<CancellationToken, Task> authorize, CancellationToken ct = default)
     {
         await mutations.WaitAsync(ct);
         try
@@ -144,20 +150,28 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
                 return (Summary(unchanged.RootElement, await HealthAsync(ct)) ?? throw Invalid(), false);
             }
             resource["enable"] = enabled;
+            await authorize(ct);
             // Without forceSave Prowlarr tests the indexer when it is being enabled and keeps it disabled on failure.
-            var reply = await SendAsync(ProwlarrCall.UpdateIndexer(id, Encoding.UTF8.GetBytes(resource.ToJsonString())), ct);
+            var reply = await ChangeAsync(ProwlarrCall.UpdateIndexer(id, Encoding.UTF8.GetBytes(resource.ToJsonString())));
             if (reply.Status == 404) throw new ApiException(404, "not_found");
             if (reply.Status == 400)
                 throw new ApiException(400, "indexer_rejected",
                     (enabled ? "Prowlarr did not enable this indexer: " : "Prowlarr did not save this change: ") + Reason(reply.Body, Secrets(raw)));
             Expect(reply, 202, 200);
             using var updated = Parse(reply.Body, 32);
-            return (Summary(updated.RootElement, await HealthAsync(ct)) ?? throw Invalid(), true);
+            return (Summary(updated.RootElement, await HealthAsync(CancellationToken.None)) ?? throw Invalid(), true);
         }
         finally { mutations.Release(); }
     }
 
     public async Task<IndexerTestResult> TestAsync(int id, CancellationToken ct = default)
+    {
+        await mutations.WaitAsync(ct);
+        try { return await TestLockedAsync(id, ct); }
+        finally { mutations.Release(); }
+    }
+
+    private async Task<IndexerTestResult> TestLockedAsync(int id, CancellationToken ct)
     {
         var (_, raw) = await IndexerAsync(id, ct);
         var identifier = id.ToString(CultureInfo.InvariantCulture);
@@ -175,14 +189,15 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
         }
     }
 
-    public async Task DeleteAsync(int id, CancellationToken ct = default)
+    public async Task DeleteAsync(int id, Func<CancellationToken, Task> authorize, CancellationToken ct = default)
     {
         await mutations.WaitAsync(ct);
         try
         {
             // Prowlarr answers 200 for unknown IDs too, so existence and protocol are checked first.
             await IndexerAsync(id, ct);
-            var reply = await SendAsync(ProwlarrCall.DeleteIndexer(id), ct);
+            await authorize(ct);
+            var reply = await ChangeAsync(ProwlarrCall.DeleteIndexer(id));
             if (reply.Status == 404) throw new ApiException(404, "not_found");
             Expect(reply, 200);
         }
@@ -432,6 +447,7 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
     // is used, with addresses and every known setting value removed.
     private static string Reason(byte[] body, IEnumerable<string> secrets)
     {
+        var hidden = secrets.Where(x => x.Length >= 4).Distinct().OrderByDescending(x => x.Length).ToArray();
         var parts = new List<string>();
         try
         {
@@ -439,7 +455,8 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
             if (document.RootElement.ValueKind == JsonValueKind.Array)
                 foreach (var failure in document.RootElement.EnumerateArray().Take(3))
                 {
-                    var message = SafeText(String(failure, "errorMessage"), 300);
+                    // The whole message is scrubbed before it is shortened, so a cut never leaves part of a value behind.
+                    var message = SafeText(Scrub(SafeText(String(failure, "errorMessage"), int.MaxValue), hidden), 300);
                     if (message.Length == 0) continue;
                     var property = String(failure, "propertyName");
                     parts.Add(property is { Length: > 0 and <= 64 } && property.All(x => char.IsAsciiLetterOrDigit(x) || x == '.') ? $"{property}: {message}" : message);
@@ -447,10 +464,14 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
         }
         catch (ApiException) { }
         var text = string.Join(" ", parts);
-        text = Address.Replace(text, "(address hidden)");
-        foreach (var secret in secrets.Where(x => x.Length >= 4).Distinct().OrderByDescending(x => x.Length))
-            text = text.Replace(secret, "(hidden)", StringComparison.OrdinalIgnoreCase);
         return text.Length > 0 ? text : "Prowlarr rejected the request.";
+    }
+
+    private static string Scrub(string text, string[] secrets)
+    {
+        text = Address.Replace(text, "(address hidden)");
+        foreach (var secret in secrets) text = text.Replace(secret, "(hidden)", StringComparison.OrdinalIgnoreCase);
+        return text;
     }
 
     private static string[] Secrets(byte[] raw)
@@ -463,6 +484,14 @@ public sealed class IndexerAdministration(IProwlarrAdminTransport transport, Ser
                 .Select(x => x.GetString()!).Where(x => x.Length >= 4).Take(200).ToArray();
         }
         catch (ApiException) { return []; }
+    }
+
+    // A change that has been sent is not cancelled with the request (the transport's deadline still applies),
+    // so its outcome is known and audited even when the caller goes away. A late answer is unconfirmed.
+    private async Task<ProwlarrReply> ChangeAsync(ProwlarrCall call)
+    {
+        try { return await SendAsync(call, CancellationToken.None); }
+        catch (ApiException error) when (error.Code == "indexer_timeout") { throw new UnconfirmedIndexerChange(); }
     }
 
     private async Task<ProwlarrReply> SendAsync(ProwlarrCall call, CancellationToken ct)

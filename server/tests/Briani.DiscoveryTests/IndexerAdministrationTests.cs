@@ -17,7 +17,7 @@ public sealed class IndexerAdministrationTests : IAsyncLifetime
     private const string CookieSecret = "cookie-secret-value-1";
     private const string PasswordSecret = "password-secret-value-2";
     private const string NativeSecret = "native-pid-secret-3";
-    private readonly TestHost host = new();
+    private readonly TestHost host = new(services => services.AddSingleton<LateProwlarr>().AddSingleton<IProwlarrAdminTransport>(sp => sp.GetRequiredService<LateProwlarr>()));
     private readonly FakeProwlarr prowlarr = new();
     private HttpClient client = null!;
     private AuthReply admin = null!;
@@ -238,6 +238,117 @@ public sealed class IndexerAdministrationTests : IAsyncLifetime
         Assert.Equal(0, await host.InDb(db => db.AuditEvents.CountAsync(x => x.Action == "indexer.created")));
     }
 
+    [Fact]
+    public async Task Long_rejection_reasons_are_scrubbed_before_they_are_shortened()
+    {
+        const string typed = "typed-key-that-straddles-the-cut";
+        // The value starts just before the 300-character limit on a failure message.
+        prowlarr.FailureMessage = key => new string('x', 290) + " " + key + " was refused by the site.";
+        using var response = await client.PostAsJsonAsync("/api/v1/admin/indexers", new
+        {
+            definition = "brianifixture", settings = new Dictionary<string, string> { ["apikey"] = typed }
+        });
+        var text = await response.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.DoesNotContain(typed[..9], text, StringComparison.Ordinal);
+        Assert.Contains("(hid", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task A_change_sent_to_Prowlarr_is_audited_when_the_caller_goes_away()
+    {
+        var id = prowlarr.Seed("fixturepublic", "Public", true, new Dictionary<string, JsonNode?>());
+        prowlarr.PauseOn = (method, _) => method == "DELETE";
+        prowlarr.Pause = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cancel = new CancellationTokenSource();
+        var pending = client.DeleteAsync($"/api/v1/admin/indexers/{id}", cancel.Token);
+        await prowlarr.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        cancel.Cancel();
+        // Prowlarr carries on with a request whose caller has gone, as ASP.NET Core does.
+        prowlarr.Pause.TrySetResult();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pending);
+
+        string[] audited = [];
+        for (var i = 0; i < 50 && audited.Length == 0; i++)
+        {
+            await Task.Delay(100);
+            audited = await host.InDb(db => db.AuditEvents.Where(x => x.Action == "indexer.deleted" && x.TargetId == id.ToString()).Select(x => x.Result).ToArrayAsync());
+        }
+        Assert.False(prowlarr.Exists(id));
+        // Prowlarr's answer was awaited rather than abandoned, so the change is recorded as done.
+        Assert.Equal(new[] { "success" }, audited);
+    }
+
+    [Fact]
+    public async Task A_change_Prowlarr_does_not_confirm_in_time_is_audited_as_unconfirmed()
+    {
+        var late = host.Services.GetRequiredService<LateProwlarr>();
+        late.TooLate = call => call.Method != HttpMethod.Get;
+        var id = prowlarr.Seed("fixturepublic", "Public", true, new Dictionary<string, JsonNode?>());
+
+        using var disabled = await client.PatchAsJsonAsync($"/api/v1/admin/indexers/{id}", new { enabled = false });
+        Assert.Equal(HttpStatusCode.GatewayTimeout, disabled.StatusCode);
+        Assert.Contains("indexer_timeout", await disabled.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        using var created = await client.PostAsJsonAsync("/api/v1/admin/indexers", new { definition = "fixturepublic", name = "Late public" });
+        Assert.Equal(HttpStatusCode.GatewayTimeout, created.StatusCode);
+        using var deleted = await client.DeleteAsync($"/api/v1/admin/indexers/{id}");
+        Assert.Equal(HttpStatusCode.GatewayTimeout, deleted.StatusCode);
+
+        var rows = await host.InDb(db => db.AuditEvents.Where(x => x.TargetType == "indexer").ToListAsync());
+        Assert.Equal(new[] { "indexer.created:", "indexer.deleted:" + id, "indexer.disabled:" + id }, rows.Select(x => x.Action + ":" + x.TargetId).Order().ToArray());
+        Assert.All(rows, x => Assert.Equal("unconfirmed", x.Result));
+    }
+
+    [Fact]
+    public async Task A_change_queued_behind_another_rechecks_the_administrator_before_writing()
+    {
+        var first = prowlarr.Seed("fixturepublic", "First", true, new Dictionary<string, JsonNode?>());
+        var second = prowlarr.Seed("fixturepublic", "Second", true, new Dictionary<string, JsonNode?>());
+        prowlarr.PauseOn = (method, _) => method == "DELETE";
+        prowlarr.Pause = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        var deleting = client.DeleteAsync($"/api/v1/admin/indexers/{first}");
+        await prowlarr.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var toggling = client.PatchAsJsonAsync($"/api/v1/admin/indexers/{second}", new { enabled = false });
+        // Give the second change time to pass the first administrator check and queue behind the delete.
+        await Task.Delay(1000);
+        await host.InDb(async db =>
+        {
+            var user = await db.Users.SingleAsync(x => x.Id == admin.User.Id);
+            user.Role = "member";
+            return await db.SaveChangesAsync();
+        });
+        prowlarr.Pause.TrySetResult();
+
+        using var deleted = await deleting.WaitAsync(TimeSpan.FromSeconds(10));
+        using var toggled = await toggling.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.Equal(HttpStatusCode.Forbidden, deleted.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, toggled.StatusCode);
+        Assert.Empty(prowlarr.Calls("PUT", "/api/v1/indexer"));
+        Assert.True((bool)prowlarr.Stored(second)["enable"]!);
+        Assert.Equal(0, await host.InDb(db => db.AuditEvents.CountAsync(x => x.Action == "indexer.disabled")));
+    }
+
+    [Fact]
+    public async Task Indexer_tests_run_one_at_a_time()
+    {
+        var one = prowlarr.Seed("brianifixture", "One", true, new Dictionary<string, JsonNode?> { ["apikey"] = FakeProwlarr.GoodKey });
+        var two = prowlarr.Seed("brianifixture", "Two", true, new Dictionary<string, JsonNode?> { ["apikey"] = FakeProwlarr.GoodKey });
+        prowlarr.PauseOn = (method, path) => method == "POST" && path == "/api/v1/indexer/test";
+        prowlarr.Pause = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        var first = client.PostAsync($"/api/v1/admin/indexers/{one}/test", null);
+        await prowlarr.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        var second = client.PostAsync($"/api/v1/admin/indexers/{two}/test", null);
+        await Task.Delay(1000);
+        // A slow Prowlarr test holds one of the two upstream connection slots that discovery shares.
+        Assert.Single(prowlarr.Calls("POST", "/api/v1/indexer/test"));
+        prowlarr.Pause.TrySetResult();
+        using var a = await first.WaitAsync(TimeSpan.FromSeconds(10));
+        using var b = await second.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.Equal(HttpStatusCode.OK, a.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, b.StatusCode);
+        Assert.Equal(2, prowlarr.Calls("POST", "/api/v1/indexer/test").Count());
+    }
+
     public static TheoryData<string, string, string, int> InvalidCreates => new()
     {
         { "brianifixture", "bogus", "x", 400 },
@@ -450,5 +561,17 @@ public sealed class IndexerAdministrationTests : IAsyncLifetime
         Assert.Throws<ArgumentOutOfRangeException>(() => ProwlarrCall.DeleteIndexer(-3));
         Assert.Throws<ArgumentOutOfRangeException>(() => ProwlarrCall.CreateIndexer([]));
         Assert.Empty(typeof(ProwlarrCall).GetConstructors());
+    }
+}
+
+/// <summary>Passes calls to the real transport, and can make Prowlarr apply a change but answer too late.</summary>
+public sealed class LateProwlarr(ProwlarrTransport inner) : IProwlarrAdminTransport
+{
+    public Func<ProwlarrCall, bool>? TooLate { get; set; }
+
+    public async Task<ProwlarrReply> SendAsync(ProwlarrCall call, CancellationToken ct = default)
+    {
+        var reply = await inner.SendAsync(call, ct);
+        return TooLate?.Invoke(call) == true ? throw new ProwlarrFailure("source_timeout") : reply;
     }
 }

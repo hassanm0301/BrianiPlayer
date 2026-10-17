@@ -613,6 +613,61 @@
         "Editing existing indexer settings is not offered; specs 01/08 still describe the narrower status/enable/test scope.",
         "No separate review pass; self-review findings fixed."
       ]
+    },
+    {
+      "date": "2026-10-17",
+      "scope": "Separate review of the administrator Indexers section (commit 0377209): secret handling, Prowlarr allowlist, authorization, create validation, mutation lock, client and contract",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_linux_local_android_tv_unverified",
+      "report": "docs/evidence/M09/indexer-admin-20261017/review.md",
+      "checks": {
+        "newTestsAgainst0377209": {
+          "exitCode": 1,
+          "failed": 5,
+          "passed": 69,
+          "log": "docs/evidence/M09/indexer-admin-20261017/review-confirm-on-0377209.log"
+        },
+        "indexerAdministrationTests": {
+          "exitCode": 0,
+          "passed": 74
+        },
+        "serverTests": {
+          "command": "dotnet test server/Briani.sln --no-restore -m:1 --filter 'Category!=EngineIntegration'",
+          "exitCode": 0,
+          "passed": 533,
+          "failed": 0
+        },
+        "flutterAnalyze": {
+          "exitCode": 0,
+          "issues": 0
+        },
+        "flutterTest": {
+          "exitCode": 0,
+          "passed": 150
+        },
+        "planValidation": {
+          "exitCode": 0
+        },
+        "secretScan": {
+          "exitCode": 0
+        },
+        "documentationValidation": {
+          "exitCode": 0
+        }
+      },
+      "findingsFixed": [
+        "Medium: a change queued behind another reached Prowlarr after the administrator was demoted; the live check now also runs inside the lock just before the write.",
+        "Medium: Prowlarr could apply a change with no audit row when the caller went away or Prowlarr answered after 18 seconds; sent changes are no longer cancelled with the request and late answers are audited as unconfirmed.",
+        "Low: failure text was shortened before scrubbing, so part of a value crossing the cut survived; scrubbing now runs on the whole message first.",
+        "Low: parallel indexer tests could hold both shared upstream slots; tests now take the same lock as changes."
+      ],
+      "limitations": [
+        "Open (Low): the 18-second limit is per Prowlarr call, not per request; a slow change or one queued behind another can outlast the client's 20-second timeout.",
+        "Open (Low): on TV, definitions Briani cannot add are disabled tiles after the addable ones and cannot be scrolled to with a remote.",
+        "Open (Info): audit rows for indexers show no resource because resourceId is a UUID in the contract.",
+        "Owner decision: specs 01/08 still describe status/enable/test only; Add and Remove go further.",
+        "No Android phone, Android TV, Pi or real Prowlarr instance used in this review."
+      ]
     }
   ],
   "deploymentAttempts": [

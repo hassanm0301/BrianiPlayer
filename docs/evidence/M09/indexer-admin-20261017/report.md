@@ -86,7 +86,7 @@ A mutation check confirmed the tests catch problems. Removing address scrubbing 
 - No real private tracker was added, and no real public indexer was contacted from the probe. Each Prowlarr test made by Briani is capped at 18 seconds so it answers before the client's 20-second timeout. For a slow site, the admin sees "Prowlarr did not answer in time…", and Prowlarr may still finish the change.
 - Editing an existing indexer's settings, categories, priority, tags or sync profile is not offered. Remove and re-add, or use Prowlarr's page.
 - Text settings a definition uses inside URLs are passed to Prowlarr as typed, the same as in Prowlarr's own UI. Only administrators can set them, and the base address is restricted to the definition's own links.
-- No separate review pass was run. The findings below come from my own review.
+- No separate review pass was run before this handoff. The findings below come from my own review. A separate review followed the same day; its findings and fixes are in [review.md](review.md).
 
 ## Review findings (fixed before handoff)
 

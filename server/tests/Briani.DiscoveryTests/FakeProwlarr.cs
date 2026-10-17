@@ -45,7 +45,11 @@ public sealed class FakeProwlarr : IDisposable
     public ConcurrentQueue<Received> Requests { get; } = new();
     public ConcurrentQueue<string> Unexpected { get; } = new();
     public TaskCompletionSource? Pause { get; set; }
+    /// <summary>Limits <see cref="Pause"/> to matching method/path pairs; every request pauses when unset.</summary>
+    public Func<string, string, bool>? PauseOn { get; set; }
     public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    /// <summary>Replaces the failure text for a refused key, to model other Prowlarr messages.</summary>
+    public Func<string, string>? FailureMessage { get; set; }
 
     public IEnumerable<Received> Calls(string method, string pathPrefix) =>
         Requests.Where(x => x.Method == method && x.Path.StartsWith(pathPrefix, StringComparison.Ordinal));
@@ -96,7 +100,7 @@ public sealed class FakeProwlarr : IDisposable
             var path = context.Request.Url!.AbsolutePath;
             var key = context.Request.Headers["X-Api-Key"];
             Requests.Enqueue(new(method, context.Request.RawUrl ?? path, body, key));
-            if (Pause is { } pause) { Entered.TrySetResult(); await pause.Task; }
+            if (Pause is { } pause && (PauseOn?.Invoke(method, path) ?? true)) { Entered.TrySetResult(); await pause.Task; }
             var (status, type, text) = key == ApiKey ? Respond(method, path, body) : (401, "text/plain", "Unauthorized");
             var bytes = Encoding.UTF8.GetBytes(text);
             context.Response.StatusCode = status;
@@ -165,14 +169,14 @@ public sealed class FakeProwlarr : IDisposable
             : null;
 
     // The fixture site accepts only GoodKey; Prowlarr's failure text quotes the request URL.
-    private static string? Failure(JsonObject resource)
+    private string? Failure(JsonObject resource)
     {
         var key = Field(resource, "apikey") ?? Field(resource, "cookie");
         if (key is null || key == GoodKey) return null;
         return new JsonArray(new JsonObject
         {
             ["isWarning"] = false, ["propertyName"] = "",
-            ["errorMessage"] = $"Unable to connect to indexer. HTTP request failed: [401:Unauthorized] [GET] at [https://brianifixture.invalid/api/torrents?passkey={key}]",
+            ["errorMessage"] = FailureMessage?.Invoke(key) ?? $"Unable to connect to indexer. HTTP request failed: [401:Unauthorized] [GET] at [https://brianifixture.invalid/api/torrents?passkey={key}]",
             ["attemptedValue"] = key, ["severity"] = "error"
         }).ToJsonString();
     }
