@@ -558,6 +558,61 @@
         "Desktop full-stack E2E blocked at preflight: runner expects briani-server:m10 but images.lock.json names the v1.1.0 image; images and lock unchanged.",
         "Windows/macOS builds not run; desktop and Android integration-test finders updated but not run."
       ]
+    },
+    {
+      "date": "2026-10-17",
+      "scope": "Administrator Indexers section: list, add from a Prowlarr definition, enable/disable, test and remove torrent indexers through an allowlist of nine Prowlarr operations; no indexer setting values returned",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_linux_local_android_tv_unverified",
+      "report": "docs/evidence/M09/indexer-admin-20261017/report.md",
+      "checks": {
+        "serverTests": {
+          "command": "dotnet test server/Briani.sln --no-restore -m:1 --filter 'Category!=EngineIntegration'",
+          "exitCode": 0,
+          "passed": 528,
+          "failed": 0
+        },
+        "indexerAdministrationTests": {
+          "exitCode": 0,
+          "passed": 69
+        },
+        "flutterAnalyze": {
+          "exitCode": 0,
+          "issues": 0
+        },
+        "flutterTest": {
+          "exitCode": 0,
+          "passed": 150
+        },
+        "contractDriftCheck": {
+          "exitCode": 0
+        },
+        "planValidation": {
+          "exitCode": 0
+        },
+        "documentationValidation": {
+          "exitCode": 0,
+          "localLinksAndAnchors": 39
+        },
+        "secretScan": {
+          "exitCode": 0
+        },
+        "localProwlarrEndToEnd": {
+          "prowlarrVersion": "2.6.5.5623",
+          "definitionsListed": 637,
+          "addable": 533,
+          "memberForbiddenRoutes": 6,
+          "secretOrApiKeyInResponses": false,
+          "evidence": "docs/evidence/M09/indexer-admin-20261017/e2e-local-prowlarr.json"
+        }
+      },
+      "limitations": [
+        "No Android phone, Android TV or physical remote used; TV covered by a D-pad widget test only.",
+        "No real private tracker added and no real public indexer contacted; end-to-end used a generated Cardigann fixture definition and a local fixture site.",
+        "Prowlarr indexer tests are capped at 18 seconds per call; slow sites report a timeout and Prowlarr may still apply the change.",
+        "Editing existing indexer settings is not offered; specs 01/08 still describe the narrower status/enable/test scope.",
+        "No separate review pass; self-review findings fixed."
+      ]
     }
   ],
   "deploymentAttempts": [

@@ -46,7 +46,7 @@ builder.Services.AddOptions<ServerOptions>().Bind(builder.Configuration.GetSecti
     .Validate(o => o.Valid(), "Briani data and state roots must be distinct absolute paths").ValidateOnStart();
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<ServerOptions>>().Value);
 builder.Services.AddDbContext<BrianiDb>((sp, o) => o.UseSqlite($"Data Source={Path.Combine(sp.GetRequiredService<ServerOptions>().StateRoot, "briani.db")};Foreign Keys=True;Default Timeout=5;Pooling=False"));
-builder.Services.AddSingleton<ServiceConnections>();builder.Services.AddSingleton<ISafeDns,SystemSafeDns>();builder.Services.AddSingleton<SafeHttp>();builder.Services.AddSingleton<IProwlarrTransport,ProwlarrTransport>();builder.Services.AddSingleton<IProwlarrClient,ProwlarrClient>();
+builder.Services.AddSingleton<ServiceConnections>();builder.Services.AddSingleton<ISafeDns,SystemSafeDns>();builder.Services.AddSingleton<SafeHttp>();builder.Services.AddSingleton<ProwlarrTransport>();builder.Services.AddSingleton<IProwlarrTransport>(sp=>sp.GetRequiredService<ProwlarrTransport>());builder.Services.AddSingleton<IProwlarrAdminTransport>(sp=>sp.GetRequiredService<ProwlarrTransport>());builder.Services.AddSingleton<IndexerAdministration>();builder.Services.AddSingleton<IProwlarrClient,ProwlarrClient>();
  builder.Services.AddSingleton<DownloadJobLocks>();builder.Services.AddSingleton<ITorrentEngine,QBitTorrentClient>();builder.Services.AddScoped<DownloadCommands>();builder.Services.AddScoped<DownloadAdmission>();builder.Services.AddScoped<DownloadImport>();builder.Services.AddSingleton<DownloadWorker>();builder.Services.AddHostedService(sp=>sp.GetRequiredService<DownloadWorker>());builder.Services.AddScoped<DownloadAccess>();builder.Services.AddScoped<DiscoveryAccess>();builder.Services.AddSingleton<SourceLimits>();builder.Services.AddScoped<SourceService>();builder.Services.AddSingleton<SourceHousekeeping>();builder.Services.AddHostedService(sp=>sp.GetRequiredService<SourceHousekeeping>());builder.Services.AddSingleton<DiscoveryQueryWorker>();builder.Services.AddHostedService(sp=>sp.GetRequiredService<DiscoveryQueryWorker>());
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddSingleton<WriteGate>();builder.Services.AddSingleton<AuthLimiter>();
@@ -107,6 +107,11 @@ app.Use(async (context, next) =>
 var uploadSlots=new SemaphoreSlim(2,2);
 app.Use(async(c,next)=>{if(c.Request.Path.Value?.TrimEnd('/').Equals("/api/v1/torrent-uploads",StringComparison.OrdinalIgnoreCase)==true && HttpMethods.IsPost(c.Request.Method)){if(!uploadSlots.Wait(0))throw new ApiException(429,"upload_limit");try{var size=c.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();if(size is not null && !size.IsReadOnly)size.MaxRequestBodySize=16842752;if(c.Request.ContentLength>16842752)throw new ApiException(413,"torrent_upload_too_large");await next(c);}finally{uploadSlots.Release();}}else await next(c);});
 app.Use(async(c,next)=>{
+    if(c.Request.Path.StartsWithSegments("/api/v1/admin/indexers")) {
+        var size=c.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
+        if(size is not null && !size.IsReadOnly)size.MaxRequestBodySize=65536;
+        if(c.Request.ContentLength>65536)throw new ApiException(413,"settings_too_large");
+    }
     if(c.Request.Path.StartsWithSegments("/api/v1/me/preferences") || c.Request.Path=="/api/v1/admin/settings") {
         var size=c.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
         if(size is not null && !size.IsReadOnly)size.MaxRequestBodySize=1048576;
@@ -162,7 +167,7 @@ ApplicationOperations.Map(app);
 app.MapAdministration();
 app.MapLibraryQueries();
 app.MapDownloadQueries();DownloadCommands.Map(app);
-ServiceConnections.Map(app);IntegrationHealth.Map(app);app.MapDiscoveryQueries();SourceService.Map(app);
+ServiceConnections.Map(app);IntegrationHealth.Map(app);IndexerManagement.Map(app);app.MapDiscoveryQueries();SourceService.Map(app);
 CompletedPlayback.Map(app);
 MediaEndpoints.Map(app);
 MediaOperations.Map(app);

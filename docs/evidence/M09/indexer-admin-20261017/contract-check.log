@@ -1,0 +1,2 @@
+PASS: deterministic API and serializer regeneration
+exit 0

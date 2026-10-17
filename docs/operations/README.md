@@ -117,6 +117,6 @@ For other people, use **Create user** and the library's access controls. **Read*
 
 ## 6. Set up torrent search (optional)
 
-Discover stays empty until you add indexers in Prowlarr. Follow [Set up torrent search](indexers.md). It takes about ten minutes. Existing files can be used without configuring indexers.
+Discover stays empty until you add indexers. You can add most of them in the app under **Administration → Indexers**. [Set up torrent search](indexers.md) covers that and Prowlarr's own page. Existing files can be used without configuring indexers.
 
 For daily app use, see the [user guide](../user-guide.md). Backups, upgrades, service controls, and recovery are in [advanced server setup and maintenance](advanced.md).

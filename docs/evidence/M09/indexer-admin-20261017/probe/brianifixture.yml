@@ -1,0 +1,66 @@
+---
+id: brianifixture
+name: Briani Fixture
+description: "Local generated fixture indexer for Briani tests"
+language: en-US
+type: private
+encoding: UTF-8
+links:
+  - http://fixture-indexer/
+
+caps:
+  categorymappings:
+    - {id: 6, cat: PC, desc: Apps}
+  modes:
+    search: [q]
+
+settings:
+  - name: apikey
+    type: text
+    label: APIKey
+  - name: sort
+    type: select
+    label: Sort requested from site
+    default: created
+    options:
+      created: created
+      seeders: seeders
+  - name: freeleech
+    type: checkbox
+    label: Search freeleech only
+    default: false
+
+search:
+  headers:
+    x-fixture-key: ["{{ .Config.apikey }}"]
+  paths:
+    - path: api/torrents
+      response:
+        type: json
+  inputs:
+    query: "{{ .Keywords }}"
+  rows:
+    selector: torrents
+  fields:
+    _id:
+      selector: id
+    category:
+      selector: category
+    title:
+      selector: releaseName
+    details:
+      text: "/browse/{{ .Result._id }}"
+    download:
+      text: "/api/torrents/{{ .Result._id }}/torrent"
+    date:
+      selector: createdAt
+    size:
+      selector: size
+    seeders:
+      selector: seeders
+    leechers:
+      selector: leechers
+    downloadvolumefactor:
+      text: 1
+    uploadvolumefactor:
+      text: 1

@@ -13,6 +13,8 @@ import '../../core/widgets/adaptive.dart';
 import '../../core/widgets/section_jump.dart';
 import '../../core/widgets/states.dart';
 
+part 'indexer_management.dart';
+
 final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
   final session = ref.watch(clientSessionProvider);
   if (session == null || !session.administrator) {
@@ -60,6 +62,11 @@ final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
           .toList()
           .cast<api_models.Provider>(),
     ),
+    _adminRead<List<AdminIndexer>>(
+      'indexers',
+      () async =>
+          (await admin.listAdminIndexers()).data!.toList().cast<AdminIndexer>(),
+    ),
   ]);
   final settings = results[0] as _AdminRead<AdminSettings>;
   final users = results[1] as _AdminRead<List<User>>;
@@ -69,6 +76,7 @@ final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
   final audit = results[5] as _AdminRead<AuditPage>;
   final libraryRows = results[6] as _AdminRead<List<ModelLibrary>>;
   final providers = results[7] as _AdminRead<List<api_models.Provider>>;
+  final indexers = results[8] as _AdminRead<List<AdminIndexer>>;
   return _AdminSnapshot(
     settings: settings.value,
     users: users.value ?? const [],
@@ -78,9 +86,14 @@ final _adminSnapshotProvider = FutureProvider<_AdminSnapshot>((ref) async {
     audit: audit.value,
     libraries: libraryRows.value ?? const [],
     providers: providers.value ?? const [],
+    indexers: indexers.value ?? const [],
     failures: {
       for (final row in results.cast<_AdminRead<dynamic>>())
         if (row.value == null) row.key,
+    },
+    errors: {
+      for (final row in results.cast<_AdminRead<dynamic>>())
+        if (row.error != null) row.key: row.error!,
     },
   );
 });
@@ -91,15 +104,16 @@ Future<_AdminRead<T>> _adminRead<T>(
 ) async {
   try {
     return _AdminRead<T>(key, await load());
-  } catch (_) {
-    return _AdminRead<T>(key, null);
+  } catch (error) {
+    return _AdminRead<T>(key, null, clientError(error));
   }
 }
 
 class _AdminRead<T> {
-  const _AdminRead(this.key, this.value);
+  const _AdminRead(this.key, this.value, [this.error]);
   final String key;
   final T? value;
+  final String? error;
 }
 
 class _AdminSnapshot {
@@ -112,7 +126,9 @@ class _AdminSnapshot {
     required this.audit,
     required this.libraries,
     required this.providers,
+    required this.indexers,
     required this.failures,
+    this.errors = const {},
   });
   final AdminSettings? settings;
   final List<User> users;
@@ -122,12 +138,16 @@ class _AdminSnapshot {
   final AuditPage? audit;
   final List<ModelLibrary> libraries;
   final List<api_models.Provider> providers;
+  final List<AdminIndexer> indexers;
   final Set<String> failures;
+  // Server-written messages for reads that failed, keyed like [failures].
+  final Map<String, String> errors;
 }
 
 const _topics = [
   JumpSection('Server', Icons.tune),
   JumpSection('Discovery', Icons.travel_explore_outlined),
+  JumpSection('Indexers', Icons.dns_outlined),
   JumpSection('Users', Icons.group_outlined),
   JumpSection('Libraries', Icons.video_library_outlined),
   JumpSection('Health', Icons.monitor_heart_outlined),
@@ -223,20 +243,24 @@ class _AdminContentState extends ConsumerState<_AdminContent>
           ),
           KeyedSubtree(
             key: sectionKeys[2],
+            child: _IndexerManagement(snapshot, retry: retry),
+          ),
+          KeyedSubtree(
+            key: sectionKeys[3],
             child: snapshot.failures.contains('users')
                 ? _UnavailableSection(title: 'Users and access', retry: retry)
                 : _UserManagement(snapshot.users),
           ),
           KeyedSubtree(
-            key: sectionKeys[3],
+            key: sectionKeys[4],
             child: _LibraryManagement(snapshot, locale: locale, retry: retry),
           ),
           KeyedSubtree(
-            key: sectionKeys[4],
+            key: sectionKeys[5],
             child: _HealthAndIntegrations(snapshot, retry: retry),
           ),
           KeyedSubtree(
-            key: sectionKeys[5],
+            key: sectionKeys[6],
             child: _Operations(snapshot, locale: locale, retry: retry),
           ),
         ];

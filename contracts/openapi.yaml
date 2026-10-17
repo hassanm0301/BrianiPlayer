@@ -2065,6 +2065,188 @@ paths:
           enum:
           - prowlarr
           - qbittorrent
+  /api/v1/admin/indexers:
+    get:
+      operationId: listAdminIndexers
+      tags:
+      - Administration
+      summary: List Prowlarr torrent indexers without any setting values
+      description: Usenet indexers are omitted. Field values are never returned because
+        Prowlarr returns indexer credentials in plain text.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminIndexer'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: createAdminIndexer
+      tags:
+      - Administration
+      summary: Add a Prowlarr torrent indexer from an addable definition
+      description: Prowlarr tests an enabled indexer before saving it; a failed test
+        saves nothing and returns indexer_rejected. Setting values are write-only.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminIndexer'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndexerCreate'
+  /api/v1/admin/indexers/{id}:
+    patch:
+      operationId: updateAdminIndexer
+      tags:
+      - Administration
+      summary: Enable or disable a Prowlarr torrent indexer
+      description: Enabling makes Prowlarr test the indexer first; it stays disabled
+        when the test fails.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminIndexer'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[1-9][0-9]{0,9}$
+        description: Prowlarr indexer ID as returned by listAdminIndexers.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndexerPatch'
+    delete:
+      operationId: deleteAdminIndexer
+      tags:
+      - Administration
+      summary: Remove a Prowlarr torrent indexer
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[1-9][0-9]{0,9}$
+        description: Prowlarr indexer ID as returned by listAdminIndexers.
+  /api/v1/admin/indexers/{id}/test:
+    post:
+      operationId: testAdminIndexer
+      tags:
+      - Administration
+      summary: Ask Prowlarr to test a configured torrent indexer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexerTestResult'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[1-9][0-9]{0,9}$
+        description: Prowlarr indexer ID as returned by listAdminIndexers.
+  /api/v1/admin/indexers/definitions:
+    get:
+      operationId: listIndexerDefinitions
+      tags:
+      - Administration
+      summary: List Prowlarr torrent indexer definitions and whether Briani can add them
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IndexerDefinitionSummary'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/indexers/definitions/{key}:
+    get:
+      operationId: getIndexerDefinition
+      tags:
+      - Administration
+      summary: Read the settings Briani shows for one definition
+      description: Secret settings never carry a value. Definitions that are not addable
+        return no fields.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexerDefinitionDetail'
+        default:
+          description: Request rejected or operation failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9._-]{1,100}$
   /api/v1/admin/maintenance:
     post:
       operationId: runMaintenance
@@ -4333,6 +4515,231 @@ components:
       description: Missing/null secret preserves existing credential. Store through
         protected server secret facilities; do not echo it. URL is validated against
         administrator deployment policy.
+    AdminIndexer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        definition:
+          type: string
+        enabled:
+          type: boolean
+        privacy:
+          type: string
+          enum:
+          - public
+          - semiPrivate
+          - private
+          - unknown
+        priority:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 50
+        supportsSearch:
+          type: boolean
+        supportsRecent:
+          type: boolean
+        state:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - unavailable
+          - unknown
+        stateDetail:
+          type: string
+          nullable: true
+      required:
+      - id
+      - name
+      - definition
+      - enabled
+      - privacy
+      - priority
+      - supportsSearch
+      - supportsRecent
+      - state
+      description: Summary of a configured torrent indexer. It never contains setting
+        values or credentials.
+    IndexerDefinitionSummary:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        language:
+          type: string
+        privacy:
+          type: string
+          enum:
+          - public
+          - semiPrivate
+          - private
+          - unknown
+        supportsSearch:
+          type: boolean
+        supportsRecent:
+          type: boolean
+        addable:
+          type: boolean
+        setupNote:
+          type: string
+          nullable: true
+          description: Server-written reason the definition is set up in Prowlarr's
+            own page instead.
+      required:
+      - key
+      - name
+      - description
+      - language
+      - privacy
+      - supportsSearch
+      - supportsRecent
+      - addable
+    IndexerSettingOption:
+      type: object
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+      required:
+      - value
+      - label
+    IndexerSettingField:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        kind:
+          type: string
+          enum:
+          - text
+          - secret
+          - integer
+          - decimal
+          - checkbox
+          - select
+          - info
+        advanced:
+          type: boolean
+        helpText:
+          type: string
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        value:
+          type: string
+          nullable: true
+          description: Default value as text; always null for secret settings. For
+            info settings this is plain text to show, not a value to send.
+        options:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/IndexerSettingOption'
+      required:
+      - name
+      - label
+      - kind
+      - advanced
+    IndexerDefinitionDetail:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        privacy:
+          type: string
+          enum:
+          - public
+          - semiPrivate
+          - private
+          - unknown
+        addable:
+          type: boolean
+        setupNote:
+          type: string
+          nullable: true
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndexerSettingField'
+      required:
+      - key
+      - name
+      - description
+      - privacy
+      - addable
+      - fields
+    IndexerCreate:
+      type: object
+      properties:
+        definition:
+          type: string
+          pattern: ^[A-Za-z0-9._-]{1,100}$
+        name:
+          type: string
+          maxLength: 100
+          nullable: true
+        enabled:
+          type: boolean
+          nullable: true
+          description: Defaults to true. A disabled indexer is saved without a test.
+        settings:
+          type: object
+          nullable: true
+          maxProperties: 48
+          additionalProperties:
+            type: string
+            maxLength: 4096
+          writeOnly: true
+          description: Setting name to value as text, using names from getIndexerDefinition.
+            Omitted settings keep Prowlarr's defaults. Values are never echoed.
+      required:
+      - definition
+      additionalProperties: false
+    IndexerPatch:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+      required:
+      - enabled
+      additionalProperties: false
+    IndexerTestResult:
+      type: object
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+          enum:
+          - healthy
+          - unavailable
+          - unknown
+        detail:
+          type: string
+        checkedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - state
+      - detail
+      - checkedAt
     MaintenanceRequest:
       type: object
       properties:

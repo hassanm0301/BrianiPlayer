@@ -1,0 +1,16 @@
+name: briani-prowlarr-probe
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr@sha256:f9151e5bc1025c6d0a630d503210cdcb6bb55a7cc098562609d96a408d838902
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+    volumes:
+      - ./config:/config
+    ports: ["127.0.0.1:29696:9696"]
+    restart: "no"
+  fixture-indexer:
+    image: nginx:alpine
+    volumes:
+      - ./fixture/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: "no"

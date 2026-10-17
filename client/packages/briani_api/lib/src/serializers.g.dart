@@ -7,6 +7,9 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (Serializers().toBuilder()
+      ..add(AdminIndexer.serializer)
+      ..add(AdminIndexerPrivacyEnum.serializer)
+      ..add(AdminIndexerStateEnum.serializer)
       ..add(AdminSettings.serializer)
       ..add(AuditEntry.serializer)
       ..add(AuditPage.serializer)
@@ -63,6 +66,17 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(FileChoicePriorityEnum.serializer)
       ..add(GetLibraryGrants200Response.serializer)
       ..add(GrantUpdate.serializer)
+      ..add(IndexerCreate.serializer)
+      ..add(IndexerDefinitionDetail.serializer)
+      ..add(IndexerDefinitionDetailPrivacyEnum.serializer)
+      ..add(IndexerDefinitionSummary.serializer)
+      ..add(IndexerDefinitionSummaryPrivacyEnum.serializer)
+      ..add(IndexerPatch.serializer)
+      ..add(IndexerSettingField.serializer)
+      ..add(IndexerSettingFieldKindEnum.serializer)
+      ..add(IndexerSettingOption.serializer)
+      ..add(IndexerTestResult.serializer)
+      ..add(IndexerTestResultStateEnum.serializer)
       ..add(Integration.serializer)
       ..add(IntegrationKindEnum.serializer)
       ..add(IntegrationUpdate.serializer)
@@ -168,6 +182,14 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(FileChoice)]),
           () => ListBuilder<FileChoice>())
       ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(IndexerSettingField)]),
+          () => ListBuilder<IndexerSettingField>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(IndexerSettingOption)]),
+          () => ListBuilder<IndexerSettingOption>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(LibraryGrant)]),
           () => ListBuilder<LibraryGrant>())
       ..addBuilderFactory(
@@ -245,6 +267,10 @@ Serializers _$serializers = (Serializers().toBuilder()
             const FullType(BuiltList, const [const FullType(String)])
           ]),
           () => MapBuilder<String, BuiltList<String>>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(String), const FullType(String)]),
+          () => MapBuilder<String, String>())
       ..addBuilderFactory(
           const FullType(BuiltMap, const [
             const FullType(String),

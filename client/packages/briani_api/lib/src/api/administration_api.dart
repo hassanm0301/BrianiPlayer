@@ -10,9 +10,15 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:briani_api/src/api_util.dart';
+import 'package:briani_api/src/model/admin_indexer.dart';
 import 'package:briani_api/src/model/admin_settings.dart';
 import 'package:briani_api/src/model/audit_page.dart';
 import 'package:briani_api/src/model/create_user.dart';
+import 'package:briani_api/src/model/indexer_create.dart';
+import 'package:briani_api/src/model/indexer_definition_detail.dart';
+import 'package:briani_api/src/model/indexer_definition_summary.dart';
+import 'package:briani_api/src/model/indexer_patch.dart';
+import 'package:briani_api/src/model/indexer_test_result.dart';
 import 'package:briani_api/src/model/integration.dart';
 import 'package:briani_api/src/model/integration_update.dart';
 import 'package:briani_api/src/model/job.dart';
@@ -33,6 +39,107 @@ class AdministrationApi {
   final Serializers _serializers;
 
   const AdministrationApi(this._dio, this._serializers);
+
+  /// Add a Prowlarr torrent indexer from an addable definition
+  /// Prowlarr tests an enabled indexer before saving it; a failed test saves nothing and returns indexer_rejected. Setting values are write-only.
+  ///
+  /// Parameters:
+  /// * [indexerCreate] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AdminIndexer] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AdminIndexer>> createAdminIndexer({ 
+    required IndexerCreate indexerCreate,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(IndexerCreate);
+      _bodyData = _serializers.serialize(indexerCreate, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AdminIndexer? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(AdminIndexer),
+      ) as AdminIndexer;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AdminIndexer>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
 
   /// Create a user
   /// 
@@ -136,6 +243,59 @@ class AdministrationApi {
       statusMessage: _response.statusMessage,
       extra: _response.extra,
     );
+  }
+
+  /// Remove a Prowlarr torrent indexer
+  /// 
+  ///
+  /// Parameters:
+  /// * [id] - Prowlarr indexer ID as returned by listAdminIndexers.
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> deleteAdminIndexer({ 
+    required String id,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers/{id}'.replaceAll('{' r'id' '}', encodeQueryParameter(_serializers, id, const FullType(String)).toString());
+    final _options = Options(
+      method: r'DELETE',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
   }
 
   /// Disable/delete according to retained ownership and audit policy
@@ -356,6 +516,87 @@ class AdministrationApi {
     );
   }
 
+  /// Read the settings Briani shows for one definition
+  /// Secret settings never carry a value. Definitions that are not addable return no fields.
+  ///
+  /// Parameters:
+  /// * [key] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [IndexerDefinitionDetail] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<IndexerDefinitionDetail>> getIndexerDefinition({ 
+    required String key,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers/definitions/{key}'.replaceAll('{' r'key' '}', encodeQueryParameter(_serializers, key, const FullType(String)).toString());
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    IndexerDefinitionDetail? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(IndexerDefinitionDetail),
+      ) as IndexerDefinitionDetail;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<IndexerDefinitionDetail>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
   /// Read user
   /// 
   ///
@@ -426,6 +667,85 @@ class AdministrationApi {
     }
 
     return Response<User>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// List Prowlarr torrent indexers without any setting values
+  /// Usenet indexers are omitted. Field values are never returned because Prowlarr returns indexer credentials in plain text.
+  ///
+  /// Parameters:
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [BuiltList<AdminIndexer>] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<BuiltList<AdminIndexer>>> listAdminIndexers({ 
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    BuiltList<AdminIndexer>? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(BuiltList, [FullType(AdminIndexer)]),
+      ) as BuiltList<AdminIndexer>;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<BuiltList<AdminIndexer>>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -515,6 +835,85 @@ class AdministrationApi {
     }
 
     return Response<AuditPage>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// List Prowlarr torrent indexer definitions and whether Briani can add them
+  /// 
+  ///
+  /// Parameters:
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [BuiltList<IndexerDefinitionSummary>] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<BuiltList<IndexerDefinitionSummary>>> listIndexerDefinitions({ 
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers/definitions';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    BuiltList<IndexerDefinitionSummary>? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(BuiltList, [FullType(IndexerDefinitionSummary)]),
+      ) as BuiltList<IndexerDefinitionSummary>;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<BuiltList<IndexerDefinitionSummary>>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -1234,6 +1633,87 @@ class AdministrationApi {
     );
   }
 
+  /// Ask Prowlarr to test a configured torrent indexer
+  /// 
+  ///
+  /// Parameters:
+  /// * [id] - Prowlarr indexer ID as returned by listAdminIndexers.
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [IndexerTestResult] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<IndexerTestResult>> testAdminIndexer({ 
+    required String id,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers/{id}/test'.replaceAll('{' r'id' '}', encodeQueryParameter(_serializers, id, const FullType(String)).toString());
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    IndexerTestResult? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(IndexerTestResult),
+      ) as IndexerTestResult;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<IndexerTestResult>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
   /// Test configured connection without exposing credentials
   /// 
   ///
@@ -1304,6 +1784,109 @@ class AdministrationApi {
     }
 
     return Response<ServiceHealth>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Enable or disable a Prowlarr torrent indexer
+  /// Enabling makes Prowlarr test the indexer first; it stays disabled when the test fails.
+  ///
+  /// Parameters:
+  /// * [id] - Prowlarr indexer ID as returned by listAdminIndexers.
+  /// * [indexerPatch] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AdminIndexer] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AdminIndexer>> updateAdminIndexer({ 
+    required String id,
+    required IndexerPatch indexerPatch,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/indexers/{id}'.replaceAll('{' r'id' '}', encodeQueryParameter(_serializers, id, const FullType(String)).toString());
+    final _options = Options(
+      method: r'PATCH',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'AccessToken',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(IndexerPatch);
+      _bodyData = _serializers.serialize(indexerPatch, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AdminIndexer? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(AdminIndexer),
+      ) as AdminIndexer;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AdminIndexer>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

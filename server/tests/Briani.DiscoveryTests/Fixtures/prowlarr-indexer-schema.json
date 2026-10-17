@@ -1,0 +1,1843 @@
+[
+ {
+  "indexerUrls": [
+   "http://fixture-indexer/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "brianifixture",
+  "description": "Local generated fixture indexer for Briani tests",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "briani fixture",
+  "name": "Briani Fixture",
+  "fields": [
+   {
+    "order": 0,
+    "name": "definitionFile",
+    "value": "brianifixture",
+    "type": "textbox",
+    "advanced": false,
+    "hidden": "hidden",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 0,
+    "name": "apikey",
+    "label": "APIKey",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "sort",
+    "label": "Sort requested from site",
+    "value": 0,
+    "type": "select",
+    "advanced": false,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "created",
+      "order": 0
+     },
+     {
+      "value": 1,
+      "name": "seeders",
+      "order": 0
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "freeleech",
+    "label": "Search freeleech only",
+    "value": false,
+    "type": "checkbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Cardigann",
+  "implementation": "Cardigann",
+  "configContract": "CardigannSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#brianifixture",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://fixturepublic.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "fixturepublic",
+  "description": "Generated fixture: Fixture Public",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "public",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture public",
+  "name": "Fixture Public",
+  "fields": [
+   {
+    "order": 0,
+    "name": "definitionFile",
+    "value": "fixturepublic",
+    "type": "textbox",
+    "advanced": false,
+    "hidden": "hidden",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Cardigann",
+  "implementation": "Cardigann",
+  "configContract": "CardigannSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#fixturepublic",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://fixturecookie.invalid/",
+   "https://mirror.fixturecookie.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "fixturecookie",
+  "description": "Generated fixture: Fixture Cookie",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture cookie",
+  "name": "Fixture Cookie",
+  "fields": [
+   {
+    "order": 0,
+    "name": "definitionFile",
+    "value": "fixturecookie",
+    "type": "textbox",
+    "advanced": false,
+    "hidden": "hidden",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 0,
+    "name": "cookie",
+    "label": "Cookie",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "info_cookie",
+    "label": "How to get the Cookie",
+    "value": "<ol><li>Login to this tracker with your browser</li><li><b>Copy</b> the cookie</li></ol>",
+    "type": "info",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "username",
+    "label": "Username",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "password",
+    "label": "Password",
+    "type": "password",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Cardigann",
+  "implementation": "Cardigann",
+  "configContract": "CardigannSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#fixturecookie",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://FixtureNative.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "FixtureNative",
+  "description": "Generated fixture: Fixture Native",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture native",
+  "name": "Fixture Native",
+  "fields": [
+   {
+    "order": 0,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "username",
+    "label": "Username",
+    "helpText": "Site Username",
+    "helpTextWarning": "Only member rank and above can use the API on this indexer.",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "userName",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "password",
+    "label": "Password",
+    "helpText": "Site Password",
+    "type": "password",
+    "advanced": false,
+    "privacy": "password",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "pid",
+    "label": "PID",
+    "helpText": "PID from My Account or My Profile page",
+    "type": "password",
+    "advanced": false,
+    "privacy": "password",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "freeleechOnly",
+    "label": "Freeleech Only",
+    "helpText": "Search freeleech releases only",
+    "value": false,
+    "type": "checkbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "minimumRatio",
+    "label": "Minimum Ratio",
+    "value": 1.5,
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "FixtureNative",
+  "implementation": "FixtureNative",
+  "configContract": "FixtureNativeSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#FixtureNative",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://fixturespaced.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "Fixture Spaced Native",
+  "description": "Generated fixture: Fixture Spaced",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture spaced",
+  "name": "Fixture Spaced",
+  "fields": [
+   {
+    "order": 0,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "username",
+    "label": "Username",
+    "helpText": "Site Username",
+    "helpTextWarning": "Only member rank and above can use the API on this indexer.",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "userName",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "password",
+    "label": "Password",
+    "helpText": "Site Password",
+    "type": "password",
+    "advanced": false,
+    "privacy": "password",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "pid",
+    "label": "PID",
+    "helpText": "PID from My Account or My Profile page",
+    "type": "password",
+    "advanced": false,
+    "privacy": "password",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "freeleechOnly",
+    "label": "Freeleech Only",
+    "helpText": "Search freeleech releases only",
+    "value": false,
+    "type": "checkbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "minimumRatio",
+    "label": "Minimum Ratio",
+    "value": 1.5,
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Fixture Spaced Native",
+  "implementation": "Fixture Spaced Native",
+  "configContract": "FixtureNativeSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#FixtureNative",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   ""
+  ],
+  "legacyUrls": [],
+  "definitionName": "Torznab",
+  "description": "Generated fixture: Generic Torznab",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "generic torznab",
+  "name": "Generic Torznab",
+  "fields": [
+   {
+    "order": 0,
+    "name": "baseUrl",
+    "label": "Url",
+    "value": "",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "apiKey",
+    "label": "API Key",
+    "helpText": "Site API Key",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "apiKey",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Torznab",
+  "implementation": "Torznab",
+  "configContract": "TorznabSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#Torznab",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   ""
+  ],
+  "legacyUrls": [],
+  "definitionName": "Torznab",
+  "description": "Generated fixture: Fixture Torznab Preset",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture torznab preset",
+  "name": "Fixture Torznab Preset",
+  "fields": [
+   {
+    "order": 0,
+    "name": "baseUrl",
+    "label": "Url",
+    "value": "",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "apiKey",
+    "label": "API Key",
+    "helpText": "Site API Key",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "apiKey",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Torznab",
+  "implementation": "Torznab",
+  "configContract": "TorznabSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#Torznab",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://fixturecaptcha.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "fixturecaptcha",
+  "description": "Generated fixture: Fixture Captcha",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture captcha",
+  "name": "Fixture Captcha",
+  "fields": [
+   {
+    "order": 0,
+    "name": "definitionFile",
+    "value": "fixturecaptcha",
+    "type": "textbox",
+    "advanced": false,
+    "hidden": "hidden",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 0,
+    "name": "username",
+    "label": "Username",
+    "type": "textbox",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "cardigannCaptcha",
+    "label": "CAPTCHA",
+    "type": "cardigannCaptcha",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Cardigann",
+  "implementation": "Cardigann",
+  "configContract": "CardigannSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#fixturecaptcha",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://fixtureflare.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "fixtureflare",
+  "description": "Generated fixture: Fixture Flare",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "torrent",
+  "privacy": "public",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture flare",
+  "name": "Fixture Flare",
+  "fields": [
+   {
+    "order": 0,
+    "name": "definitionFile",
+    "value": "fixtureflare",
+    "type": "textbox",
+    "advanced": false,
+    "hidden": "hidden",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 2,
+    "name": "baseSettings.queryLimit",
+    "label": "Query Limit",
+    "helpText": "The number of max queries as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 3,
+    "name": "baseSettings.grabLimit",
+    "label": "Grab Limit",
+    "helpText": "The number of max grabs as specified by the respective unit that Prowlarr will allow to the site",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 4,
+    "name": "baseSettings.limitsUnit",
+    "label": "Limits Unit",
+    "helpText": "The unit of time for counting limits per indexer",
+    "value": 0,
+    "type": "select",
+    "advanced": true,
+    "selectOptions": [
+     {
+      "value": 0,
+      "name": "Day",
+      "order": 0,
+      "hint": "(0)"
+     },
+     {
+      "value": 1,
+      "name": "Hour",
+      "order": 1,
+      "hint": "(1)"
+     }
+    ],
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 5,
+    "name": "torrentBaseSettings.appMinimumSeeders",
+    "label": "Apps Minimum Seeders",
+    "helpText": "Minimum seeders required by the Applications for the indexer to grab, empty is Sync profile's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 6,
+    "name": "torrentBaseSettings.seedRatio",
+    "label": "Seed Ratio",
+    "helpText": "The ratio a torrent should reach before stopping, empty uses the download client's default. Ratio should be at least 1.0 and follow the indexers rules",
+    "type": "number",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": true
+   },
+   {
+    "order": 7,
+    "name": "torrentBaseSettings.seedTime",
+    "label": "Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a torrent should be seeded before stopping, empty uses the download client's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 8,
+    "name": "torrentBaseSettings.packSeedTime",
+    "label": "Pack Seed Time",
+    "unit": "minutes",
+    "helpText": "The time a pack (season or discography) torrent should be seeded before stopping, empty is app's default",
+    "type": "number",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 9,
+    "name": "torrentBaseSettings.preferMagnetUrl",
+    "label": "Prefer Magnet URL",
+    "helpText": "When enabled, this indexer will prefer the use of magnet URLs for grabs with fallback to torrent links",
+    "value": false,
+    "type": "checkbox",
+    "advanced": true,
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 0,
+    "name": "info_flaresolverr",
+    "label": "FlareSolverr Info",
+    "value": "This site may use Cloudflare DDoS Protection.",
+    "type": "info",
+    "advanced": false,
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Cardigann",
+  "implementation": "Cardigann",
+  "configContract": "CardigannSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#fixtureflare",
+  "tags": [],
+  "presets": []
+ },
+ {
+  "indexerUrls": [
+   "https://fixtureusenet.invalid/"
+  ],
+  "legacyUrls": [],
+  "definitionName": "fixtureusenet",
+  "description": "Generated fixture: Fixture Usenet",
+  "language": "en-US",
+  "enable": true,
+  "redirect": false,
+  "supportsRss": true,
+  "supportsSearch": true,
+  "supportsRedirect": false,
+  "supportsPagination": false,
+  "appProfileId": 0,
+  "protocol": "usenet",
+  "privacy": "private",
+  "capabilities": {
+   "limitsMax": 100,
+   "limitsDefault": 100,
+   "categories": [
+    {
+     "id": 4000,
+     "name": "PC",
+     "subCategories": []
+    },
+    {
+     "id": 100006,
+     "name": "Apps",
+     "subCategories": []
+    }
+   ],
+   "supportsRawSearch": false,
+   "searchParams": [
+    "q",
+    "q"
+   ],
+   "tvSearchParams": [],
+   "movieSearchParams": [],
+   "musicSearchParams": [],
+   "bookSearchParams": []
+  },
+  "priority": 25,
+  "downloadClientId": 0,
+  "added": "0001-01-01T00:00:00Z",
+  "sortName": "fixture usenet",
+  "name": "Fixture Usenet",
+  "fields": [
+   {
+    "order": 0,
+    "name": "definitionFile",
+    "value": "fixtureusenet",
+    "type": "textbox",
+    "advanced": false,
+    "hidden": "hidden",
+    "privacy": "normal",
+    "isFloat": false
+   },
+   {
+    "order": 1,
+    "name": "baseUrl",
+    "label": "Base Url",
+    "helpText": "Select which base url Prowlarr will use for requests to the site",
+    "type": "select",
+    "advanced": false,
+    "selectOptionsProviderAction": "getUrls",
+    "privacy": "normal",
+    "isFloat": false
+   }
+  ],
+  "implementationName": "Cardigann",
+  "implementation": "Cardigann",
+  "configContract": "CardigannSettings",
+  "infoLink": "https://wiki.servarr.com/prowlarr/supported-indexers#fixtureusenet",
+  "tags": [],
+  "presets": []
+ }
+]
