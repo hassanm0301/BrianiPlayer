@@ -33,6 +33,21 @@ sudo docker compose --project-directory /home/hassan/briani/downloads up -d --bu
 | Container | `healthy`, restart policy `unless-stopped` |
 | Briani stack | Untouched: `briani`, `qbittorrent`, `prowlarr` and the guard kept running; `/readyz` 200 |
 
+## Logo update (same day, 14:44 +04)
+
+After `025dfb1`, only `page.html` differed from the Pi's copy; the Pi's old copy matched `20d01ad`. As `hassan`, the new `page.html` was copied over (SHA-256 `1affe02e…2895624`, equal to the commit). As `claude`:
+
+```sh
+sudo docker compose --project-directory /home/hassan/briani/downloads up -d --build
+```
+
+| Check | Result |
+|---|---|
+| Container | Recreated, `healthy`, 0 restarts, uid 10001, read-only root; `/app/page.html` hash equals the commit |
+| Live page | 200; header mark and favicon are the new logo; no console or CSP errors |
+| Mirror | Cache volume kept; `/healthz` reports all three packages mirrored at v1.2.0, no error; `/android` still 200 with 238,810,925 bytes |
+| Briani stack | Untouched; `/readyz` 200 |
+
 ## Limitations
 
 - Android TV and phone get the same debug-signed local-test APK, the only installable APK in the releases. Installing on a physical phone or TV from this page was not tested.
