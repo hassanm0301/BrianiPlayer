@@ -463,9 +463,11 @@ class _AddIndexerDialogState extends ConsumerState<_AddIndexerDialog> {
                     IndexerDefinitionSummaryPrivacyEnum.private => 'Private',
                     _ => 'Unknown access',
                   };
-                  return ListTile(
-                    key: ValueKey('definition-${definition.key}'),
+                  final itemKey = ValueKey('definition-${definition.key}');
+                  ListTile tile({Key? key, Color? tileColor}) => ListTile(
+                    key: key,
                     enabled: definition.addable && !_busy,
+                    tileColor: tileColor,
                     leading: Icon(
                       definition.privacy ==
                               IndexerDefinitionSummaryPrivacyEnum.public
@@ -492,6 +494,23 @@ class _AddIndexerDialogState extends ConsumerState<_AddIndexerDialog> {
                             ),
                     ),
                     onTap: () => _choose(definition),
+                  );
+                  if (definition.addable) return tile(key: itemKey);
+                  // A disabled tile only takes focus in directional mode, so a
+                  // keyboard would stop at the last addable definition and never
+                  // scroll to these notes. This stop is for reading: the tile
+                  // stays disabled, so Select does nothing.
+                  return Focus(
+                    key: itemKey,
+                    child: Builder(
+                      builder: (context) => ExcludeFocus(
+                        child: tile(
+                          tileColor: Focus.of(context).hasFocus
+                              ? theme.focusColor
+                              : null,
+                        ),
+                      ),
+                    ),
                   );
                 },
               ),

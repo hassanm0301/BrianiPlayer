@@ -1,0 +1,257 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.0.1 (2.1.1 available)
+  archive 4.5.1 (4.5.2 available)
+  build 4.0.11 (5.0.0 available)
+  build_config 1.3.3 (1.4.0 available)
+  build_daemon 4.1.6 (4.1.7 available)
+  build_runner 2.16.2 (2.17.1 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  cupertino_ui 1.1.2 (1.1.3 available)
+  dart_style 3.1.13 (3.1.14 available)
+  file_picker_darwin 2.2.0 (2.3.2 available)
+  file_picker_platform_interface 4.1.0 (4.2.0 available)
+  file_picker_web 4.1.0 (4.2.0 available)
+  go_router 18.0.2 (18.1.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  material_ui 1.6.0 (1.7.0 available)
+! media_kit 1.2.6 from path vendor/media_kit (overridden)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  screen_retriever 0.2.2 (0.3.0 available)
+  shared_preferences_android 2.4.28 (2.5.0 available)
+  shelf 1.4.2 (1.4.3 available)
+  source_gen 4.3.0 (4.3.1 available)
+  synchronized 3.4.2 (3.5.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.3 available)
+  vm_service 15.3.0 (15.4.0 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+31 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/feature_preferences_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +1: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +2: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +3: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:00 +4: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/dialog_lifecycle_test.dart: magnet cancel dismisses cleanly without creating a download
+00:00 +5: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/dialog_lifecycle_test.dart: saved download settings survive dialog exit and preserve values
+00:02 +6: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:02 +7: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:02 +8: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:02 +9: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:02 +10: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: system accessibility scaling remains effective
+00:03 +11: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +12: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +13: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +14: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +15: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +16: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +17: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:03 +18: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: valid partial transfer settings are submitted
+00:03 +19: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: valid partial transfer settings are submitted
+00:03 +20: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_shell_test.dart: TV shell uses compact top tabs with focus on the selected tab
+00:03 +21: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:03 +22: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:03 +23: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:03 +24: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:03 +25: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:04 +26: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:04 +27: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:04 +28: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+
+Warning: A call to tap() with finder "Found 1 widget with text "Recently changed": [
+  Text("Recently changed", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 192.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#74387 relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#b4146@Offset(160.0, 28.0), RenderSemanticsAnnotations#17fb5@Offset(160.0, 28.0), RenderMouseRegion#8144b@Offset(160.0, 28.0), RenderSemanticsAnnotations#36cca@Offset(160.0, 28.0), RenderSemanticsAnnotations#7f976@Offset(160.0, 28.0), RenderMergeSemantics#62ac1@Offset(160.0, 28.0), RenderAnimatedOpacity#69eb3@Offset(160.0, 28.0), _RenderMenuItem#7ee6a@Offset(160.0, 28.0), RenderListBody#fe43b@Offset(160.0, 140.0), RenderPadding#bdb42@Offset(160.0, 148.0), _RenderSingleChildViewport#da45e@Offset(160.0, 148.0), RenderIgnorePointer#69e3f@Offset(160.0, 148.0), RenderSemanticsAnnotations#925fa@Offset(160.0, 148.0), RenderPointerListener#b933e@Offset(160.0, 148.0), RenderSemanticsGestureHandler#ad7c3@Offset(160.0, 148.0), RenderPointerListener#6cb3d@Offset(160.0, 148.0), _RenderScrollSemantics#8f95b@Offset(160.0, 148.0), RenderClipRect#93ff5@Offset(160.0, 148.0), RenderSemanticsAnnotations#18bb0@Offset(160.0, 148.0), RenderIntrinsicWidth#8760e@Offset(160.0, 148.0), RenderConstrainedBox#d8c5b@Offset(160.0, 148.0), RenderPositionedBox#bea13@Offset(160.0, 148.0), _RenderInkFeatures#8d23e@Offset(160.0, 148.0), RenderCustomPaint#612af@Offset(160.0, 148.0), RenderPhysicalShape#cee2a@Offset(160.0, 148.0), RenderAnimatedOpacity#a4409@Offset(160.0, 148.0), RenderCustomSingleChildLayoutBox#452b9@Offset(576.0, 192.0), _RenderLayoutBuilder#42fe0@Offset(576.0, 192.0), RenderRepaintBoundary#4b531@Offset(576.0, 192.0), RenderIgnorePointer#95f7c@Offset(576.0, 192.0), RenderRepaintBoundary#9a35f@Offset(576.0, 192.0), RenderSemanticsAnnotations#02645@Offset(576.0, 192.0), RenderOffstage#57ffd@Offset(576.0, 192.0), RenderSemanticsAnnotations#e9019@Offset(576.0, 192.0), _RenderTheater#2e3c8@Offset(576.0, 192.0), RenderAbsorbPointer#49dc3@Offset(576.0, 192.0), RenderPointerListener#9bf94@Offset(576.0, 192.0), RenderSemanticsAnnotations#6af0c@Offset(576.0, 192.0), RenderCustomPaint#8c363@Offset(576.0, 192.0), RenderSemanticsAnnotations#7f2b9@Offset(576.0, 192.0), RenderSemanticsAnnotations#2b9d0@Offset(576.0, 192.0), RenderSemanticsAnnotations#00caa@Offset(576.0, 192.0), RenderTapRegionSurface#a984d@Offset(576.0, 192.0), RenderSemanticsAnnotations#9efae@Offset(576.0, 192.0), RenderSemanticsAnnotations#1e5c8@Offset(576.0, 192.0), HitTestEntry<HitTestTarget>#64bff(_ReusableRenderView#b99e0), HitTestEntry<HitTestTarget>#ebd4b(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart:139:17)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:04 +29: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +30: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +31: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +32: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +33: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +34: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +35: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: retained photo viewer updates media and adjacent navigation and stops slideshow
+00:04 +35: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: sort Largest first sends a supported wire value and keeps content
+
+Warning: A call to tap() with finder "Found 1 widget with text "Largest first": [
+  Text("Largest first", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 248.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#7eabf relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#28057@Offset(160.0, 28.0), RenderSemanticsAnnotations#7a0a4@Offset(160.0, 28.0), RenderMouseRegion#48bd9@Offset(160.0, 28.0), RenderSemanticsAnnotations#bf73c@Offset(160.0, 28.0), RenderSemanticsAnnotations#699dd@Offset(160.0, 28.0), RenderMergeSemantics#27275@Offset(160.0, 28.0), RenderAnimatedOpacity#f2b5a@Offset(160.0, 28.0), _RenderMenuItem#777ab@Offset(160.0, 28.0), RenderListBody#ce34d@Offset(160.0, 196.0), RenderPadding#e2de6@Offset(160.0, 204.0), _RenderSingleChildViewport#db9f0@Offset(160.0, 204.0), RenderIgnorePointer#47894@Offset(160.0, 204.0), RenderSemanticsAnnotations#209a4@Offset(160.0, 204.0), RenderPointerListener#e45a1@Offset(160.0, 204.0), RenderSemanticsGestureHandler#ae31b@Offset(160.0, 204.0), RenderPointerListener#44053@Offset(160.0, 204.0), _RenderScrollSemantics#fc1c7@Offset(160.0, 204.0), RenderClipRect#92b2f@Offset(160.0, 204.0), RenderSemanticsAnnotations#1b888@Offset(160.0, 204.0), RenderIntrinsicWidth#9124c@Offset(160.0, 204.0), RenderConstrainedBox#4b233@Offset(160.0, 204.0), RenderPositionedBox#53eea@Offset(160.0, 204.0), _RenderInkFeatures#ea212@Offset(160.0, 204.0), RenderCustomPaint#4a482@Offset(160.0, 204.0), RenderPhysicalShape#74ce9@Offset(160.0, 204.0), RenderAnimatedOpacity#7a4d9@Offset(160.0, 204.0), RenderCustomSingleChildLayoutBox#5ed22@Offset(576.0, 248.0), _RenderLayoutBuilder#1b78f@Offset(576.0, 248.0), RenderRepaintBoundary#af7e3@Offset(576.0, 248.0), RenderIgnorePointer#bbde8@Offset(576.0, 248.0), RenderRepaintBoundary#1f0d3@Offset(576.0, 248.0), RenderSemanticsAnnotations#193e4@Offset(576.0, 248.0), RenderOffstage#d72cc@Offset(576.0, 248.0), RenderSemanticsAnnotations#d54c7@Offset(576.0, 248.0), _RenderTheater#f00c4@Offset(576.0, 248.0), RenderAbsorbPointer#51cdc@Offset(576.0, 248.0), RenderPointerListener#d4bd3@Offset(576.0, 248.0), RenderSemanticsAnnotations#825a7@Offset(576.0, 248.0), RenderCustomPaint#37d3e@Offset(576.0, 248.0), RenderSemanticsAnnotations#7e90f@Offset(576.0, 248.0), RenderSemanticsAnnotations#bc5f6@Offset(576.0, 248.0), RenderSemanticsAnnotations#b7b9e@Offset(576.0, 248.0), RenderTapRegionSurface#11046@Offset(576.0, 248.0), RenderSemanticsAnnotations#bdf61@Offset(576.0, 248.0), RenderSemanticsAnnotations#4b335@Offset(576.0, 248.0), HitTestEntry<HitTestTarget>#f77b7(_ReusableRenderView#b99e0), HitTestEntry<HitTestTarget>#967d3(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart:139:17)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:04 +36: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: sort Largest first sends a supported wire value and keeps content
+00:04 +37: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: photo viewer arrow keys browse with wrap-around and Space toggles slideshow
+00:04 +38: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: late folder search cannot overwrite newer results
+00:04 +39: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +40: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +41: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +42: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +43: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +44: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +45: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +46: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/polish_interaction_test.dart: quiet download refresh reconciles the loaded window without rewinding pagination
+00:04 +47: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/desktop_focus_test.dart: a stopped download with a selection offers Resume, not Pause
+00:04 +48: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/desktop_focus_test.dart: a stopped download with a selection offers Resume, not Pause
+00:04 +49: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/desktop_focus_test.dart: a stopped download with a selection offers Resume, not Pause
+00:04 +50: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +50: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart: late preferences do not reset a folder sort chosen by the user
+
+Warning: A call to tap() with finder "Found 1 widget with text "Largest first": [
+  Text("Largest first", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 248.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#24852 relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#eb840@Offset(160.0, 28.0), RenderSemanticsAnnotations#af389@Offset(160.0, 28.0), RenderMouseRegion#a31c8@Offset(160.0, 28.0), RenderSemanticsAnnotations#6fba4@Offset(160.0, 28.0), RenderSemanticsAnnotations#ea25c@Offset(160.0, 28.0), RenderMergeSemantics#3c9df@Offset(160.0, 28.0), RenderAnimatedOpacity#d7b48@Offset(160.0, 28.0), _RenderMenuItem#c9368@Offset(160.0, 28.0), RenderListBody#a7817@Offset(160.0, 196.0), RenderPadding#32510@Offset(160.0, 204.0), _RenderSingleChildViewport#9eb8a@Offset(160.0, 204.0), RenderIgnorePointer#766bb@Offset(160.0, 204.0), RenderSemanticsAnnotations#bca6f@Offset(160.0, 204.0), RenderPointerListener#45bcb@Offset(160.0, 204.0), RenderSemanticsGestureHandler#5b47a@Offset(160.0, 204.0), RenderPointerListener#5250c@Offset(160.0, 204.0), _RenderScrollSemantics#98608@Offset(160.0, 204.0), RenderClipRect#a26c6@Offset(160.0, 204.0), RenderSemanticsAnnotations#4ee52@Offset(160.0, 204.0), RenderIntrinsicWidth#e7360@Offset(160.0, 204.0), RenderConstrainedBox#96611@Offset(160.0, 204.0), RenderPositionedBox#56f0a@Offset(160.0, 204.0), _RenderInkFeatures#5e77e@Offset(160.0, 204.0), RenderCustomPaint#d8308@Offset(160.0, 204.0), RenderPhysicalShape#f5c84@Offset(160.0, 204.0), RenderAnimatedOpacity#86b46@Offset(160.0, 204.0), RenderCustomSingleChildLayoutBox#38bd4@Offset(576.0, 248.0), _RenderLayoutBuilder#63735@Offset(576.0, 248.0), RenderRepaintBoundary#b78e6@Offset(576.0, 248.0), RenderIgnorePointer#e58e0@Offset(576.0, 248.0), RenderRepaintBoundary#7604d@Offset(576.0, 248.0), RenderSemanticsAnnotations#b72f8@Offset(576.0, 248.0), RenderOffstage#ebea3@Offset(576.0, 248.0), RenderSemanticsAnnotations#8f46c@Offset(576.0, 248.0), _RenderTheater#c0e37@Offset(576.0, 248.0), RenderAbsorbPointer#d5271@Offset(576.0, 248.0), RenderPointerListener#b06c6@Offset(576.0, 248.0), RenderSemanticsAnnotations#fa6fa@Offset(576.0, 248.0), RenderCustomPaint#8aea5@Offset(576.0, 248.0), RenderSemanticsAnnotations#e19d7@Offset(576.0, 248.0), RenderSemanticsAnnotations#4c8a1@Offset(576.0, 248.0), RenderSemanticsAnnotations#474ad@Offset(576.0, 248.0), RenderTapRegionSurface#5b92d@Offset(576.0, 248.0), RenderSemanticsAnnotations#1af37@Offset(576.0, 248.0), RenderSemanticsAnnotations#d7525@Offset(576.0, 248.0), HitTestEntry<HitTestTarget>#13265(_ReusableRenderView#b99e0), HitTestEntry<HitTestTarget>#27a73(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/browse_request_test.dart:332:15)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:05 +51: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +52: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +53: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +54: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +55: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +56: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +57: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +58: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +59: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +60: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +61: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:05 +62: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +63: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +64: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +65: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +66: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +67: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +68: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +69: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +70: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +71: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +72: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +73: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +74: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +75: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +76: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +77: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +78: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +79: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:06 +80: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_review_regressions_test.dart: breadcrumb keeps its scroll position and crumb focus at the start
+00:06 +81: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: an unavailable indexer list shows the server message
+00:06 +82: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_review_regressions_test.dart: administration jump list reaches sections below the fold
+00:06 +83: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_review_regressions_test.dart: administration jump list reaches sections below the fold
+00:06 +84: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/ui_review_regressions_test.dart: administration jump list reaches sections below the fold
+00:06 +85: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +86: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +87: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +88: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +89: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:07 +90: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:07 +91: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:07 +92: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:07 +93: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:07 +94: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+00:07 +95: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+00:07 +96: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+00:07 +97: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+00:07 +98: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+00:07 +99: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/tv_shell_traversal_test.dart: TV content route can traverse Up to the primary navigation
+00:07 +100: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/tv_shell_traversal_test.dart: TV content route can traverse Up to the primary navigation
+00:07 +101: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +102: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +103: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +104: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +105: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +106: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +107: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +108: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +109: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +110: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +111: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +112: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +113: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +114: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +115: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +116: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +117: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +118: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +119: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +120: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +121: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +122: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +123: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +124: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +125: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +126: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +127: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +128: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +129: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +130: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +131: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +132: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +133: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:08 +134: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +135: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +136: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +137: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +138: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +139: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +140: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +141: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/tv_remote_navigation_test.dart: D-pad focus follows stable row identity across progress updates
+00:09 +142: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:09 +143: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:09 +144: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:09 +145: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:09 +146: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/tv_remote_navigation_test.dart: panel dismisses through Back and restores opener focus
+00:09 +147: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: selecting library root explicitly moves to a null folder id
+00:09 +148: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:09 +149: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: folder fetches the next page when scrolled near the end
+00:10 +150: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: photo viewer reports an unavailable authorized image and offers retry
+00:10 +151: /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/libraries_screens_test.dart: Flutter decodes the generated EXIF-oriented JPEG upright
+00:10 +152: All tests passed!
+exit 0

@@ -1,0 +1,56 @@
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart
+00:00 +0: a TV remote scrolls past addable definitions to the Prowlarr-only ones
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      Iterable.single (dart:core/iterable.dart:694:25)
+#1      WidgetController.widget (package:flutter_test/src/controller.dart:828:30)
+#2      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart:756:36)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  a TV remote scrolls past addable definitions to the Prowlarr-only ones
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: a TV remote scrolls past addable definitions to the Prowlarr-only ones [E]
+  Test failed. See exception logs above.
+  The test description was: a TV remote scrolls past addable definitions to the Prowlarr-only ones
+  
+00:01 +0 -1: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: true
+  Actual: <false>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart:752:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart line 752
+The test description was:
+  the keyboard scrolls past addable definitions to the Prowlarr-only ones
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -2: the keyboard scrolls past addable definitions to the Prowlarr-only ones [E]
+  Test failed. See exception logs above.
+  The test description was: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+  
+00:01 +0 -2: Some tests failed.
+
+Failing tests:
+  /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: a TV remote scrolls past addable definitions to the Prowlarr-only ones
+  /home/hassan/projects/BrianiPlayer/.claude/worktrees/ecstatic-jackson-1679b8/client/test/indexer_management_test.dart: the keyboard scrolls past addable definitions to the Prowlarr-only ones
+exit 1

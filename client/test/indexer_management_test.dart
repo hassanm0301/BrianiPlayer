@@ -63,11 +63,34 @@ Map<String, Object?> _indexer(
   'stateDetail': enabled ? 'No recent failures in Prowlarr.' : null,
 };
 
+Map<String, Object?> _definition(
+  String key,
+  String name, {
+  required bool addable,
+}) => {
+  'key': key,
+  'name': name,
+  'description': 'Generated fixture',
+  'language': 'en-US',
+  'privacy': 'public',
+  'supportsSearch': true,
+  'supportsRecent': true,
+  'addable': addable,
+  'setupNote': addable ? null : "This indexer uses a site address you type in yourself, so it is set up in Prowlarr's own page.",
+};
+
 /// Answers the administration reads plus the indexer endpoints the way the
 /// Briani server does, and records every request the screen makes.
 class _IndexerAdapter implements HttpClientAdapter {
-  _IndexerAdapter({this.indexersUnavailable = false});
+  _IndexerAdapter({
+    this.indexersUnavailable = false,
+    this.extraDefinitions = 0,
+  });
   final bool indexersUnavailable;
+
+  /// Adds this many addable and as many Prowlarr-only definitions, so the list
+  /// is longer than the dialog shows at once.
+  final int extraDefinitions;
   final requests = <(String, String, Object?)>[];
   final indexers = [
     _indexer('3', 'Fixture One'),
@@ -183,6 +206,10 @@ class _IndexerAdapter implements HttpClientAdapter {
           'addable': true,
           'setupNote': null,
         },
+        for (var i = 1; i <= extraDefinitions; i++)
+          _definition('openfixture$i', 'Open Fixture $i', addable: true),
+        for (var i = 1; i <= extraDefinitions; i++)
+          _definition('setupfixture$i', 'Setup Fixture $i', addable: false),
       ]);
     }
     if (path == '/api/v1/admin/indexers/definitions/brianifixture') {
@@ -425,7 +452,10 @@ void main() {
 
       expect(find.text('Briani Fixture'), findsOneWidget);
       final captcha = tester.widget<ListTile>(
-        find.byKey(const ValueKey('definition-fixturecaptcha')),
+        find.descendant(
+          of: find.byKey(const ValueKey('definition-fixturecaptcha')),
+          matching: find.byType(ListTile),
+        ),
       );
       expect(captcha.enabled, isFalse);
       expect(find.textContaining('such as a CAPTCHA'), findsOneWidget);
@@ -660,4 +690,126 @@ void main() {
     expect(sent['settings'], containsPair('sort', '1'));
     expect(sent['settings'], containsPair('freeleech', 'true'));
   });
+
+  for (final television in [true, false]) {
+    testWidgets(
+      '${television ? 'a TV remote' : 'the keyboard'} scrolls past addable definitions to the Prowlarr-only ones',
+      (tester) async {
+        tester.view.physicalSize = const Size(1920, 1080);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final adapter = _IndexerAdapter(extraDefinitions: 6);
+        await tester.pumpWidget(_app(adapter, television: television));
+        await tester.pumpAndSettle();
+
+        await _pressUntil(
+          tester,
+          LogicalKeyboardKey.arrowDown,
+          _button('Add indexer'),
+        );
+        await _select(tester);
+        final dialog = find.byType(AlertDialog);
+        final list = find.descendant(
+          of: dialog,
+          matching: find.byType(ListView),
+        );
+        final position = tester
+            .state<ScrollableState>(
+              find.descendant(of: list, matching: find.byType(Scrollable)),
+            )
+            .position;
+        expect(position.maxScrollExtent, greaterThan(0));
+        if (!television) {
+          // The search field has focus on desktop; Tab leaves it.
+          expect(
+            _focusWithin(find.widgetWithText(TextField, 'Search indexers')),
+            isTrue,
+          );
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pumpAndSettle();
+        }
+
+        bool shown(Finder finder) {
+          final viewport = tester.getRect(list);
+          final tile = tester.getRect(finder);
+          return tile.top >= viewport.top - 0.5 &&
+              tile.bottom <= viewport.bottom + 0.5;
+        }
+
+        // Addable definitions come first; the last one is Open Fixture 6.
+        await _pressUntil(
+          tester,
+          LogicalKeyboardKey.arrowDown,
+          find.byKey(const ValueKey('definition-openfixture6')),
+          max: 12,
+        );
+        final before = position.pixels;
+
+        // One more press moves on to the first definition left to Prowlarr.
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+        final captcha = find.byKey(const ValueKey('definition-fixturecaptcha'));
+        expect(_focusWithin(captcha), isTrue);
+        expect(shown(captcha), isTrue);
+        expect(position.pixels, greaterThan(before));
+        // It is still a disabled tile, highlighted while it has focus.
+        final captchaTile = tester.widget<ListTile>(
+          find.descendant(of: captcha, matching: find.byType(ListTile)),
+        );
+        expect(captchaTile.enabled, isFalse);
+        expect(
+          captchaTile.tileColor,
+          Theme.of(tester.element(captcha)).focusColor,
+        );
+
+        // Down keeps going to the end of the list, one press per definition,
+        // scrolling as it goes.
+        final last = find.byKey(const ValueKey('definition-setupfixture6'));
+        expect(last, findsNothing);
+        await _pressUntil(tester, LogicalKeyboardKey.arrowDown, last, max: 6);
+        expect(shown(last), isTrue);
+        expect(position.pixels, position.maxScrollExtent);
+        expect(
+          find.descendant(
+            of: last,
+            matching: find.textContaining(
+              'a site address you type in yourself',
+            ),
+          ),
+          findsOneWidget,
+        );
+
+        // Select on a Prowlarr-only definition doesn't open the settings form.
+        await _select(tester);
+        expect(
+          find.descendant(of: dialog, matching: find.text('Add indexer')),
+          findsOneWidget,
+        );
+        expect(find.text('Add Setup Fixture 6'), findsNothing);
+        expect(
+          adapter.requests.where(
+            (r) => r.$2.startsWith('/api/v1/admin/indexers/definitions/'),
+          ),
+          isEmpty,
+        );
+        expect(_focusWithin(last), isTrue);
+
+        // Up goes back over the same definitions to the addable ones.
+        await _pressUntil(
+          tester,
+          LogicalKeyboardKey.arrowUp,
+          find.byKey(const ValueKey('definition-openfixture6')),
+          max: 7,
+        );
+        await _select(tester);
+        expect(
+          adapter.calls(
+            'GET',
+            '/api/v1/admin/indexers/definitions/openfixture6',
+          ),
+          hasLength(1),
+        );
+      },
+    );
+  }
 }

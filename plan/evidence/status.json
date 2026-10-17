@@ -668,6 +668,40 @@
         "Owner decision: specs 01/08 still describe status/enable/test only; Add and Remove go further.",
         "No Android phone, Android TV, Pi or real Prowlarr instance used in this review."
       ]
+    },
+    {
+      "date": "2026-10-17",
+      "scope": "Indexer add dialog: definitions Briani cannot add are reachable with a remote or keyboard (review finding 6)",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_linux_local_android_tv_unverified",
+      "report": "docs/evidence/M09/indexer-admin-20261017/tv-unaddable-definitions.md",
+      "checks": {
+        "newTestsAgainst96a3af5": {
+          "exitCode": 1,
+          "failed": 2,
+          "passed": 0,
+          "log": "docs/evidence/M09/indexer-admin-20261017/tv-unaddable-confirm-on-96a3af5.log"
+        },
+        "flutterAnalyze": {
+          "exitCode": 0,
+          "issues": 0,
+          "log": "docs/evidence/M09/indexer-admin-20261017/tv-unaddable-client-analyze.log"
+        },
+        "flutterTest": {
+          "exitCode": 0,
+          "passed": 152,
+          "log": "docs/evidence/M09/indexer-admin-20261017/tv-unaddable-client-tests.log"
+        },
+        "planValidation": {
+          "exitCode": 0
+        }
+      },
+      "findingsFixed": [
+        "Low: definitions Briani cannot add were disabled tiles, which take no focus in traditional navigation, so a keyboard (or a remote on a device not detected as a TV) stopped at the last addable one. Each is now one focus stop that stays disabled; on TV, Flutter's directional mode already let them take focus."
+      ],
+      "limitations": [
+        "Widget tests only; not run on an Android TV with a real remote or on a desktop build."
+      ]
     }
   ],
   "deploymentAttempts": [

@@ -13,7 +13,7 @@ Each finding below was confirmed by reading the code and, for the four fixed one
 | 3 | Low | Part of a credential could survive the scrubbing of Prowlarr's failure text | Fixed |
 | 4 | Low | Parallel indexer tests could take both of SafeHttp's upstream slots, which discovery shares | Fixed |
 | 5 | Low | The 18-second limit is per Prowlarr call, not per request | Open |
-| 6 | Low | On TV, definitions Briani can't add can't be scrolled to | Open |
+| 6 | Low | On TV, definitions Briani can't add can't be scrolled to | Fixed later (`tv-unaddable-definitions.md`) |
 | 7 | Info | Audit rows for indexers show no resource | Open |
 | 8 | Info | Specs 01/08 still describe a narrower scope | Owner decision |
 | 9 | Info | Smaller notes | Open |
@@ -67,6 +67,8 @@ A per-request budget, or a bounded lock wait with its own "busy" answer, would c
 `indexer_management.dart:425-428` lists addable definitions first. `:468` disables every other tile, and a disabled `ListTile` can't take focus. With a remote, focus stops at the last addable entry, so the list never scrolls to the 100-odd definitions that need Prowlarr's page, or to their setup notes. Searching narrows the list, and their notes are readable once visible.
 
 Making those tiles focusable but not tappable would fix this. It's a UX gap only: those definitions can't be added from Briani anyway.
+
+**Later:** fixed in a follow-up; see `tv-unaddable-definitions.md`. On TV, Flutter's directional mode already let the disabled tiles take focus. The gap was real in traditional mode (keyboard, or a remote on a device not detected as a TV).
 
 ### 7. Audit rows for indexers show no resource (Info, open)
 
