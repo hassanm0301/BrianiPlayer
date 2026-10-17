@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
 
-/// The Briani app mark: a rounded tile with a play glyph in the accent color.
+/// The Briani app mark: the pot logo without the wordmark, centered in a
+/// [size] square. Decorative; callers label it where it carries meaning.
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key, this.size = 44});
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
+    return Image.asset(
+      'assets/brand/mark.png',
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: scheme.primary,
-        borderRadius: BorderRadius.circular(size * .32),
-      ),
-      child: Icon(
-        Icons.play_arrow_rounded,
-        color: scheme.onPrimary,
-        size: size * .68,
-      ),
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+      excludeFromSemantics: true,
     );
   }
 }
 
-/// Mark, product name and a one-line purpose for signed-out screens.
+/// The full logo (mark over the product name) and a one-line purpose for
+/// signed-out screens.
 class BrandHeader extends StatelessWidget {
   const BrandHeader({super.key, required this.subtitle});
   final String subtitle;
@@ -34,14 +30,14 @@ class BrandHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        const BrandMark(size: 64),
-        const SizedBox(height: 16),
-        Text(
-          'Briani Player',
-          textAlign: TextAlign.center,
-          style: theme.textTheme.headlineMedium,
+        Image.asset(
+          'assets/brand/logo.png',
+          height: 148,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          semanticLabel: 'Briani Player',
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 12),
         Text(
           subtitle,
           textAlign: TextAlign.center,

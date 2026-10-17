@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/brand/briani-logo.png" alt="Briani Player logo" width="280"></p>
+
 # Briani Player
 
 Browse and play media from your own server on Linux, Android phones/tablets, and Android TV. Briani supports folder libraries, photos, torrent search through Prowlarr, and playback while qBittorrent downloads a video.

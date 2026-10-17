@@ -558,6 +558,39 @@
         "Desktop full-stack E2E blocked at preflight: runner expects briani-server:m10 but images.lock.json names the v1.1.0 image; images and lock unchanged.",
         "Windows/macOS builds not run; desktop and Android integration-test finders updated but not run."
       ]
+    },
+    {
+      "date": "2026-10-17",
+      "scope": "Owner-supplied logo: in-app mark and full logo, Android adaptive/themed launcher icon and TV banner, macOS/Windows app icons, Linux window icon, download page favicon/header; colour palette unchanged",
+      "codeStatus": "complete",
+      "verificationStatus": "passed_linux_desktop_android_build_only",
+      "report": "docs/evidence/M07/brand-logo-20261017/report.md",
+      "checks": {
+        "brandAssetsReproducible": true,
+        "flutterAnalyze": {
+          "exitCode": 0,
+          "issues": 0
+        },
+        "flutterTest": {
+          "exitCode": 0,
+          "passed": 149
+        },
+        "downloadsTests": {
+          "exitCode": 0,
+          "passed": 12
+        },
+        "androidDebugApkBuild": {
+          "exitCode": 0
+        },
+        "linuxDebugBuild": {
+          "exitCode": 0
+        },
+        "realLinuxAppServerScreen": "full logo rendered; 256x256 window icon set under XWayland"
+      },
+      "limitations": [
+        "No Android phone, Android TV, Windows or macOS device or build verified the new icons.",
+        "Linux window icon applies only where the window manager reads it from the window (X11/XWayland); the bundle installs no desktop entry for native Wayland shells."
+      ]
     }
   ],
   "deploymentAttempts": [

@@ -10,6 +10,7 @@ import '../core/platform/platform_capabilities.dart';
 import '../core/preferences/preferences_providers.dart';
 import '../core/session/client_session.dart';
 import '../core/widgets/adaptive.dart';
+import '../core/widgets/brand.dart';
 import '../core/widgets/states.dart';
 import '../features/session/device_pairing.dart';
 import 'theme.dart';
@@ -210,22 +211,9 @@ class _AppMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Tooltip(
       message: 'Briani Player · $serverLabel',
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: scheme.primary,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Icon(
-          Icons.play_arrow_rounded,
-          color: scheme.onPrimary,
-          size: 30,
-        ),
-      ),
+      child: const BrandMark(size: 52),
     );
   }
 }

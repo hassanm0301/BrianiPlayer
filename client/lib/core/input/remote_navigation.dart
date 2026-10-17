@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../widgets/brand.dart';
+
 /// Shared keyboard/remote bindings for screens that must work with a D-pad.
 /// Directional focus traversal and Back remain owned by Flutter's normal
 /// focus and route systems.
@@ -170,15 +172,7 @@ class TvNavigationScaffold extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(32, 16, 32, 8),
             child: Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: scheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Icons.play_arrow_rounded, color: scheme.onPrimary, size: 28),
-                ),
+                const BrandMark(size: 48),
                 const SizedBox(width: 20),
                 for (var i = 0; i < destinations.length; i++) ...[
                   if (i > 0) const SizedBox(width: 8),
