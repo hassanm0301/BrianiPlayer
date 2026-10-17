@@ -1,0 +1,32 @@
+# Briani Player download page: its own Compose project, separate from the
+# Briani server stack. Run from this directory:
+#   docker compose up -d --build
+# Settings go in a .env file next to this one; see docs/operations/downloads.md.
+name: briani-downloads
+services:
+  downloads:
+    build: .
+    image: briani-downloads:local
+    environment:
+      DOWNLOADS_REPO: ${DOWNLOADS_REPO:-hassanm0301/BrianiPlayer}
+      DOWNLOADS_SERVER_URL: ${DOWNLOADS_SERVER_URL:-}
+      DOWNLOADS_INTERVAL: ${DOWNLOADS_INTERVAL:-900}
+      DOWNLOADS_PRERELEASES: ${DOWNLOADS_PRERELEASES:-1}
+    ports: ["${DOWNLOADS_BIND:-127.0.0.1}:${DOWNLOADS_PORT:-8089}:8089"]
+    volumes:
+      - cache:/cache
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 64
+    restart: unless-stopped
+    stop_grace_period: 5s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8089/healthz', timeout=5)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+volumes:
+  cache:

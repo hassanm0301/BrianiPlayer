@@ -12,6 +12,8 @@ The files described here are private candidate artifacts under `dist/`, not publ
 
 The Android file named `briani-player-unsigned.apk` needs signing before installation. Use the local-test APK for the sideload steps below.
 
+If your operator runs the [client download page](operations/downloads.md), open it on the device instead. It offers the newest local-test APK and Linux bundle from the project's GitHub releases.
+
 ## Linux x64 bundle
 
 The archive targets Linux x86-64 (amd64). It needs a graphical desktop plus the host GTK 3, GLib/GObject, and libsecret libraries, a compatible system `libmpv` (`libmpv.so.2` in the inspected candidate), and the audio/video libraries used by that mpv build. Install these runtime dependencies through your distribution's package manager; their package names vary. The archive does not bundle mpv or every system library. The [client build notes](development/client-builds.md) link to the inspected runtime dependency list.

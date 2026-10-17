@@ -120,3 +120,5 @@ For other people, use **Create user** and the library's access controls. **Read*
 Discover stays empty until you add indexers in Prowlarr. Follow [Set up torrent search](indexers.md). It takes about ten minutes. Existing files can be used without configuring indexers.
 
 For daily app use, see the [user guide](../user-guide.md). Backups, upgrades, service controls, and recovery are in [advanced server setup and maintenance](advanced.md).
+
+To let people download the apps straight from your server, set up the optional [client download page](downloads.md).
