@@ -61,6 +61,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   bool _viewEdited = false;
   bool _failedPage = false;
   int _queryGeneration = 0;
+  String? _searchedQuery;
 
   @override
   void initState() {
@@ -255,6 +256,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         identical(ref.read(activeApiProvider), api);
     _queryCancel = cancel;
     setState(() {
+      _searchedQuery = _searchController.text.trim();
       _loading = true;
       _loadingMore = false;
       _error = null;
@@ -1042,25 +1044,36 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
           message: 'No results are available for this view.',
         );
       }
-      final query = _searchController.text.trim();
-      if (query.isEmpty) {
-        return const EmptyState(
-          icon: Icons.search,
-          title: 'Search your indexers',
-          message: 'Enter a torrent name to search.',
-        );
-      }
-      if (_snapshot == null) {
-        return EmptyState(
-          icon: Icons.search,
-          title: 'Ready to search',
-          message: 'Press Enter to search for “$query”.',
-        );
-      }
-      return const EmptyState(
-        icon: Icons.search_off,
-        title: 'No matches',
-        message: 'No results in this fetched snapshot.',
+      // Typing does not rebuild the screen, so this prompt follows the field.
+      return ValueListenableBuilder<TextEditingValue>(
+        valueListenable: _searchController,
+        builder: (context, value, _) {
+          final query = value.text.trim();
+          if (query.isEmpty) {
+            return const EmptyState(
+              icon: Icons.search,
+              title: 'Search your indexers',
+              message: 'Enter a torrent name to search.',
+            );
+          }
+          if (_snapshot == null || query != _searchedQuery) {
+            return EmptyState(
+              icon: Icons.search,
+              title: 'Ready to search',
+              message: 'Press Enter to search for “$query”.',
+              action: FilledButton.icon(
+                onPressed: _submitSearch,
+                icon: const Icon(Icons.search),
+                label: const Text('Search'),
+              ),
+            );
+          }
+          return const EmptyState(
+            icon: Icons.search_off,
+            title: 'No matches',
+            message: 'No results in this fetched snapshot.',
+          );
+        },
       );
     }
     return LayoutBuilder(

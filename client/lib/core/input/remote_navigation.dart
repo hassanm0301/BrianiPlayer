@@ -26,8 +26,8 @@ class RemoteNavigationScope extends StatelessWidget {
       const SingleActivator(LogicalKeyboardKey.select): const ActivateIntent(),
       const SingleActivator(LogicalKeyboardKey.gameButtonA):
           const ActivateIntent(),
-      const SingleActivator(LogicalKeyboardKey.enter): const ActivateIntent(),
-      const SingleActivator(LogicalKeyboardKey.numpadEnter):
+      const _EnterOutsideText(LogicalKeyboardKey.enter): const ActivateIntent(),
+      const _EnterOutsideText(LogicalKeyboardKey.numpadEnter):
           const ActivateIntent(),
     };
     if (television) {
@@ -97,6 +97,29 @@ class _TvVerticalTextAction extends Action<ExtendSelectionVerticallyToAdjacentLi
     }
     return callingAction?.invoke(intent);
   }
+}
+
+// Enter in a text field belongs to the platform text input, which turns it
+// into the field's submit action or a newline. Mapping it to ActivateIntent
+// there would instead "tap" an enclosing InkWell (SearchBar has one) and
+// swallow the key, so onSubmitted would never fire.
+class _EnterOutsideText implements ShortcutActivator {
+  const _EnterOutsideText(this.key);
+
+  final LogicalKeyboardKey key;
+
+  @override
+  Iterable<LogicalKeyboardKey> get triggers => [key];
+
+  @override
+  bool accepts(KeyEvent event, HardwareKeyboard state) {
+    if (!SingleActivator(key).accepts(event, state)) return false;
+    final focus = FocusManager.instance.primaryFocus?.context;
+    return focus?.findAncestorWidgetOfExactType<EditableText>() == null;
+  }
+
+  @override
+  String debugDescribeKeys() => '${key.keyLabel} outside text fields';
 }
 
 class _MediaPlayPauseIntent extends Intent {

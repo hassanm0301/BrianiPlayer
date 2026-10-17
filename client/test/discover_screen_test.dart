@@ -103,6 +103,86 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Add download'), findsNothing);
   });
+
+  testWidgets('Enter in the desktop search bar submits the search', (
+    tester,
+  ) async {
+    final adapter = _DiscoveryAdapter();
+    final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
+      ..httpClientAdapter = adapter;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [activeApiProvider.overrideWithValue(BrianiApi(dio: dio))],
+        child: _desktop(const DiscoverScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Search').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Search your indexers'), findsOneWidget);
+    adapter.queries.clear();
+
+    await tester.tap(find.byType(SearchBar));
+    await tester.enterText(find.byType(SearchBar), 'ubuntu');
+    await tester.pump();
+    expect(find.text('Search your indexers'), findsNothing);
+    expect(find.text('Ready to search'), findsOneWidget);
+
+    // The app-wide remote bindings must leave Enter to the text field so the
+    // platform text input turns it into the field's search action.
+    expect(await tester.sendKeyEvent(LogicalKeyboardKey.enter), isFalse);
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(adapter.queries, hasLength(1));
+    expect(adapter.queries.single['mode'], 'search');
+    expect(adapter.queries.single['query'], 'ubuntu');
+    expect(find.text('Example release'), findsWidgets);
+
+    await tester.tap(find.byTooltip('Clear search'));
+    await tester.pump();
+    expect(find.text('Example release'), findsWidgets);
+  });
+
+  testWidgets('Ready to search offers a Search button', (tester) async {
+    final adapter = _DiscoveryAdapter();
+    final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
+      ..httpClientAdapter = adapter;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [activeApiProvider.overrideWithValue(BrianiApi(dio: dio))],
+        child: _desktop(const DiscoverScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Search').first);
+    await tester.pumpAndSettle();
+    adapter.queries.clear();
+    await tester.enterText(find.byType(SearchBar), 'ubuntu');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Search'));
+    await tester.pumpAndSettle();
+    expect(adapter.queries.single['query'], 'ubuntu');
+    expect(find.text('Example release'), findsWidgets);
+  });
+
+  testWidgets('Enter still activates a focused button', (tester) async {
+    var pressed = 0;
+    await tester.pumpWidget(
+      _desktop(
+        Scaffold(
+          body: FilledButton(
+            autofocus: true,
+            onPressed: () => pressed++,
+            child: const Text('Go'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(await tester.sendKeyEvent(LogicalKeyboardKey.enter), isTrue);
+    await tester.pumpAndSettle();
+    expect(pressed, 1);
+  });
 }
 
 Finder _metric(String label) => find.byWidgetPredicate(
@@ -135,6 +215,13 @@ Widget _television(Widget home) => MaterialApp(
   home: home,
 );
 
+/// Wraps [home] the way the app does on desktop: the shared remote key
+/// bindings without D-pad navigation mode.
+Widget _desktop(Widget home) => MaterialApp(
+  builder: (context, child) => RemoteNavigationScope(child: child!),
+  home: home,
+);
+
 bool _focusInside<T extends Widget>() {
   final context = FocusManager.instance.primaryFocus?.context;
   return context != null &&
@@ -151,6 +238,7 @@ class _DiscoveryAdapter implements HttpClientAdapter {
   final bool providerFailure;
   final bool discoveryForbidden;
   final bool downloadable;
+  final List<Map<String, dynamic>> queries = [];
 
   @override
   Future<ResponseBody> fetch(
@@ -159,6 +247,10 @@ class _DiscoveryAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     final path = options.path;
+    if (path.endsWith('/discovery/queries') && requestStream != null) {
+      final bytes = await requestStream.expand((chunk) => chunk).toList();
+      queries.add(jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>);
+    }
     if (discoveryForbidden && path.contains('/discovery/')) {
       return ResponseBody.fromString(
         jsonEncode({
