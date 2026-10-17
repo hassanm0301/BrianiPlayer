@@ -21,6 +21,7 @@ lib/src/auth/basic_auth.dart
 lib/src/auth/bearer_auth.dart
 lib/src/auth/oauth.dart
 lib/src/date_serializer.dart
+lib/src/model/admin_indexer.dart
 lib/src/model/admin_settings.dart
 lib/src/model/audit_entry.dart
 lib/src/model/audit_page.dart
@@ -58,6 +59,13 @@ lib/src/model/event.dart
 lib/src/model/file_choice.dart
 lib/src/model/get_library_grants200_response.dart
 lib/src/model/grant_update.dart
+lib/src/model/indexer_create.dart
+lib/src/model/indexer_definition_detail.dart
+lib/src/model/indexer_definition_summary.dart
+lib/src/model/indexer_patch.dart
+lib/src/model/indexer_setting_field.dart
+lib/src/model/indexer_setting_option.dart
+lib/src/model/indexer_test_result.dart
 lib/src/model/integration.dart
 lib/src/model/integration_update.dart
 lib/src/model/job.dart

@@ -48,14 +48,13 @@ import 'package:briani_api/briani_api.dart';
 
 
 final api = BrianiApi().getAdministrationApi();
-final CreateUser createUser = ; // CreateUser | 
-final String idempotencyKey = idempotencyKey_example; // String | Use a unique key for retriable mutations; reused key with different body is rejected.
+final IndexerCreate indexerCreate = ; // IndexerCreate | 
 
 try {
-    final response = await api.createUser(createUser, idempotencyKey);
+    final response = await api.createAdminIndexer(indexerCreate);
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling AdministrationApi->createUser: $e\n");
+    print("Exception when calling AdministrationApi->createAdminIndexer: $e\n");
 }
 
 ```
@@ -66,12 +65,17 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AdministrationApi*](doc/AdministrationApi.md) | [**createAdminIndexer**](doc/AdministrationApi.md#createadminindexer) | **POST** /api/v1/admin/indexers | Add a Prowlarr torrent indexer from an addable definition
 [*AdministrationApi*](doc/AdministrationApi.md) | [**createUser**](doc/AdministrationApi.md#createuser) | **POST** /api/v1/admin/users | Create a user
+[*AdministrationApi*](doc/AdministrationApi.md) | [**deleteAdminIndexer**](doc/AdministrationApi.md#deleteadminindexer) | **DELETE** /api/v1/admin/indexers/{id} | Remove a Prowlarr torrent indexer
 [*AdministrationApi*](doc/AdministrationApi.md) | [**deleteUser**](doc/AdministrationApi.md#deleteuser) | **DELETE** /api/v1/admin/users/{id} | Disable/delete according to retained ownership and audit policy
 [*AdministrationApi*](doc/AdministrationApi.md) | [**getAdminHealth**](doc/AdministrationApi.md#getadminhealth) | **GET** /api/v1/admin/health | Read detailed dependency health
 [*AdministrationApi*](doc/AdministrationApi.md) | [**getAdminSettings**](doc/AdministrationApi.md#getadminsettings) | **GET** /api/v1/admin/settings | Read curated server settings
+[*AdministrationApi*](doc/AdministrationApi.md) | [**getIndexerDefinition**](doc/AdministrationApi.md#getindexerdefinition) | **GET** /api/v1/admin/indexers/definitions/{key} | Read the settings Briani shows for one definition
 [*AdministrationApi*](doc/AdministrationApi.md) | [**getUser**](doc/AdministrationApi.md#getuser) | **GET** /api/v1/admin/users/{id} | Read user
+[*AdministrationApi*](doc/AdministrationApi.md) | [**listAdminIndexers**](doc/AdministrationApi.md#listadminindexers) | **GET** /api/v1/admin/indexers | List Prowlarr torrent indexers without any setting values
 [*AdministrationApi*](doc/AdministrationApi.md) | [**listAudit**](doc/AdministrationApi.md#listaudit) | **GET** /api/v1/admin/audit | Read redacted administrator audit
+[*AdministrationApi*](doc/AdministrationApi.md) | [**listIndexerDefinitions**](doc/AdministrationApi.md#listindexerdefinitions) | **GET** /api/v1/admin/indexers/definitions | List Prowlarr torrent indexer definitions and whether Briani can add them
 [*AdministrationApi*](doc/AdministrationApi.md) | [**listIntegrations**](doc/AdministrationApi.md#listintegrations) | **GET** /api/v1/admin/integrations | Read private integrations without secrets
 [*AdministrationApi*](doc/AdministrationApi.md) | [**listStorageDirectories**](doc/AdministrationApi.md#liststoragedirectories) | **GET** /api/v1/admin/storage/{id}/directories | Browse contained directories for library setup
 [*AdministrationApi*](doc/AdministrationApi.md) | [**listStorageRoots**](doc/AdministrationApi.md#liststorageroots) | **GET** /api/v1/admin/storage | Read mounted storage roots and reservations
@@ -80,7 +84,9 @@ Class | Method | HTTP request | Description
 [*AdministrationApi*](doc/AdministrationApi.md) | [**runMaintenance**](doc/AdministrationApi.md#runmaintenance) | **POST** /api/v1/admin/maintenance | Queue bounded application maintenance
 [*AdministrationApi*](doc/AdministrationApi.md) | [**setAdminSettings**](doc/AdministrationApi.md#setadminsettings) | **PUT** /api/v1/admin/settings | Update curated server settings
 [*AdministrationApi*](doc/AdministrationApi.md) | [**setIntegration**](doc/AdministrationApi.md#setintegration) | **PUT** /api/v1/admin/integrations/{kind} | Configure protected service connection
+[*AdministrationApi*](doc/AdministrationApi.md) | [**testAdminIndexer**](doc/AdministrationApi.md#testadminindexer) | **POST** /api/v1/admin/indexers/{id}/test | Ask Prowlarr to test a configured torrent indexer
 [*AdministrationApi*](doc/AdministrationApi.md) | [**testIntegration**](doc/AdministrationApi.md#testintegration) | **POST** /api/v1/admin/integrations/{kind}/test | Test configured connection without exposing credentials
+[*AdministrationApi*](doc/AdministrationApi.md) | [**updateAdminIndexer**](doc/AdministrationApi.md#updateadminindexer) | **PATCH** /api/v1/admin/indexers/{id} | Enable or disable a Prowlarr torrent indexer
 [*AdministrationApi*](doc/AdministrationApi.md) | [**updateUser**](doc/AdministrationApi.md#updateuser) | **PATCH** /api/v1/admin/users/{id} | Update user without removing last administrator
 [*DiscoveryApi*](doc/DiscoveryApi.md) | [**createDiscoveryQuery**](doc/DiscoveryApi.md#creatediscoveryquery) | **POST** /api/v1/discovery/queries | Create/reuse bounded query snapshot
 [*DiscoveryApi*](doc/DiscoveryApi.md) | [**getDiscoverySnapshot**](doc/DiscoveryApi.md#getdiscoverysnapshot) | **GET** /api/v1/discovery/queries/{id} | Read own query results with partial-failure warnings
@@ -143,6 +149,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AdminIndexer](doc/AdminIndexer.md)
  - [AdminSettings](doc/AdminSettings.md)
  - [AuditEntry](doc/AuditEntry.md)
  - [AuditPage](doc/AuditPage.md)
@@ -179,6 +186,13 @@ Class | Method | HTTP request | Description
  - [FileChoice](doc/FileChoice.md)
  - [GetLibraryGrants200Response](doc/GetLibraryGrants200Response.md)
  - [GrantUpdate](doc/GrantUpdate.md)
+ - [IndexerCreate](doc/IndexerCreate.md)
+ - [IndexerDefinitionDetail](doc/IndexerDefinitionDetail.md)
+ - [IndexerDefinitionSummary](doc/IndexerDefinitionSummary.md)
+ - [IndexerPatch](doc/IndexerPatch.md)
+ - [IndexerSettingField](doc/IndexerSettingField.md)
+ - [IndexerSettingOption](doc/IndexerSettingOption.md)
+ - [IndexerTestResult](doc/IndexerTestResult.md)
  - [Integration](doc/Integration.md)
  - [IntegrationUpdate](doc/IntegrationUpdate.md)
  - [Job](doc/Job.md)

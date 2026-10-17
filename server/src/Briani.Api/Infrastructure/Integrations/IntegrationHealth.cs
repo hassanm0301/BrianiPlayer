@@ -23,6 +23,6 @@ public static class IntegrationHealth
             await RequireAdministratorAsync(actor,db,permissions,ct);connections.Observe(kind,configured.Version,state,detail);return Results.Ok(new{service=kind,state,detail,checkedAt=clock.GetUtcNow()});
         }).RequireAuthorization("administrator");
     }
-    private static async Task RequireAdministratorAsync(Actor actor,BrianiDb db,PermissionService permissions,CancellationToken ct)
+    internal static async Task RequireAdministratorAsync(Actor actor,BrianiDb db,PermissionService permissions,CancellationToken ct)
     {if(!await permissions.IsAccessValidAsync(actor,ct) || !await db.Users.AsNoTracking().AnyAsync(x=>x.Id==actor.UserId && x.Enabled && !x.MustChangePassword && x.Role=="administrator",ct))throw new ApiException(403,"forbidden");}
 }

@@ -137,6 +137,14 @@ public static class ErrorMessages
         ["source_address_rejected"] = "The indexer link points to a blocked network address.",
         ["invalid_source"] = "This result's source is not valid.",
 
+        // Indexer administration
+        ["indexer_rejected"] = "Prowlarr did not accept this indexer change.",
+        ["indexer_setup_in_prowlarr"] = "This indexer needs settings that only Prowlarr's own page supports.",
+        ["invalid_indexer_settings"] = "Some indexer settings are not valid. Check them and try again.",
+        ["indexer_profile_missing"] = "Prowlarr has no sync profile to give the indexer. Create one in Prowlarr's own page first.",
+        ["indexer_timeout"] = "Prowlarr did not answer in time. Refresh the list to see whether the change was applied.",
+        ["prowlarr_credentials_rejected"] = "Prowlarr rejected the API key Briani uses. Check the Prowlarr integration settings.",
+
         // Downloads and torrents
         ["download_failed"] = "The download failed.",
         ["download_conflict"] = "This download conflicts with an existing one.",

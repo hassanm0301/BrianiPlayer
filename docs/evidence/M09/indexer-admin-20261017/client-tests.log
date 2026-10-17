@@ -1,0 +1,255 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.0.1 (2.1.1 available)
+  archive 4.5.1 (4.5.2 available)
+  build 4.0.11 (5.0.0 available)
+  build_config 1.3.3 (1.4.0 available)
+  build_daemon 4.1.6 (4.1.7 available)
+  build_runner 2.16.2 (2.17.1 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  cupertino_ui 1.1.2 (1.1.3 available)
+  dart_style 3.1.13 (3.1.14 available)
+  file_picker_darwin 2.2.0 (2.3.2 available)
+  file_picker_platform_interface 4.1.0 (4.2.0 available)
+  file_picker_web 4.1.0 (4.2.0 available)
+  go_router 18.0.2 (18.1.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  material_ui 1.6.0 (1.7.0 available)
+! media_kit 1.2.6 from path vendor/media_kit (overridden)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  screen_retriever 0.2.2 (0.3.0 available)
+  shared_preferences_android 2.4.28 (2.5.0 available)
+  shelf 1.4.2 (1.4.3 available)
+  source_gen 4.3.0 (4.3.1 available)
+  synchronized 3.4.2 (3.5.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.3 available)
+  vm_service 15.3.0 (15.4.0 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+31 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/feature_preferences_test.dart
+00:00 +0: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +1: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +2: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +3: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/feature_preferences_test.dart: folder screen applies saved sort, layout, and filename display
+00:00 +4: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +5: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +6: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +7: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:00 +8: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/dialog_lifecycle_test.dart: rename keeps its value and controller through route dismissal
+00:01 +9: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/feature_preferences_test.dart: administration exposes curated discovery scope controls
+00:01 +10: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:01 +11: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:01 +12: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/ui_shell_test.dart: desktop shell uses a navigation rail and keeps the avatar out of page bars
+00:01 +13: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/dialog_lifecycle_test.dart: saved download settings survive dialog exit and preserve values
+00:01 +14: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +15: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +16: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:01 +17: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:02 +18: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:02 +19: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:02 +20: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: tabs preserve folder search and Back; hidden downloads stop polling
+00:02 +21: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/ui_shell_test.dart: account menu offers Administration only to administrators
+00:02 +22: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/ui_shell_test.dart: account menu offers Administration only to administrators
+00:02 +23: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: download detail polls live data without repeatedly loading metadata
+00:02 +24: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: download detail polls live data without repeatedly loading metadata
+00:02 +25: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/quality_regression_test.dart: download detail polls live data without repeatedly loading metadata
+00:02 +26: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +27: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +28: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +29: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +30: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +31: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +32: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +33: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +34: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +35: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:02 +36: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:03 +37: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+
+Warning: A call to tap() with finder "Found 1 widget with text "Recently changed": [
+  Text("Recently changed", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 192.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#7af9b relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#4b127@Offset(160.0, 28.0), RenderSemanticsAnnotations#a4352@Offset(160.0, 28.0), RenderMouseRegion#d73de@Offset(160.0, 28.0), RenderSemanticsAnnotations#e1da2@Offset(160.0, 28.0), RenderSemanticsAnnotations#ff032@Offset(160.0, 28.0), RenderMergeSemantics#ecc64@Offset(160.0, 28.0), RenderAnimatedOpacity#33afc@Offset(160.0, 28.0), _RenderMenuItem#560d8@Offset(160.0, 28.0), RenderListBody#615e9@Offset(160.0, 140.0), RenderPadding#521d6@Offset(160.0, 148.0), _RenderSingleChildViewport#a20a9@Offset(160.0, 148.0), RenderIgnorePointer#7d8eb@Offset(160.0, 148.0), RenderSemanticsAnnotations#3ddc3@Offset(160.0, 148.0), RenderPointerListener#1702d@Offset(160.0, 148.0), RenderSemanticsGestureHandler#71693@Offset(160.0, 148.0), RenderPointerListener#bce68@Offset(160.0, 148.0), _RenderScrollSemantics#9eed8@Offset(160.0, 148.0), RenderClipRect#c1a47@Offset(160.0, 148.0), RenderSemanticsAnnotations#3c40a@Offset(160.0, 148.0), RenderIntrinsicWidth#3df59@Offset(160.0, 148.0), RenderConstrainedBox#2f594@Offset(160.0, 148.0), RenderPositionedBox#8cb77@Offset(160.0, 148.0), _RenderInkFeatures#1ac7a@Offset(160.0, 148.0), RenderCustomPaint#78bc4@Offset(160.0, 148.0), RenderPhysicalShape#07c0c@Offset(160.0, 148.0), RenderAnimatedOpacity#93dfa@Offset(160.0, 148.0), RenderCustomSingleChildLayoutBox#bca07@Offset(576.0, 192.0), _RenderLayoutBuilder#88ebe@Offset(576.0, 192.0), RenderRepaintBoundary#c2bbc@Offset(576.0, 192.0), RenderIgnorePointer#3f771@Offset(576.0, 192.0), RenderRepaintBoundary#99e2a@Offset(576.0, 192.0), RenderSemanticsAnnotations#91674@Offset(576.0, 192.0), RenderOffstage#8ebe8@Offset(576.0, 192.0), RenderSemanticsAnnotations#d7965@Offset(576.0, 192.0), _RenderTheater#5a39a@Offset(576.0, 192.0), RenderAbsorbPointer#96213@Offset(576.0, 192.0), RenderPointerListener#3511f@Offset(576.0, 192.0), RenderSemanticsAnnotations#5e97b@Offset(576.0, 192.0), RenderCustomPaint#bd955@Offset(576.0, 192.0), RenderSemanticsAnnotations#381d9@Offset(576.0, 192.0), RenderSemanticsAnnotations#d6ec2@Offset(576.0, 192.0), RenderSemanticsAnnotations#de47b@Offset(576.0, 192.0), RenderTapRegionSurface#6653a@Offset(576.0, 192.0), RenderSemanticsAnnotations#1ace1@Offset(576.0, 192.0), RenderSemanticsAnnotations#1cbd5@Offset(576.0, 192.0), HitTestEntry<HitTestTarget>#13e93(_ReusableRenderView#cfa20), HitTestEntry<HitTestTarget>#e95e5(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart:139:17)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:03 +38: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Recently changed sends a supported wire value and keeps content
+00:03 +39: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/desktop_focus_test.dart: a stopped download with a selection offers Resume, not Pause
+00:03 +39: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: sort Largest first sends a supported wire value and keeps content
+
+Warning: A call to tap() with finder "Found 1 widget with text "Largest first": [
+  Text("Largest first", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 248.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#c982b relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#d81a7@Offset(160.0, 28.0), RenderSemanticsAnnotations#bf460@Offset(160.0, 28.0), RenderMouseRegion#a01ab@Offset(160.0, 28.0), RenderSemanticsAnnotations#6ce29@Offset(160.0, 28.0), RenderSemanticsAnnotations#6a019@Offset(160.0, 28.0), RenderMergeSemantics#50d7c@Offset(160.0, 28.0), RenderAnimatedOpacity#cd3ab@Offset(160.0, 28.0), _RenderMenuItem#ea5d2@Offset(160.0, 28.0), RenderListBody#e7409@Offset(160.0, 196.0), RenderPadding#94d7f@Offset(160.0, 204.0), _RenderSingleChildViewport#90cc4@Offset(160.0, 204.0), RenderIgnorePointer#0ae4b@Offset(160.0, 204.0), RenderSemanticsAnnotations#649f0@Offset(160.0, 204.0), RenderPointerListener#3830c@Offset(160.0, 204.0), RenderSemanticsGestureHandler#78733@Offset(160.0, 204.0), RenderPointerListener#afcc5@Offset(160.0, 204.0), _RenderScrollSemantics#0ab51@Offset(160.0, 204.0), RenderClipRect#687a7@Offset(160.0, 204.0), RenderSemanticsAnnotations#0c64a@Offset(160.0, 204.0), RenderIntrinsicWidth#8569a@Offset(160.0, 204.0), RenderConstrainedBox#a4af2@Offset(160.0, 204.0), RenderPositionedBox#1fd86@Offset(160.0, 204.0), _RenderInkFeatures#b1f64@Offset(160.0, 204.0), RenderCustomPaint#c82ae@Offset(160.0, 204.0), RenderPhysicalShape#85430@Offset(160.0, 204.0), RenderAnimatedOpacity#c05e6@Offset(160.0, 204.0), RenderCustomSingleChildLayoutBox#854e8@Offset(576.0, 248.0), _RenderLayoutBuilder#5f2e8@Offset(576.0, 248.0), RenderRepaintBoundary#09245@Offset(576.0, 248.0), RenderIgnorePointer#396de@Offset(576.0, 248.0), RenderRepaintBoundary#aadb0@Offset(576.0, 248.0), RenderSemanticsAnnotations#13e4e@Offset(576.0, 248.0), RenderOffstage#686f2@Offset(576.0, 248.0), RenderSemanticsAnnotations#d9c1c@Offset(576.0, 248.0), _RenderTheater#e5846@Offset(576.0, 248.0), RenderAbsorbPointer#5b123@Offset(576.0, 248.0), RenderPointerListener#3512e@Offset(576.0, 248.0), RenderSemanticsAnnotations#e9b48@Offset(576.0, 248.0), RenderCustomPaint#36ebd@Offset(576.0, 248.0), RenderSemanticsAnnotations#7300e@Offset(576.0, 248.0), RenderSemanticsAnnotations#d4dcb@Offset(576.0, 248.0), RenderSemanticsAnnotations#b9208@Offset(576.0, 248.0), RenderTapRegionSurface#b6907@Offset(576.0, 248.0), RenderSemanticsAnnotations#c7899@Offset(576.0, 248.0), RenderSemanticsAnnotations#d3ad6@Offset(576.0, 248.0), HitTestEntry<HitTestTarget>#43d3e(_ReusableRenderView#cfa20), HitTestEntry<HitTestTarget>#5ce42(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart:139:17)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:03 +40: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/desktop_focus_test.dart: a stopped download with a selection offers Resume, not Pause
+00:03 +41: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/desktop_focus_test.dart: a stopped download with a selection offers Resume, not Pause
+00:03 +42: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:03 +43: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:03 +44: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:03 +45: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:03 +46: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:03 +47: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +48: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +49: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +50: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +51: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +52: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +53: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +54: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +55: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +56: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +57: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +57: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart: late preferences do not reset a folder sort chosen by the user
+
+Warning: A call to tap() with finder "Found 1 widget with text "Largest first": [
+  Text("Largest first", dependencies: [DefaultSelectionStyle, DefaultTextStyle, MediaQuery]),
+]" derived an Offset (Offset(576.0, 248.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderParagraph#cffb3 relayoutBoundary=up40
+The hit test result at that offset is: HitTestResult(RenderPointerListener#5fcbe@Offset(160.0, 28.0), RenderSemanticsAnnotations#5d6b7@Offset(160.0, 28.0), RenderMouseRegion#6d6d4@Offset(160.0, 28.0), RenderSemanticsAnnotations#c9a46@Offset(160.0, 28.0), RenderSemanticsAnnotations#59656@Offset(160.0, 28.0), RenderMergeSemantics#1ba9d@Offset(160.0, 28.0), RenderAnimatedOpacity#03248@Offset(160.0, 28.0), _RenderMenuItem#32c81@Offset(160.0, 28.0), RenderListBody#38e3d@Offset(160.0, 196.0), RenderPadding#ac0b3@Offset(160.0, 204.0), _RenderSingleChildViewport#b251e@Offset(160.0, 204.0), RenderIgnorePointer#4499b@Offset(160.0, 204.0), RenderSemanticsAnnotations#856a0@Offset(160.0, 204.0), RenderPointerListener#ed83c@Offset(160.0, 204.0), RenderSemanticsGestureHandler#05aad@Offset(160.0, 204.0), RenderPointerListener#2390f@Offset(160.0, 204.0), _RenderScrollSemantics#202f3@Offset(160.0, 204.0), RenderClipRect#05095@Offset(160.0, 204.0), RenderSemanticsAnnotations#c4754@Offset(160.0, 204.0), RenderIntrinsicWidth#0c014@Offset(160.0, 204.0), RenderConstrainedBox#da1b1@Offset(160.0, 204.0), RenderPositionedBox#6c365@Offset(160.0, 204.0), _RenderInkFeatures#ea000@Offset(160.0, 204.0), RenderCustomPaint#5d1b9@Offset(160.0, 204.0), RenderPhysicalShape#8eabc@Offset(160.0, 204.0), RenderAnimatedOpacity#47da3@Offset(160.0, 204.0), RenderCustomSingleChildLayoutBox#4c923@Offset(576.0, 248.0), _RenderLayoutBuilder#9b4eb@Offset(576.0, 248.0), RenderRepaintBoundary#a0c9b@Offset(576.0, 248.0), RenderIgnorePointer#7b813@Offset(576.0, 248.0), RenderRepaintBoundary#55e0e@Offset(576.0, 248.0), RenderSemanticsAnnotations#c02e7@Offset(576.0, 248.0), RenderOffstage#002de@Offset(576.0, 248.0), RenderSemanticsAnnotations#6dcd2@Offset(576.0, 248.0), _RenderTheater#5162b@Offset(576.0, 248.0), RenderAbsorbPointer#655db@Offset(576.0, 248.0), RenderPointerListener#b9e99@Offset(576.0, 248.0), RenderSemanticsAnnotations#8da92@Offset(576.0, 248.0), RenderCustomPaint#9cbd3@Offset(576.0, 248.0), RenderSemanticsAnnotations#cb159@Offset(576.0, 248.0), RenderSemanticsAnnotations#daac5@Offset(576.0, 248.0), RenderSemanticsAnnotations#9bfde@Offset(576.0, 248.0), RenderTapRegionSurface#ecca2@Offset(576.0, 248.0), RenderSemanticsAnnotations#d5b87@Offset(576.0, 248.0), RenderSemanticsAnnotations#e22b5@Offset(576.0, 248.0), HitTestEntry<HitTestTarget>#6db5c(_ReusableRenderView#cfa20), HitTestEntry<HitTestTarget>#b93f7(<AutomatedTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/browse_request_test.dart:332:15)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+#6      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+00:04 +58: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: indexer rows toggle, test and remove through the server
+00:04 +59: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:04 +60: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:05 +61: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:05 +62: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/polish_interaction_test.dart: late settings write for detail A cannot replace detail B settings in retained State
+00:05 +63: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +64: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +65: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +66: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +67: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +68: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +69: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +70: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +71: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +72: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +73: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: adding keeps the dialog open with the server message, then sends the settings
+00:05 +74: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: an unavailable indexer list shows the server message
+00:05 +75: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:05 +76: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +77: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +78: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +79: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +80: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +81: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +82: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +83: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +84: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +85: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +86: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/indexer_management_test.dart: a TV remote reaches every indexer action and the add flow
+00:06 +87: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:06 +88: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:06 +89: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:06 +90: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/server_profiles_tv_navigation_test.dart: TV D-pad travels from Add server to the Connect action
+00:07 +91: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/downloads_screen_test.dart: TV remote opens a download, toggles a file and reaches Save selection
+00:07 +92: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:07 +93: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:07 +94: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:07 +95: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/discover_screen_test.dart: discovery preserves unknown counts instead of showing zero
+00:08 +96: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +97: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +98: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +99: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +100: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +101: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +102: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +103: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +104: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +105: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +106: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +107: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +108: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +109: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +110: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +111: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +112: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +113: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +114: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +115: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +116: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +117: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +118: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +119: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: settings slider saves once at the end of a drag
+00:08 +120: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/device_pairing_test.dart: approval preview shows returned device and server before approval
+00:09 +121: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:09 +122: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:09 +123: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: one failed admin read leaves healthy sections available
+00:09 +124: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +125: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +126: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +127: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +128: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +129: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +130: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +131: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +132: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: mounted libraries tolerate a disconnected API transition
+00:09 +133: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: rejected create-member stays open with the server message
+00:09 +134: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/settings_polish_test.dart: rejected create-member stays open with the server message
+00:09 +135: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:09 +136: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +137: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +138: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +139: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +140: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +141: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +142: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +143: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/preferences_screens_test.dart: settings screen exposes synced preference controls
+00:10 +144: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: cancelling a move never sends a mutation request
+00:10 +145: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: selecting library root explicitly moves to a null folder id
+00:10 +146: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: move picker loads later pages and browses nested folders
+00:10 +147: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: folder fetches the next page when scrolled near the end
+00:11 +148: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: photo viewer reports an unavailable authorized image and offers retry
+00:11 +149: /home/hassan/projects/BrianiPlayer/.claude/worktrees/strange-curran-cf584c/client/test/libraries_screens_test.dart: Flutter decodes the generated EXIF-oriented JPEG upright
+00:11 +150: All tests passed!
+exit 0

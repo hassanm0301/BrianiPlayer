@@ -1,0 +1,246 @@
+[
+ {
+  "step": "list (before)",
+  "status": 200,
+  "leak": false,
+  "body": []
+ },
+ {
+  "step": "definitions",
+  "total": 637,
+  "addable": 533,
+  "notes": {
+   "This indexer needs FlareSolverr, which is set up in Prowlarr's own page.": 58,
+   "This indexer needs settings Briani does not show (such as a CAPTCHA), so it is set up in Prowlarr's own page.": 40,
+   "This indexer type is set up in Prowlarr's own page.": 5,
+   "This indexer uses a site address you type in yourself, so it is set up in Prowlarr's own page.": 1
+  },
+  "linuxtracker": [
+   true
+  ],
+  "pandacd": [
+   true
+  ],
+  "bytes": 164073,
+  "leak": false
+ },
+ {
+  "step": "create wrong key",
+  "status": 400,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "Prowlarr did not accept this indexer change.",
+   "status": 400,
+   "code": "indexer_rejected",
+   "detail": "Prowlarr did not add this indexer: Unable to connect to indexer. Unexpected response status Unauthorized code from indexer request",
+   "traceId": "434838ad1e6a4eafb9080e8b52017f19",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "create good",
+  "status": 201,
+  "leak": false,
+  "body": {
+   "id": "5",
+   "name": "E2E fixture",
+   "definition": "brianifixture",
+   "enabled": true,
+   "privacy": "private",
+   "priority": 25,
+   "supportsSearch": true,
+   "supportsRecent": true,
+   "state": "healthy",
+   "stateDetail": "No recent failures in Prowlarr."
+  }
+ },
+ {
+  "step": "list",
+  "status": 200,
+  "leak": false,
+  "body": [
+   {
+    "id": "5",
+    "name": "E2E fixture",
+    "definition": "brianifixture",
+    "enabled": true,
+    "privacy": "private",
+    "priority": 25,
+    "supportsSearch": true,
+    "supportsRecent": true,
+    "state": "healthy",
+    "stateDetail": "No recent failures in Prowlarr."
+   }
+  ]
+ },
+ {
+  "step": "test",
+  "status": 200,
+  "leak": false,
+  "body": {
+   "id": "5",
+   "state": "healthy",
+   "detail": "Prowlarr reached this indexer and it returned results.",
+   "checkedAt": "2026-10-17T07:45:48.9032053+00:00"
+  }
+ },
+ {
+  "step": "disable",
+  "status": 200,
+  "leak": false,
+  "body": {
+   "id": "5",
+   "name": "E2E fixture",
+   "definition": "brianifixture",
+   "enabled": false,
+   "privacy": "private",
+   "priority": 25,
+   "supportsSearch": true,
+   "supportsRecent": true,
+   "state": "unknown",
+   "stateDetail": null
+  }
+ },
+ {
+  "step": "disable again (no-op)",
+  "status": 200,
+  "leak": false,
+  "body": {
+   "id": "5",
+   "name": "E2E fixture",
+   "definition": "brianifixture",
+   "enabled": false,
+   "privacy": "private",
+   "priority": 25,
+   "supportsSearch": true,
+   "supportsRecent": true,
+   "state": "unknown",
+   "stateDetail": null
+  }
+ },
+ {
+  "step": "enable",
+  "status": 200,
+  "leak": false,
+  "body": {
+   "id": "5",
+   "name": "E2E fixture",
+   "definition": "brianifixture",
+   "enabled": true,
+   "privacy": "private",
+   "priority": 25,
+   "supportsSearch": true,
+   "supportsRecent": true,
+   "state": "healthy",
+   "stateDetail": "No recent failures in Prowlarr."
+  }
+ },
+ {
+  "step": "test after toggle",
+  "status": 200,
+  "leak": false,
+  "body": {
+   "id": "5",
+   "state": "healthy",
+   "detail": "Prowlarr reached this indexer and it returned results.",
+   "checkedAt": "2026-10-17T07:45:52.9033265+00:00"
+  }
+ },
+ {
+  "step": "discovery providers",
+  "status": 403,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "Your account does not have permission for this action.",
+   "status": 403,
+   "code": "forbidden",
+   "detail": "Discovery needs a library to download into. In Administration \u2192 Libraries, add a library that is not read-only, or make an existing one writable, and check that it is enabled and its disk is online.",
+   "traceId": "6e2afe80c7114bc998395298f38cb82b",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "bad field",
+  "status": 400,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "Some indexer settings are not valid. Check them and try again.",
+   "status": 400,
+   "code": "invalid_indexer_settings",
+   "detail": "'bogus' is not a setting of this indexer.",
+   "traceId": "1fc0590e44504b10ae3aab9ab67b30a5",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "bad select",
+  "status": 400,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "Some indexer settings are not valid. Check them and try again.",
+   "status": 400,
+   "code": "invalid_indexer_settings",
+   "detail": "Choose one of the listed values for Sort requested from site.",
+   "traceId": "5fd70a8b1f194dbead5953ad53bffb55",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "setup in prowlarr",
+  "status": 409,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "This indexer needs settings that only Prowlarr's own page supports.",
+   "status": 409,
+   "code": "indexer_setup_in_prowlarr",
+   "detail": "This indexer type is set up in Prowlarr's own page.",
+   "traceId": "861194d578a04d8ba813974d94726cfe",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "traversal",
+  "status": 404,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "This item is unavailable or no longer accessible.",
+   "status": 404,
+   "code": "not_found",
+   "detail": "This item is unavailable or no longer accessible.",
+   "traceId": "b754b8a129dc4649b6f432435f7998ed",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "delete",
+  "status": 204,
+  "leak": false,
+  "body": null
+ },
+ {
+  "step": "delete again",
+  "status": 404,
+  "leak": false,
+  "body": {
+   "type": "about:blank",
+   "title": "This item is unavailable or no longer accessible.",
+   "status": 404,
+   "code": "not_found",
+   "detail": "This item is unavailable or no longer accessible.",
+   "traceId": "8a21df7cca2449ad8f7ee89f3d970970",
+   "retryAfterSeconds": null
+  }
+ },
+ {
+  "step": "list (after)",
+  "status": 200,
+  "leak": false,
+  "body": []
+ }
+]

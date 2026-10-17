@@ -4,13 +4,43 @@ Briani's **Discover** screen searches for torrents through [Prowlarr](https://pr
 
 > No indexers are enabled. Enable indexers in Prowlarr and in Briani's settings.
 
-This guide takes about ten minutes. You only need it for torrent search. Your existing libraries, and **Add → Magnet link…** / **Torrent file…**, work without it.
+Adding an indexer in the Briani app takes a few minutes. You only need this for torrent search. Your existing libraries, and **Add → Magnet link…** / **Torrent file…**, work without it.
 
 ```
 Briani app ──► Briani server ──► Prowlarr ──► the indexers you add
 ```
 
 You choose the indexers. Briani doesn't include any, and it doesn't scrape sites itself. Only add sites you're allowed to use, and follow your local laws and each site's rules.
+
+## Two ways to add indexers
+
+- **In the Briani app**, under **Administration → Indexers**. This works for most indexers, including private ones that ask for a username, password, cookie, or API key. You don't need to open anything on the server. See [Add indexers in Briani](#add-indexers-in-briani).
+- **In Prowlarr's own page**, over an SSH tunnel. Use this for indexers that Briani lists as *set up in Prowlarr's own page*: ones that need a CAPTCHA, FlareSolverr, or a site address you type in yourself (such as **Generic Torznab** or **Torrent RSS Feed**). Use it as well to change an existing indexer's settings, categories, or priority. Start at [step 1](#1-open-prowlarrs-admin-page).
+
+Both ways change the same Prowlarr indexer list, so you can mix them.
+
+## Add indexers in Briani
+
+You need to be signed in as an administrator.
+
+1. Open the account menu (your initial at the bottom of the side bar) and choose **Administration**. Go to **Indexers**. On a wide window it's in the list on the left. On a TV, press Down until you reach it.
+2. Choose **Add indexer**. Type part of a name in **Search indexers**. Indexers Briani can add are listed first. The rest are listed after them with the reason they're set up in Prowlarr's own page.
+3. Choose an indexer and fill in what it asks for. **Public** indexers usually need nothing. For **private** ones, enter your details on that site. Passwords, cookies, and keys go to Prowlarr. Briani never shows them again. **Show advanced settings** reveals optional settings; you can leave them as they are.
+4. Leave **Enable now** on and choose **Add**. Prowlarr tests the indexer first. If the test fails, nothing is added and the dialog shows Prowlarr's reason, for example a wrong key. Fix it and choose **Add** again. To add the indexer now and test it later, turn **Enable now** off.
+5. Each indexer in the list has:
+   - a switch to turn it on or off. Turning it on makes Prowlarr test it again, and it stays off if the test fails.
+   - **Test**, which asks Prowlarr to test it now.
+   - **Remove**, which deletes the indexer from Prowlarr, including its saved login.
+
+To change a private indexer's login or other settings, remove it and add it again, or edit it in Prowlarr's own page.
+
+Everything in this section works with a TV remote. Typing a cookie or key on a TV is slow, so you may prefer a computer or phone for that part.
+
+Then [check the connection in Briani](#5-check-the-connection-in-briani). The [table in step 4](#4-add-indexers) explains which Discover modes each indexer supports.
+
+## Add indexers in Prowlarr's own page
+
+Follow steps 1 to 6 for indexers that Briani can't set up, or when you want to change Prowlarr settings that Briani doesn't show.
 
 ## Before you start
 
@@ -81,7 +111,7 @@ If none of your indexers support RSS, choosing **Latest** shows "No enabled prov
 
 You don't need to touch Prowlarr's **Apps**, **Download Clients**, or **Sync App Indexers**. Briani reads Prowlarr's indexer list directly and sends downloads to its own qBittorrent.
 
-**Want to check that everything is connected first?** Two lawful public indexers work well for this. **LinuxTracker** (Linux install images) and **PandaCD** (Creative Commons and artist-permitted music) both support search and RSS. Search for `ubuntu` in Discover to see LinuxTracker results.
+**Want to check that everything is connected first?** Two lawful public indexers work well for this, and both can be added in the Briani app. **LinuxTracker** (Linux install images) and **PandaCD** (Creative Commons and artist-permitted music) both support search and RSS. Search for `ubuntu` in Discover to see LinuxTracker results.
 
 > **Internet Archive doesn't work at the moment.** As of October 2026 (Prowlarr 2.6.5), archive.org doesn't answer requests that come from Prowlarr, so this indexer fails its test with a timeout. There's nothing to fix on your side.
 
@@ -104,13 +134,18 @@ cd ~/briani/ops
 docker compose up -d
 ```
 
-You can now stop the SSH tunnel with **Ctrl+C**. Your indexers stay configured. To add or change indexers later, repeat steps 1, 2, 4, and 6.
+You can now stop the SSH tunnel with **Ctrl+C**. Your indexers stay configured. To add indexers later, use [Briani's Indexers section](#add-indexers-in-briani), or repeat steps 1, 2, 4, and 6.
 
 ## If something doesn't work
 
 | What you see | What to do |
 |---|---|
-| "No indexers are enabled. Enable indexers in Prowlarr and in Briani's settings." | Prowlarr has no enabled torrent indexers, or Briani's **Discovery scope** leaves all of them out. Check steps 4 and 5. |
+| "No indexers are enabled. Enable indexers in Prowlarr and in Briani's settings." | Prowlarr has no enabled torrent indexers, or Briani's **Discovery scope** leaves all of them out. Check **Administration → Indexers** and step 5. |
+| "Prowlarr did not add this indexer: …" or "Prowlarr did not enable this indexer: …" | Prowlarr's test failed, and the rest of the message is its reason. Check the details you entered for that site. If the site is down for now, turn **Enable now** off to add it disabled, and switch it on later. |
+| "This indexer … is set up in Prowlarr's own page." | Briani can't show the settings this indexer needs. Add it through [Prowlarr's own page](#add-indexers-in-prowlarrs-own-page). |
+| "Prowlarr did not answer in time. Refresh the list to see whether the change was applied." | Prowlarr's test of a slow site took longer than Briani waits. Choose the refresh button at the top of **Administration** to see whether the indexer was added or changed. |
+| "Prowlarr has no sync profile to give the indexer. …" | Prowlarr normally has a **Standard** sync profile. If it was deleted, create one in Prowlarr (**Settings → Apps → Sync Profiles**). |
+| "Prowlarr rejected the API key Briani uses. …" | See the row about a regenerated API key below. |
 | "No enabled provider supports recent releases. Use Search instead." | None of your indexers support RSS. Use **Search**, or add an indexer with RSS support. |
 | "Indexer '…' does not support browsing latest releases." / "…does not support text search." | That indexer is skipped in this mode. The others still return results. |
 | "Indexer '…' did not respond in time." / "…is temporarily disabled by Prowlarr" / "…failed recently in Prowlarr" | The site is slow, down, or blocking Prowlarr. Open Prowlarr and test the indexer there. Prowlarr pauses an indexer for a while after repeated failures. |

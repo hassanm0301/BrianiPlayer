@@ -15,6 +15,7 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:briani_api/src/date_serializer.dart';
 import 'package:briani_api/src/model/date.dart';
 
+import 'package:briani_api/src/model/admin_indexer.dart';
 import 'package:briani_api/src/model/admin_settings.dart';
 import 'package:briani_api/src/model/audit_entry.dart';
 import 'package:briani_api/src/model/audit_page.dart';
@@ -51,6 +52,13 @@ import 'package:briani_api/src/model/event.dart';
 import 'package:briani_api/src/model/file_choice.dart';
 import 'package:briani_api/src/model/get_library_grants200_response.dart';
 import 'package:briani_api/src/model/grant_update.dart';
+import 'package:briani_api/src/model/indexer_create.dart';
+import 'package:briani_api/src/model/indexer_definition_detail.dart';
+import 'package:briani_api/src/model/indexer_definition_summary.dart';
+import 'package:briani_api/src/model/indexer_patch.dart';
+import 'package:briani_api/src/model/indexer_setting_field.dart';
+import 'package:briani_api/src/model/indexer_setting_option.dart';
+import 'package:briani_api/src/model/indexer_test_result.dart';
 import 'package:briani_api/src/model/integration.dart';
 import 'package:briani_api/src/model/integration_update.dart';
 import 'package:briani_api/src/model/job.dart';
@@ -95,6 +103,7 @@ import 'package:briani_api/src/model/version_request.dart';
 part 'serializers.g.dart';
 
 @SerializersFor([
+  AdminIndexer,
   AdminSettings,
   AuditEntry,
   AuditPage,
@@ -131,6 +140,13 @@ part 'serializers.g.dart';
   FileChoice,
   GetLibraryGrants200Response,
   GrantUpdate,
+  IndexerCreate,
+  IndexerDefinitionDetail,
+  IndexerDefinitionSummary,
+  IndexerPatch,
+  IndexerSettingField,
+  IndexerSettingOption,
+  IndexerTestResult,
   Integration,
   IntegrationUpdate,
   Job,
@@ -174,12 +190,20 @@ part 'serializers.g.dart';
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
+        const FullType(BuiltMap, [FullType(String), FullType(String)]),
+        () => MapBuilder<String, String>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(DownloadFile)]),
         () => ListBuilder<DownloadFile>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(PlaybackSidecar)]),
         () => ListBuilder<PlaybackSidecar>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(IndexerDefinitionSummary)]),
+        () => ListBuilder<IndexerDefinitionSummary>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(FileChoice)]),
@@ -246,6 +270,14 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<ContinueWatching>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(IndexerSettingField)]),
+        () => ListBuilder<IndexerSettingField>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(IndexerSettingOption)]),
+        () => ListBuilder<IndexerSettingOption>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(Download)]),
         () => ListBuilder<Download>(),
       )
@@ -260,6 +292,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
         () => MapBuilder<String, JsonObject?>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AdminIndexer)]),
+        () => ListBuilder<AdminIndexer>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(String)]),

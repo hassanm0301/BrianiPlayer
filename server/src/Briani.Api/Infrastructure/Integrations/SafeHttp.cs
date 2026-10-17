@@ -32,10 +32,15 @@ public sealed class SafeHttp(ISafeDns dns)
         ValidateContentUrl(uri,approvedOrigin);var addresses=await dns.ResolveAsync(uri.DnsSafeHost,ct);var service=approvedOrigin is not null && SameOrigin(uri,approvedOrigin);
         if(addresses.Length is <1 or >16 || addresses.Any(ip=>!(service?NetworkAddressPolicy.ApprovedService(ip):NetworkAddressPolicy.IsPublic(ip))))throw new ApiException(400,"source_address_rejected");return addresses.Distinct().ToArray();
     }
-    public async Task<BoundedHttpResponse> GetAsync(Uri uri,int maxBytes,Uri? approvedOrigin=null,string? apiKey=null,CancellationToken ct=default)
+    public Task<BoundedHttpResponse> GetAsync(Uri uri,int maxBytes,Uri? approvedOrigin=null,string? apiKey=null,CancellationToken ct=default)=>
+        SendAsync(HttpMethod.Get,uri,null,maxBytes,approvedOrigin,apiKey,TimeSpan.FromSeconds(20),ct);
+    // Request bodies only ever go to the configured service origin, never to a content URL.
+    public async Task<BoundedHttpResponse> SendAsync(HttpMethod method,Uri uri,byte[]? jsonBody,int maxBytes,Uri? approvedOrigin,string? apiKey,TimeSpan timeout,CancellationToken ct=default)
     {
-        if(maxBytes is <1 or >16777216)throw new ArgumentOutOfRangeException(nameof(maxBytes));ValidateContentUrl(uri,approvedOrigin);
-        var caller=ct;using var deadline=CancellationTokenSource.CreateLinkedTokenSource(ct);deadline.CancelAfter(TimeSpan.FromSeconds(20));ct=deadline.Token;await concurrency.WaitAsync(ct);
+        if(maxBytes is <1 or >16777216)throw new ArgumentOutOfRangeException(nameof(maxBytes));if(timeout<=TimeSpan.Zero || timeout>TimeSpan.FromSeconds(20))throw new ArgumentOutOfRangeException(nameof(timeout));ValidateContentUrl(uri,approvedOrigin);
+        if(method!=HttpMethod.Get && (approvedOrigin is null || !SameOrigin(uri,approvedOrigin)))throw new ArgumentException("Only the configured service accepts non-GET requests.",nameof(method));
+        if(jsonBody is not null && (method==HttpMethod.Get || jsonBody.Length>1048576))throw new ArgumentException("Invalid request body.",nameof(jsonBody));
+        var caller=ct;using var deadline=CancellationTokenSource.CreateLinkedTokenSource(ct);deadline.CancelAfter(timeout);ct=deadline.Token;await concurrency.WaitAsync(ct);
         try
         {
             using var handler=new SocketsHttpHandler{AllowAutoRedirect=false,UseCookies=false,UseProxy=false,ConnectTimeout=TimeSpan.FromSeconds(5),MaxResponseHeadersLength=64,MaxConnectionsPerServer=2,PooledConnectionLifetime=TimeSpan.Zero};
@@ -46,7 +51,8 @@ public sealed class SafeHttp(ISafeDns dns)
                 {var socket=new Socket(address.AddressFamily,SocketType.Stream,ProtocolType.Tcp){NoDelay=true};try{await socket.ConnectAsync(new IPEndPoint(address,context.DnsEndPoint.Port),cancel);return new NetworkStream(socket,true);}catch{socket.Dispose();if(cancel.IsCancellationRequested)throw;}}
                 throw new ApiException(503,"source_connection_failed");
             };
-            using var client=new HttpClient(handler){Timeout=Timeout.InfiniteTimeSpan};using var request=new HttpRequestMessage(HttpMethod.Get,uri){Version=HttpVersion.Version11,VersionPolicy=HttpVersionPolicy.RequestVersionExact};
+            using var client=new HttpClient(handler){Timeout=Timeout.InfiniteTimeSpan};using var request=new HttpRequestMessage(method,uri){Version=HttpVersion.Version11,VersionPolicy=HttpVersionPolicy.RequestVersionExact};
+            if(jsonBody is not null){request.Content=new ByteArrayContent(jsonBody);request.Content.Headers.ContentType=new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");}
             if(apiKey is not null && approvedOrigin is not null && SameOrigin(uri,approvedOrigin))request.Headers.Add("X-Api-Key",apiKey);
             request.Headers.UserAgent.ParseAdd("Briani/1");using var response=await client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
             if(response.Content.Headers.ContentLength>maxBytes)throw new ApiException(400,"source_payload_too_large");

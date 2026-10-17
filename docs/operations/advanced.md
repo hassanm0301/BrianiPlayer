@@ -216,7 +216,7 @@ Grant each person only the access they need. A member with no library grants see
 
 ## 8. Set up torrent discovery in Prowlarr
 
-Skip indexer setup if you only want to browse your existing files. For torrent search, add your chosen indexers in Prowlarr's own administration UI, then test the connections in Briani. Briani does not supply indexer accounts or configure Prowlarr as a download client; Briani controls qBittorrent itself.
+Skip indexer setup if you only want to browse your existing files. For torrent search, add your chosen indexers, then test the connections in Briani. Most torrent indexers can be added, tested, switched on or off, and removed in the app under **Administration → Indexers**; Briani reaches Prowlarr only through a fixed set of administrator-only operations and never returns saved indexer credentials. Indexers that need a CAPTCHA, FlareSolverr, or a typed site address, and changes to an existing indexer's settings, still use Prowlarr's own administration UI as described below. Briani does not supply indexer accounts or configure Prowlarr as a download client; Briani controls qBittorrent itself.
 
 For a step-by-step walkthrough, including Prowlarr's first login and fixes for each Discover message, follow [Set up torrent search](indexers.md). This section is the reference version, using the `briani_compose` helper.
 
