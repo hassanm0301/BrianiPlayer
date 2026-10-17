@@ -53,3 +53,14 @@ The indexer feature's end-to-end check ran against a local, isolated Prowlarr 2.
 - Head-of-line blocking from a slow peer is still open and needs a decision (`plan/specs/11_DECISIONS_AND_RISKS.md`).
 - Clients were built with Flutter 3.47.7 (`flutter-version.log`); `toolchain.lock.json` pins 3.47.6.
 - The release APK is unsigned. All M11 certification blockers remain open; see `dist/manifest.json`.
+
+## Candidate assembly and audit
+
+| Command | Exit | Result |
+|---|---:|---|
+| `python3 tools/release/build_candidate.py --root .` | 3 | `blocked`: 7 artifacts, 247 components, 166 blockers (`candidate-assembly.log`), as for v1.2.0 |
+| `python3 tools/release/package_audit.py verify --root .` | 3 | `blocked`: 360 blockers (`release-verify.log`). The set matches v1.2.0's except that the Flutter-pin note now names v1.3.0 |
+
+Both ran with `sourceCommit` set to the `v1.3.0` tag commit, on a clean hardlinked copy of the tagged tree. Both tools walk the whole working directory. A first run in the main checkout swept three local scratch checkouts into the source archive (2,401 extra files) and the lockfile inventory, so its outputs were discarded. The clean copy's source archive has 843 files. Compared with v1.2.0's 800, the only changes are this release's own files.
+
+The APK native-member hashes in `dist/candidate-inputs.json` were refreshed from the new builds. Only the three `libapp.so` (compiled Dart) entries of the release APK changed; every third-party native library is byte-identical to v1.2.0's.
